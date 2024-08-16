@@ -1,9 +1,9 @@
 import mongoose from 'mongoose'
 import crypto from 'crypto'
 
-import User from '@/schema/user'
-import Map from '@/schema/map'
-import Comment from '@/schema/comment'
+import User from '@/models/user'
+import Map from '@/models/map'
+import Comment from '@/models/comment'
 
 export async function createUser(
   username: string,
@@ -30,7 +30,6 @@ export async function createUser(
   if (dateCreated) userDetail.dateCreated = dateCreated
   if (salt) userDetail.salt = salt
   if (hashedPassword) userDetail.hashedPassword = hashedPassword
-
 
   const user = new User(userDetail)
   return user.save()

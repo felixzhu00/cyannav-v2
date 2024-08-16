@@ -6,9 +6,9 @@ import Pbf from 'pbf'
 
 import geojsonData from './public/america.geo.json' assert { type: 'json' }
 import mongoose from 'mongoose'
-import User from './schema/user.js'
-import Map from './schema/map.js'
-import Comment from './schema/comment.js'
+import User from './models/user.js'
+import Map from './models/map.js'
+import Comment from './models/comment.js'
 
 const mongoDB = 'mongodb://localhost:27017/cyan' //replace with db of your choice
 

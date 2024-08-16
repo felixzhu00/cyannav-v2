@@ -1,6 +1,3 @@
-'use client'
-
-import { useRouter } from 'next/navigation'
 import { featureMap } from '@/lib/const'
 import LeftSidebar from '@/components/map-editor/left-bar/left-sidebar'
 import MenuBar from '@/components/map-editor/title-bar/menubar'

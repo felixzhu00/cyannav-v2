@@ -8,5 +8,6 @@
   ],
   "parserOptions": {
     "project": "./tsconfig.json"
-  }
+  },
+  "ignorePatterns": ["components/ui/"]
 }

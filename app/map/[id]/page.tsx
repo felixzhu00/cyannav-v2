@@ -10,5 +10,12 @@ export default async function MapPage({ params }: { params: { id: string } }) {
 
   const map = await getMapById(id)
 
+  if ('errors' in map) {
+    // Handle the error case
+    console.error(map.errors)
+    return <p>Error: {map.message}</p>
+  }
+
+
   return <MapEditPage map={map} />
 }

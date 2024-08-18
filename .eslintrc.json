@@ -9,5 +9,6 @@
   "parserOptions": {
     "project": "./tsconfig.json"
   },
+  "rules": { "import/order": "off" },
   "ignorePatterns": ["components/ui/"]
 }

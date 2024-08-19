@@ -1,4 +1,6 @@
 import mongoose, { Document, Schema, Model, Types } from 'mongoose'
+// eslint-disable-next-line import/no-cycle
+import { IMapDocument } from '@/models/map'
 
 export interface IUser {
   username: string
@@ -6,7 +8,7 @@ export interface IUser {
   password: string
   salt: string
   profilePicture?: Buffer
-  favorite?: Types.ObjectId[] // Array of Map references
+  favorite?: IMapDocument[] | IMapDocument['_id'][] | Types.ObjectId[] // Array of Map references
   dateCreated?: Date
   plan?: 'free' | 'pro'
 }
@@ -24,6 +26,8 @@ const UserSchema = new Schema<IUserDocument>({
   plan: { type: String, enum: ['free', 'pro'], default: 'free' },
 })
 
+// delete mongoose.models['User']
+// export default mongoose.model<IUserDocument>('User', UserSchema);
 const User: Model<IUserDocument> =
   mongoose.models.User || mongoose.model<IUserDocument>('User', UserSchema)
 

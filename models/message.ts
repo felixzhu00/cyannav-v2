@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema, Model, Types } from 'mongoose'
+import { IUserDocument } from '@/models/user'
 
 export interface IEmoji {
   character: string
@@ -6,7 +7,7 @@ export interface IEmoji {
 }
 
 export interface IMessage {
-  author: Types.ObjectId // Reference to User
+  author: IUserDocument | IUserDocument['_id'] | Types.ObjectId // Reference to User
   text: string
   emojis?: IEmoji[]
   replyTo?: Types.ObjectId // Array of Message references
@@ -27,6 +28,8 @@ const MessageSchema = new Schema<IMessageDocument>({
   ],
   dateCreated: { type: Date, default: Date.now },
 })
+// delete mongoose.models['Message']
+// export default mongoose.model<IMessageDocument>('Message', MessageSchema)
 
 const Message: Model<IMessageDocument> =
   mongoose.models.Message ||

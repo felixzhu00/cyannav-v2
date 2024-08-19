@@ -1,66 +1,159 @@
 // NOTE this is for dev use only do not run on production
 // File does not work with any imported ts file
+
+/* eslint-disable no-console */
 import crypto from 'crypto'
 import geobuf from 'geobuf'
 import Pbf from 'pbf'
 
 import geojsonData from './public/america.geo.json' assert { type: 'json' }
+
 import mongoose from 'mongoose'
-import User from './models/user.js'
-import Map from './models/map.js'
-import Comment from './models/comment.js'
+const { Schema } = mongoose
 
-const mongoDB = 'mongodb://localhost:27017/cyan' //replace with db of your choice
-
-async function main() {
-  await mongoose.connect(mongoDB)
-  console.log('Connected to MongoDB')
-
-  // Clear existing data
-  await User.deleteMany({})
-  await Map.deleteMany({})
-  await Comment.deleteMany({})
-  console.log('Cleared existing data')
-
-  const users = await createBotUsers(10)
-  const comments = await createBotComments(users, 20)
-  const maps = await createBotMap(20, users, comments)
-
-  // Clean up
-  mongoose.connection.close()
-  console.log('Database populated successfully')
-}
-
-main().catch((err) => {
-  console.error('Error populating database:', err)
-  mongoose.connection.close()
+const MessageSchema = new Schema({
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  text: { type: String, required: true },
+  replyTo: { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },
+  emojis: [
+    {
+      character: { type: String, required: true },
+      owner: { type: mongoose.Schema.Types.ObjectId, required: true },
+    },
+  ],
+  dateCreated: { type: Date, default: Date.now },
 })
+
+// Check if the model already exists (to prevent recompilation during hot reloads)
+const Message =
+  mongoose.models.Message || mongoose.model('Message', MessageSchema)
+
+const MapSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  mapType: {
+    type: String,
+    required: true,
+  },
+  isPublished: {
+    type: Boolean,
+    default: false,
+  },
+  thumbnail: {
+    type: Buffer,
+  },
+  geojson: {
+    type: Buffer,
+  },
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
+
+  messages: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Message',
+    },
+  ],
+  sharedUsers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
+  forkedFrom: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Map',
+    },
+  ],
+  dateCreated: {
+    type: Date,
+    default: Date.now,
+  },
+})
+
+// Check if the model already exists (to prevent recompilation during hot reloads)
+const Map = mongoose.models.Map || mongoose.model('Map', MapSchema)
+
+const UserSchema = new Schema({
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  salt: {
+    type: String,
+    required: true,
+  },
+  profilePicture: {
+    type: Buffer,
+  },
+  favorite: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Map',
+    },
+  ],
+  dateCreated: {
+    type: Date,
+    default: Date.now,
+  },
+  plan: { type: String, enum: ['free', 'pro'], default: 'free' },
+})
+
+// Check if the model already exists (to prevent recompilation during hot reloads)
+const User = mongoose.models.User || mongoose.model('User', UserSchema)
+
+const mongoDB = 'mongodb://localhost:27017/cyan' // replace with db of your choice
 
 async function createUser(
   username,
   email,
   password,
   plan,
-  profilePicture, // Optional parameter
-  favorite, // Optional parameter
-  dateCreated // Optional parameter
+  profilePicture,
+  favorite,
+  dateCreated
 ) {
+  const salt = crypto.randomBytes(16).toString('hex')
+  const hashedPassword = crypto
+    .pbkdf2Sync(password, salt, 100, 64, 'sha256')
+    .toString('hex')
+
   const userDetail = {
     username,
     email,
+    password: hashedPassword,
+    salt,
+    plan,
+    profilePicture,
+    favorite,
+    dateCreated,
   }
-
-  const salt = crypto.randomBytes(16).toString('hex')
-  const hashedPassword = crypto
-    .pbkdf2Sync(password, salt, 100, 64, 'sha256') // TODO remeber to concatnate env secret to password
-    .toString('hex')
-
-  if (plan) userDetail.plan = plan
-  if (profilePicture) userDetail.profilePicture = profilePicture
-  if (favorite) userDetail.favorite = favorite
-  if (dateCreated) userDetail.dateCreated = dateCreated
-  if (salt) userDetail.salt = salt
-  if (hashedPassword) userDetail.password = hashedPassword
 
   const user = new User(userDetail)
   return user.save()
@@ -68,59 +161,46 @@ async function createUser(
 
 async function createMap(
   title,
-  owner, // Assuming owner is a reference to a User
+  owner,
   mapType,
   isPublished,
   geojson,
   thumbnail,
-  like, // Optional
-  dislike, // Optional
-  comments, // Optional, assuming comments are references
-  sharedUsers, // Optional
-  forkedFrom, // Optional
-  dateCreated // Optional
+  likes,
+  messages,
+  sharedUsers,
+  forkedFrom,
+  dateCreated
 ) {
   const mapDetail = {
     title,
     owner,
     mapType,
     isPublished,
-    thumbnail,
     geojson,
+    thumbnail,
+    likes,
+    messages,
+    sharedUsers,
+    forkedFrom,
+    dateCreated,
   }
-
-  if (thumbnail) mapDetail.thumbnail = thumbnail
-  if (like) mapDetail.like = like
-  if (dislike) mapDetail.dislike = dislike
-  if (comments) mapDetail.comments = comments
-  if (sharedUsers) mapDetail.sharedUsers = sharedUsers
-  if (forkedFrom) mapDetail.forkedFrom = forkedFrom
-  if (dateCreated) mapDetail.dateCreated = dateCreated
 
   const map = new Map(mapDetail)
   return map.save()
 }
 
-async function createComment(
-  author, // Reference to a User
-  text,
-  childComment, // Optional, array of references to Comment
-  downVote, // Optional, array of references to User
-  upVote, // Optional, array of references to User
-  dateCreated // Optional
-) {
-  const commentDetail = {
+async function createMessage(author, text, emojis, replyTo, dateCreated) {
+  const messageDetail = {
     author,
     text,
+    emojis,
+    replyTo,
+    dateCreated,
   }
 
-  if (childComment) commentDetail.childComment = childComment
-  if (downVote) commentDetail.downVote = downVote
-  if (upVote) commentDetail.upVote = upVote
-  if (dateCreated) commentDetail.dateCreated = dateCreated
-
-  const comment = new Comment(commentDetail)
-  return comment.save()
+  const message = new Message(messageDetail)
+  return message.save()
 }
 
 async function createBotUsers(amount) {
@@ -156,7 +236,7 @@ async function createBotUsers(amount) {
   return createdUsers
 }
 
-async function createBotComments(usersList, amount) {
+async function createBotMessages(usersList, amount) {
   if (amount <= 0) {
     throw new Error(
       'Amount must be a positive number and less than or equal to the number of users.'
@@ -164,58 +244,30 @@ async function createBotComments(usersList, amount) {
   }
 
   const baseDate = new Date('2022-01-01')
-  const comments = []
-
-  const getRandomUsers = (count, users) => {
-    const shuffled = users.slice().sort(() => 0.5 - Math.random())
-    return shuffled.slice(0, count)
-  }
+  const Messages = []
 
   for (let i = 0; i < amount; i += 1) {
-    const author = usersList[i % usersList.length] // Ensure the author is selected from the list of users
+    const author = usersList[i % usersList.length].id // Ensure the author is selected from the list of users
     const text = `I love cupcakes ${i}`
-    // const text = createHmac('sha256', 'abcdefg')
-    //   .update(`I love cupcakes ${i}`)
-    //   .digest('hex');
-
-    const numVotes = Math.floor(Math.random() * (usersList.length / 2)) // Random number of votes
-
-    // Randomly choose a subset of users to be downvotes and upvotes
-    const voteList = getRandomUsers(
-      numVotes,
-      usersList.filter((user) => user.toString() !== author.toString())
-    )
-
-    const downVotes = []
-    const upVotes = []
-
-    // Assign users to downvotes or upvotes randomly
-    while (voteList.length > 0) {
-      if (Math.random() > 0.7) {
-        upVotes.push(voteList.pop())
-      } else {
-        downVotes.push(voteList.pop())
-      }
-    }
 
     const dateCreated = new Date(baseDate)
-    dateCreated.setDate(baseDate.getDate() + i) // Increment date for each comment
+    dateCreated.setDate(baseDate.getDate() + i) // Increment date for each Message
 
-    comments.push(
-      createComment(author, text, undefined, downVotes, upVotes, dateCreated)
+    Messages.push(
+      createMessage(author, text, undefined, undefined, dateCreated)
     )
   }
 
-  // Wait for all comment creation promises to resolve
-  const createdComments = await Promise.all(comments)
+  // Wait for all Message creation promises to resolve
+  const createdMessages = await Promise.all(Messages)
 
-  console.log(`${amount} bot comments created successfully!`)
+  console.log(`${amount} bot Messages created successfully!`)
 
-  // Return the list of created comments
-  return createdComments
+  // Return the list of created Messages
+  return createdMessages
 }
 
-async function createBotMap(amount, userList, commentList) {
+async function createBotMap(amount, userList, messageList) {
   if (amount <= 0) {
     throw new Error(
       'Amount must be a positive number and less than or equal to the number of geojson entries.'
@@ -236,7 +288,10 @@ async function createBotMap(amount, userList, commentList) {
     const filteredUsers = excludeUser
       ? users.filter((user) => user.toString() !== excludeUser.toString())
       : users
-    const shuffled = filteredUsers.slice().sort(() => 0.5 - Math.random())
+    const shuffled = filteredUsers
+      .slice()
+      .sort(() => 0.5 - Math.random())
+      .map((user) => user.id)
     return shuffled.slice(0, count)
   }
 
@@ -249,10 +304,10 @@ async function createBotMap(amount, userList, commentList) {
     // Generate title
     // const geojsonData = await GeoJSON.findById(geojson).exec(); // Assume GeoJSON is a Mongoose model for geojsonList
 
-    const title = geojsonData.features[0].properties.name + ` ${i}`
+    const title = `${geojsonData.features[0].properties.name} ${i}`
 
     // Randomly select owner
-    const owner = userList[Math.floor(Math.random() * userList.length)]
+    const owner = userList[Math.floor(Math.random() * userList.length)].id
 
     // Randomly select map type
     const mapType = mapTypes[Math.floor(Math.random() * mapTypes.length)]
@@ -260,17 +315,6 @@ async function createBotMap(amount, userList, commentList) {
     // Generate like and dislike arrays
     const numVotes = Math.floor(Math.random() * (userList.length / 2))
     const voteList = getRandomUsers(numVotes, userList, owner)
-
-    const downVotes = []
-    const upVotes = []
-
-    while (voteList.length > 0) {
-      if (Math.random() > 0.7) {
-        upVotes.push(voteList.pop())
-      } else {
-        downVotes.push(voteList.pop())
-      }
-    }
 
     // Generate shareUsers
     const shareUsers = getRandomUsers(
@@ -285,8 +329,9 @@ async function createBotMap(amount, userList, commentList) {
 
     // Use geobuf to encode data to buffer type
     const buffer = geobuf.encode(geojsonData, new Pbf())
-    const finalBuffer = Buffer.from(buffer);
+    const finalBuffer = Buffer.from(buffer)
 
+    const chatroomMessages = messageList.map((mess) => mess.id)
     // console.log(typeof buffer)
 
     // Create the map
@@ -298,9 +343,8 @@ async function createBotMap(amount, userList, commentList) {
         true, // isPublished
         finalBuffer, // Assuming geojson is a Buffer or compatible type
         undefined, // Optional thumbnail
-        upVotes, // Likes
-        downVotes, // Dislikes
-        commentList, // Comments
+        voteList, // Likes
+        chatroomMessages, // Messages
         shareUsers, // Share users
         undefined,
         dateCreated // Date created
@@ -316,3 +360,28 @@ async function createBotMap(amount, userList, commentList) {
   // Return the list of created maps
   return createdMaps
 }
+
+async function main() {
+  await mongoose.connect(mongoDB)
+  console.log('Connected to MongoDB')
+
+  // Clear existing data
+  await User.deleteMany({})
+  await Map.deleteMany({})
+  await Message.deleteMany({})
+  console.log('Cleared existing data')
+
+  const users = await createBotUsers(10)
+  const Messages = await createBotMessages(users, 20)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const maps = await createBotMap(20, users, Messages)
+
+  // Clean up
+  mongoose.connection.close()
+  console.log('Database populated successfully')
+}
+
+main().catch((err) => {
+  console.error('Error populating database:', err)
+  mongoose.connection.close()
+})

@@ -3,12 +3,13 @@
 import { FeatureCollection } from 'geojson'
 import React, { useRef, useEffect, useMemo, useCallback } from 'react'
 import maplibregl from 'maplibre-gl'
-import geojsonData from '../../public/america.geo.json'
-
-const geojson = geojsonData as FeatureCollection
 
 // TODO: use html and css to add a legend
-export default function Choropleth() {
+export default function Choropleth({
+  geojson,
+}: {
+  geojson: FeatureCollection
+}) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<maplibregl.Map | null>(null)
 

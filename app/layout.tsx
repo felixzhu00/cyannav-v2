@@ -4,8 +4,8 @@ import './globals.css'
 import Header from '@/components/landing/header'
 import Footer from '@/components/landing/footer'
 import { Toaster } from '@/components/ui/toaster'
-import ThemeProvider from '@/components/theme-provider'
-import SessionWrapper from '@/components/SessionWrapper'
+import { headers } from 'next/headers';
+
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,18 +19,29 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+
+  // get pathname
+  const headersList = headers();
+  const fullUrl = headersList.get('referer') || "";
+  // url Object
+  const url = new URL(fullUrl);
+  // Get the pathname from the URL
+  const {pathname} = url;
+  // Extract the /map/ part
+  const mapSegment = pathname.split('/')[1];
+  // Create boolean for map path
+  const isMap = mapSegment !== 'map'
+  
+  
+
   return (
-    <SessionWrapper>
-      <html lang="en">
-        <body className={inter.className}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <Toaster />
-            <Header />
-            {children}
-            <Footer />
-          </ThemeProvider>
-        </body>
-      </html>
-    </SessionWrapper>
+    <html lang="en">
+      <body className={inter.className}>
+        {isMap && <Toaster/>}
+        {isMap && <Header/>}
+        {children}
+        {isMap && <Footer/>}
+      </body>
+    </html>
   )
 }

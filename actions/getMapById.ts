@@ -1,5 +1,6 @@
 import Map, { IMapDocument } from '../models/map'
-import { IUserDocument } from '../models/user'
+import User, { IUserDocument } from '../models/user'
+import Message, { IMessageDocument } from '../models/message'
 
 import dbConnect from '../lib/dbConnect'
 import { decodeGeo } from '@/lib/utils'
@@ -51,7 +52,10 @@ export const MapSchemaDecoded = z.object({
 export default async function getMapById(id: string) {
   await dbConnect()
   const map:IMapDocument | null = await Map.findById(id).populate('owner', 'username').lean()
-  
+
+  const user = await User.findById(id)
+  const message = await Message.findById(id)
+
 
   if (!map) {
     return {

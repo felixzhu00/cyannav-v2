@@ -26,9 +26,9 @@ const UserSchema = new Schema<IUserDocument>({
   plan: { type: String, enum: ['free', 'pro'], default: 'free' },
 })
 
-// delete mongoose.models['User']
-// export default mongoose.model<IUserDocument>('User', UserSchema);
-const User: Model<IUserDocument> =
-  mongoose.models.User || mongoose.model<IUserDocument>('User', UserSchema)
+delete mongoose.models['User']
+export default mongoose.model<IUserDocument>('User', UserSchema);
+// const User: Model<IUserDocument> =
+//   mongoose.models.User || mongoose.model<IUserDocument>('User', UserSchema)
 
-export default User
+// export default User

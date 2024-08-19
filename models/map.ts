@@ -33,11 +33,10 @@ const MapSchema = new Schema<IMapDocument>({
   dateCreated: { type: Date, default: Date.now },
 })
 
-// delete mongoose.models['Map']
+delete mongoose.models['Map']
+export default mongoose.model<IMapDocument>('Map', MapSchema)
 
-// export default mongoose.model<IMapDocument>('Map', MapSchema)
+// const Map: Model<IMapDocument> =
+//   mongoose.models.Map || model<IMapDocument>('Map', MapSchema)
 
-const Map: Model<IMapDocument> =
-  mongoose.models.Map || model<IMapDocument>('Map', MapSchema)
-
-export default Map
+// export default Map

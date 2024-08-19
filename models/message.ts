@@ -29,11 +29,11 @@ const MessageSchema = new Schema<IMessageDocument>({
   ],
   dateCreated: { type: Date, default: Date.now },
 })
-// delete mongoose.models['Message']
-// export default mongoose.model<IMessageDocument>('Message', MessageSchema)
+delete mongoose.models['Message']
+export default mongoose.model<IMessageDocument>('Message', MessageSchema)
 
-const Message: Model<IMessageDocument> =
-  mongoose.models.Message ||
-  mongoose.model<IMessageDocument>('Message', MessageSchema)
+// const Message: Model<IMessageDocument> =
+//   mongoose.models.Message ||
+//   mongoose.model<IMessageDocument>('Message', MessageSchema)
 
-export default Message
+// export default Message

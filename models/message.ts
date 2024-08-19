@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema, Model, Types } from 'mongoose'
+// eslint-disable-next-line import/no-cycle
 import { IUserDocument } from '@/models/user'
 
 export interface IEmoji {

@@ -1,6 +1,5 @@
 import Map, { IMapDocument } from '../models/map'
-import User, { IUserDocument } from '../models/user'
-import Message from '../models/message'
+import { IUserDocument } from '../models/user'
 
 import dbConnect from '../lib/dbConnect'
 import { decodeGeo } from '@/lib/utils'
@@ -49,15 +48,8 @@ export const MapSchemaDecoded = z.object({
   dateCreated: z.date().default(() => new Date()),
 })
 
-export default async function getMapById(id: number) {
+export default async function getMapById(id: string) {
   await dbConnect()
-
-  const collectionName = mongoose.models
-
-  console.log(`Is User model registered? ${collectionName}`)
-
-  const user = await User.findById(id)
-  const message = await Message.findById(id)
   const map:IMapDocument | null = await Map.findById(id).populate('owner', 'username').lean()
   
 

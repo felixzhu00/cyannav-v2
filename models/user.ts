@@ -7,8 +7,8 @@ export interface IUser {
   salt: string
   profilePicture?: Buffer
   favorite?: Types.ObjectId[] // Array of Map references
-  dateCreated: Date
-  plan: 'free' | 'pro'
+  dateCreated?: Date
+  plan?: 'free' | 'pro'
 }
 
 export interface IUserDocument extends IUser, Document {}

@@ -1,18 +1,18 @@
-import { sampleComments } from '@/lib/const'
 import CommentInput from './comment-input'
 import Comment from './comment'
+import IMessagesDocument from '@/models/message'
 
-export default function CommentTab() {
+export default function CommentTab({messages}: {messages: (typeof IMessagesDocument | undefined)[]}) {
   return (
     <div className="flex-col justify-between">
       <div>
-        {sampleComments.map((comment) => (
+        {messages?.map((message) => (
           <Comment
-            key={comment.id}
+            key={message?.id}
             // id={comment.id}
-            message={comment.message}
-            user={comment.user}
-            time={comment.time}
+            message={message.message}
+            user={message.author}
+            time={message.time}
           />
         ))}
       </div>

@@ -12,7 +12,7 @@ type MenuBarProps = {
   owner: string,
   isPublished: boolean,
   sharedUsers: string[] | undefined
-  forkedFrom: string[] | undefined    //Change DB model
+  forkedFrom: string[] | undefined    // Change DB model
 }
 
 

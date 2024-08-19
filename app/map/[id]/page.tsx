@@ -16,6 +16,5 @@ export default async function MapPage({ params }: { params: { id: string } }) {
     return <p>Error: {map.message}</p>
   }
 
-
   return <MapEditPage map={map} />
 }

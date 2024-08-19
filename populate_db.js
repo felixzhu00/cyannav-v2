@@ -75,12 +75,10 @@ const MapSchema = new Schema({
       ref: 'User',
     },
   ],
-  forkedFrom: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Map',
-    },
-  ],
+  forkedFrom: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Map',
+  },
   dateCreated: {
     type: Date,
     default: Date.now,

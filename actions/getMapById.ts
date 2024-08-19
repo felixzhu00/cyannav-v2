@@ -1,4 +1,6 @@
-import Map  from '../models/map'
+import Map, { IMapDocument } from '../models/map'
+import User, { IUserDocument } from '../models/user'
+import Message from '../models/message'
 
 import dbConnect from '../lib/dbConnect'
 import { decodeGeo } from '@/lib/utils'
@@ -47,9 +49,17 @@ export const MapSchemaDecoded = z.object({
   dateCreated: z.date().default(() => new Date()),
 })
 
-export default async function getMapById(id: string) {
+export default async function getMapById(id: number) {
   await dbConnect()
-  const map = await Map.findById(id).lean()
+
+  const collectionName = mongoose.models
+
+  console.log(`Is User model registered? ${collectionName}`)
+
+  const user = await User.findById(id)
+  const message = await Message.findById(id)
+  const map:IMapDocument | null = await Map.findById(id).populate('owner', 'username').lean()
+  
 
   if (!map) {
     return {
@@ -60,22 +70,17 @@ export default async function getMapById(id: string) {
 
   const transformedMap = {
     ...map,
-    owner: map.owner?.toString(),
+    owner: (map.owner as IUserDocument)?.username?.toString(),
     geojson: map.geojson ? Buffer.from(map.geojson.buffer) : undefined,
     thumbnail: map.thumbnail ? Buffer.from(map.thumbnail) : undefined,
-    comments: map.comments?.map((commentId) =>
-      (commentId as Types.ObjectId).toString()
+    messages: map.messages?.map((messagesId) =>
+      (messagesId as Types.ObjectId).toString()
     ),
     sharedUsers: map.sharedUsers?.map((userId) =>
       (userId as Types.ObjectId).toString()
     ),
-    forkedFrom: map.forkedFrom?.map((forkedId) =>
-      (forkedId as Types.ObjectId).toString()
-    ),
+    forkedFrom: map.forkedFrom?.toString(),
     likes: map.likes?.map((likeId) => (likeId as Types.ObjectId).toString()),
-    dislike: map.dislike?.map((dislikeId) =>
-      (dislikeId as Types.ObjectId).toString()
-    ),
   }
 
   const validateDBMap = MapSchemaEncoded.safeParse(transformedMap)
@@ -100,5 +105,5 @@ export default async function getMapById(id: string) {
     }
   }
 
-  return {...validateDecodedMap.data}
+  return { ...validateDecodedMap.data }
 }

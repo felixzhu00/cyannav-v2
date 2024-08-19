@@ -27,8 +27,7 @@ export default function MapEditPage({
     isPublished,
     geojson,
     likes,
-    dislike,
-    comments,
+    messages,
     sharedUsers,
     forkedFrom,
     dateCreated,
@@ -61,7 +60,7 @@ export default function MapEditPage({
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={20}>
-            {/* <RightSideBar geojson={geojson} messages={messages}/> */}
+            <RightSideBar geojson={geojson} messages={messages}/>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

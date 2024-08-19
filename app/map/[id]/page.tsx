@@ -1,3 +1,4 @@
+'use client'
 import MapEditPage from '@/components/map-editor/map-edit-page'
 import getMapById from '@/actions/getMapById'
 

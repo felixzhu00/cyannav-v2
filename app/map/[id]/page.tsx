@@ -1,4 +1,3 @@
-'use client'
 import MapEditPage from '@/components/map-editor/map-edit-page'
 import getMapById from '@/actions/getMapById'
 
@@ -10,6 +9,10 @@ export default async function MapPage({ params }: { params: { id: string } }) {
   if (!id || Array.isArray(id)) return <p>Invalid ID</p>
 
   const map = await getMapById(id)
+
+  if ('errors' in map) {
+    return <p>Error: {map.message}</p>
+  }
 
   return <MapEditPage map={map} />
 }

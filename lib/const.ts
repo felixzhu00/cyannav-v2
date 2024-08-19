@@ -1,5 +1,4 @@
 // Import any necessary components
-import React from 'react'
 import dynamic from 'next/dynamic'
 import {
   Map,

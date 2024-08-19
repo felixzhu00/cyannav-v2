@@ -3,7 +3,7 @@ import crypto from 'crypto'
 
 import User from '@/models/user'
 import Map from '@/models/map'
-import Comment from '@/models/comment'
+import Comment from '@/models/message'
 
 export async function createUser(
   username: string,

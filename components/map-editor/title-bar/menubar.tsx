@@ -7,7 +7,16 @@ import {
 } from '@/components/ui/popover'
 import ShareDialog from './share-dialog'
 
-export default function MenuBar() {
+type MenuBarProps = {
+  title: string,
+  owner: string,
+  isPublished: boolean,
+  sharedUsers: string[] | undefined
+  forkedFrom: string[] | undefined    // Change DB model
+}
+
+
+export default function MenuBar({title, owner, isPublished, sharedUsers, forkedFrom}:MenuBarProps) {
   return (
     <div className="flex w-full items-center justify-between border-b-2 border-zinc-700 bg-zinc-900 p-4 text-white shadow">
       {/* Left Section: File Options */}
@@ -43,9 +52,9 @@ export default function MenuBar() {
       {/* TODO display where fork from */}
       {/* Center Section: Placeholder Name */}
       <div className="flex-1 text-center">
-        <span className="mr-4 text-xl font-semibold">Map Name</span>
+        <span className="mr-4 text-xl font-semibold">{title}</span>
         <span className="mr-4 text-xl font-semibold text-zinc-400">/</span>
-        <span className="text-zinc-500">By Username</span>
+        <span className="text-zinc-500">By {owner}</span>
       </div>
 
       {/* Right Section: Profile Icon and Share Option */}

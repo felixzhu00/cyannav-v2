@@ -5,6 +5,7 @@ import LeftSidebar from '@/components/map-editor/left-bar/left-sidebar'
 import MenuBar from '@/components/map-editor/title-bar/menubar'
 import RightSideBar from '@/components/map-editor/right-bar/right-sidebar'
 import { MapSchemaDecoded } from '@/actions/getMapById'
+import { z } from 'zod'
 
 import {
   ResizableHandle,
@@ -13,7 +14,12 @@ import {
 } from '@/components/ui/resizable'
 import EditToolbar from '@/components/map-editor/map-content/edit-toolbar'
 
-export default function MapEditPage({ map }: { map: typeof MapSchemaDecoded }) {
+export default function MapEditPage({
+  map,
+}: {
+  map: z.infer<typeof MapSchemaDecoded>
+}) {
+  console.log(map)
   const {
     title,
     owner,
@@ -21,8 +27,7 @@ export default function MapEditPage({ map }: { map: typeof MapSchemaDecoded }) {
     isPublished,
     geojson,
     likes,
-    dislike,
-    comments,
+    messages,
     sharedUsers,
     forkedFrom,
     dateCreated,
@@ -31,11 +36,17 @@ export default function MapEditPage({ map }: { map: typeof MapSchemaDecoded }) {
   return (
     <div className="flex h-screen w-full flex-col">
       {/* Fixed Top MenuBar */}
-      <MenuBar />
+      <MenuBar
+        title={title}
+        owner={owner}
+        isPublished={isPublished}
+        sharedUsers={sharedUsers}
+        forkedFrom={forkedFrom}
+      />
       <div className="flex h-screen justify-between">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel className="min-w-[134px]" defaultSize={20}>
-            <LeftSidebar />
+            <LeftSidebar geojson={geojson} />
           </ResizablePanel>
           <ResizableHandle withHandle />
 
@@ -49,7 +60,7 @@ export default function MapEditPage({ map }: { map: typeof MapSchemaDecoded }) {
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={20}>
-            <RightSideBar />
+            <RightSideBar geojson={geojson} messages={messages}/>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

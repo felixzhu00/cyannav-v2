@@ -4,6 +4,7 @@
 /* eslint-disable no-console */
 import crypto from 'crypto'
 import geobuf from 'geobuf'
+import { nanoid } from 'nanoid'
 import Pbf from 'pbf'
 
 import geojsonData from './public/america.geo.json' assert { type: 'json' }
@@ -127,6 +128,14 @@ const UserSchema = new Schema({
 const User = mongoose.models.User || mongoose.model('User', UserSchema)
 
 const mongoDB = 'mongodb://localhost:27017/cyan' // replace with db of your choice
+
+function addIdsToGeojsonFeatures(geojson) {
+  // Iterate over each feature and add an `id` using nanoid
+  geojson.features.forEach((feature) => {
+    feature.id = nanoid()
+  })
+  return geojson
+}
 
 async function createUser(
   username,
@@ -302,7 +311,9 @@ async function createBotMap(amount, userList, messageList) {
     // Generate title
     // const geojsonData = await GeoJSON.findById(geojson).exec(); // Assume GeoJSON is a Mongoose model for geojsonList
 
-    const title = `${geojsonData.features[0].properties.name} ${i}`
+    const geojsonWithIds = addIdsToGeojsonFeatures(geojsonData)
+
+    const title = `${geojsonWithIds.features[0].properties.name} ${i}`
 
     // Randomly select owner
     const owner = userList[Math.floor(Math.random() * userList.length)].id
@@ -326,7 +337,7 @@ async function createBotMap(amount, userList, messageList) {
     dateCreated.setDate(baseDate.getDate() + i)
 
     // Use geobuf to encode data to buffer type
-    const buffer = geobuf.encode(geojsonData, new Pbf())
+    const buffer = geobuf.encode(geojsonWithIds, new Pbf())
     const finalBuffer = Buffer.from(buffer)
 
     const chatroomMessages = messageList.map((mess) => mess.id)

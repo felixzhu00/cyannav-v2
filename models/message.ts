@@ -2,13 +2,18 @@ import mongoose, { Document, Schema, Model, Types } from 'mongoose'
 // eslint-disable-next-line import/no-cycle
 import { IUserDocument } from '@/models/user'
 
+interface IPopulatedAuthor {
+  _id: Types.ObjectId; // MongoDB ObjectId type
+  username: string;    // The username of the author
+}
+
 export interface IEmoji {
   character: string
   owner: Types.ObjectId
 }
 
 export interface IMessage {
-  author: IUserDocument | IUserDocument['_id'] | Types.ObjectId // Reference to User
+  author: IUserDocument | IUserDocument['_id'] | Types.ObjectId | IPopulatedAuthor // Reference to User
   text: string
   emojis?: IEmoji[]
   replyTo?: Types.ObjectId // Array of Message references

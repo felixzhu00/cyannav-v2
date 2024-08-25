@@ -17,8 +17,8 @@ import { Label } from '@/components/ui/label'
 export default function DialogCloseButton() {
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="secondary">Share</Button>
+      <DialogTrigger asChild >
+        <Button variant="secondary" >Share</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

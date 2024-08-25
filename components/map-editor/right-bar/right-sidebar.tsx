@@ -13,7 +13,7 @@ export default function RightSideBar() {
           Edit
         </TabsTrigger>
         <TabsTrigger className="flex-1" value="comment">
-          Comment
+          Chat
         </TabsTrigger>
       </TabsList>
       <TabsContent

@@ -22,7 +22,7 @@ export default function Comment({ message, user, time }: CommentProps) {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <span className="mr-2 text-xl font-bold">{user}</span>
+            <span className="mr-2 font-bold">{user}</span>
             <span className="text-sm text-gray-500">
               {new Date(time).toLocaleString('en-US', {
                 hour12: true,
@@ -48,7 +48,7 @@ export default function Comment({ message, user, time }: CommentProps) {
         </div>
       </div>
 
-      <div className="rounded-lg p-2 pl-5 text-xl">{message}</div>
+      <div className="rounded-lg p-2 pl-5">{message}</div>
     </div>
   )
 }

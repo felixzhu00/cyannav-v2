@@ -86,7 +86,12 @@ export default function EditTab() {
   const localItems = selectedFeature?._self
   const gobalItems = (map.geojson as CustomFeatureCollection)._shared
 
-  if (!selectedFeature) return <div>Select A Layer</div>
+  if (!selectedFeature)
+    return (
+      <div className="mt-5 text-center text-sm text-gray-500">
+        Select A Layer From The Left To Edit
+      </div>
+    )
   return (
     <div className="space-y-3">
       <Variablebar />

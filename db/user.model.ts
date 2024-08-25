@@ -1,19 +1,5 @@
-import mongoose, { Document, Schema, Model, Types } from 'mongoose'
-// eslint-disable-next-line import/no-cycle
-import { IMapDocument } from '@/models/map'
-
-export interface IUser {
-  username: string
-  email: string
-  password: string
-  salt: string
-  profilePicture?: Buffer
-  favorite?: IMapDocument[] | IMapDocument['_id'][] | Types.ObjectId[] // Array of Map references
-  dateCreated?: Date
-  plan?: 'free' | 'pro'
-}
-
-export interface IUserDocument extends IUser, Document {}
+import { IUserDocument } from '@/core/_entities/types/user.types'
+import { Schema, model, models } from 'mongoose'
 
 const UserSchema = new Schema<IUserDocument>({
   username: { type: String, required: true, unique: true },
@@ -26,9 +12,9 @@ const UserSchema = new Schema<IUserDocument>({
   plan: { type: String, enum: ['free', 'pro'], default: 'free' },
 })
 
-delete mongoose.models['User']
-export default mongoose.model<IUserDocument>('User', UserSchema);
+delete models.User
+export default model<IUserDocument>('User', UserSchema)
+
 // const User: Model<IUserDocument> =
 //   mongoose.models.User || mongoose.model<IUserDocument>('User', UserSchema)
-
 // export default User

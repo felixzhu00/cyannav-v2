@@ -1,11 +1,12 @@
 // app/api/map/[id]/route.ts
 
 import { NextResponse } from 'next/server'
-import Map, { IMapDocument } from '@/models/map'
-import { IUserDocument } from '@/models/user'
-import dbConnect from '@/lib/dbConnect'
+import Map from '@/db/map.model'
 import { Types } from 'mongoose'
-import { IMessageDocument } from '@/models/message'
+import dbConnect from '@/db/dbConnect'
+import { IMapDocument } from '@/core/_entities/types/map.types'
+import { IUserDocument } from '@/core/_entities/types/user.types'
+import { IMessageDocument } from '@/core/_entities/types/messages.types'
 
 // import User from '@/models/user'
 // import Message from '@/models/message'

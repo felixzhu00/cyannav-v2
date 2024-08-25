@@ -1,8 +1,9 @@
+// OUTDATED: create uses-cases for the model in heres
+
 import mongoose from 'mongoose'
 import crypto from 'crypto'
 
 import User from '@/models/user'
-import Map from '@/models/map'
 import Comment from '@/models/message'
 
 export async function createUser(
@@ -35,63 +36,6 @@ export async function createUser(
   const user = new User(userDetail)
   console.log(user)
   return user.save()
-}
-
-export async function loginUser(email: string, password: string) {
-  try {
-    const user = await User.findOne({ email })
-
-    if (!user) {
-      throw new Error('User not found')
-    }
-
-    const hashedPassword = crypto
-      .pbkdf2Sync(password, user.salt, 100, 64, 'sha256')
-      .toString('hex')
-
-    if (hashedPassword !== user.password) {
-      throw new Error('Invalid password')
-    }
-
-    // If password matches, return the user
-    return user
-  } catch (e: any) {
-    throw new Error(e.message)
-  }
-}
-
-export async function createMap(
-  title: string,
-  owner: mongoose.Types.ObjectId, // Assuming owner is a reference to a User
-  mapType: string,
-  isPublished: boolean,
-  geojson: Buffer,
-  thumbnail?: Buffer,
-  like?: mongoose.Types.ObjectId[], // Optional
-  dislike?: mongoose.Types.ObjectId[], // Optional
-  comments?: mongoose.Types.ObjectId[], // Optional, assuming comments are references
-  sharedUsers?: mongoose.Types.ObjectId[], // Optional
-  forkedFrom?: mongoose.Types.ObjectId[], // Optional
-  dateCreated?: Date // Optional
-) {
-  const mapDetail: any = {
-    title,
-    owner,
-    mapType,
-    isPublished,
-    geojson,
-  }
-
-  if (thumbnail) mapDetail.thumbnail = thumbnail
-  if (like) mapDetail.like = like
-  if (dislike) mapDetail.dislike = dislike
-  if (comments) mapDetail.comments = comments
-  if (sharedUsers) mapDetail.sharedUsers = sharedUsers
-  if (forkedFrom) mapDetail.forkedFrom = forkedFrom
-  if (dateCreated) mapDetail.dateCreated = dateCreated
-
-  const map = new Map(mapDetail)
-  return map.save()
 }
 
 export async function createComment(

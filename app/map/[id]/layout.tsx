@@ -1,18 +1,16 @@
 import ThemeProvider from '@/components/theme-provider'
+import { Provider } from 'jotai'
+import React from 'react'
 
-export default function MapLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function MapLayout({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme="dark"
       enableSystem
       disableTransitionOnChange
     >
-      {children}
+      <Provider>{children}</Provider>
     </ThemeProvider>
   )
 }

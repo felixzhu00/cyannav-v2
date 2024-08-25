@@ -14,7 +14,11 @@ export default function LeftSidebarItem({ name, id }: LeftSidebarItemProps) {
   const [currLayer, setCurrLayer] = useAtom(currLayerAtom)
 
   const handleLayerChange = () => {
-    setCurrLayer(id)
+    if (currLayer !== id) {
+      setCurrLayer(id)
+    } else {
+      setCurrLayer('')
+    }
   }
 
   return (

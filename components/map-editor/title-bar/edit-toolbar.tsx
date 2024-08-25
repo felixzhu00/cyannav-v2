@@ -1,4 +1,4 @@
-import { selectedEditOptionAtom } from '@/atoms/jotai'
+import { selectedEditOptionAtom } from '@/lib/jotai'
 import {
   Menubar,
   MenubarMenu,

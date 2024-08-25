@@ -3,15 +3,15 @@ import { MessageDocumentSchema } from './messages.schema'
 import { FeatureCollection } from 'geojson'
 
 export const MapSchemaEncoded = z.object({
-  title: z.string().nonempty(),
-  owner: z.string().nonempty(), // Assuming `ObjectId` as a string for Zod validation
-  mapType: z.string().nonempty(),
+  title: z.string().min(1),
+  owner: z.string().min(1), // Assuming `ObjectId` as a string for Zod validation
+  mapType: z.string().min(1),
   isPublished: z.boolean().default(false),
   thumbnail: z.instanceof(Buffer).optional(),
   geojson: z
     .object({
       type: z.literal('Buffer'),
-      data: z.array(z.number()).nonempty(), // Byte array
+      data: z.array(z.number()).min(1), // Byte array
     })
     .optional(),
   likes: z.array(z.string()).optional(), // Assuming `ObjectId` as a string
@@ -22,9 +22,9 @@ export const MapSchemaEncoded = z.object({
 })
 
 export const MapSchemaDecoded = z.object({
-  title: z.string().nonempty(),
-  owner: z.string().nonempty(), // Assuming `ObjectId` as a string for Zod validation
-  mapType: z.string().nonempty(),
+  title: z.string().min(1),
+  owner: z.string().min(1), // Assuming `ObjectId` as a string for Zod validation
+  mapType: z.string().min(1),
   isPublished: z.boolean().default(false),
   thumbnail: z.instanceof(Buffer).optional(),
   geojson: z

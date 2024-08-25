@@ -18,3 +18,8 @@ export const MessageSchema = z.object({
     .union([z.string(), z.date()])
     .transform((val) => (typeof val === 'string' ? new Date(val) : val)),
 })
+
+// Define Zod schema for IMessageDocument by extending IMessage
+export const MessageDocumentSchema = MessageSchema.extend({
+  _id: z.string().nonempty(),
+})

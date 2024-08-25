@@ -1,7 +1,7 @@
 import CommentInput from './comment-input'
 import Comment from './comment'
 import { useAtom } from 'jotai'
-import { mapAtom } from '@/atoms/jotai'
+import { mapAtom } from '@/lib/jotai'
 
 export default function CommentTab() {
   const [map] = useAtom(mapAtom)

@@ -3,7 +3,7 @@ import { User } from 'lucide-react'
 import ShareDialog from './share-dialog'
 import EditToolbar from './edit-toolbar'
 import { useAtom } from 'jotai'
-import { mapAtom } from '@/atoms/jotai'
+import { mapAtom } from '@/lib/jotai'
 
 // type MenuBarProps = {
 //   title: string,

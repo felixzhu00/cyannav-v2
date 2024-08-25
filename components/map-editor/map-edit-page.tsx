@@ -1,7 +1,7 @@
 'use client'
 
 import { useHydrateAtoms } from 'jotai/utils'
-import { mapAtom } from '@/atoms/jotai'
+import { mapAtom } from '@/lib/jotai'
 import Choropleth from '../templates/Choropleth'
 import LeftSidebar from '@/components/map-editor/left-bar/left-sidebar'
 import RightSideBar from '@/components/map-editor/right-bar/right-sidebar'

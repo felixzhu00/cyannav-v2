@@ -1,7 +1,7 @@
 import React from 'react'
 import LeftSidebarItem from './left-sidebar-item'
 import { useAtom } from 'jotai'
-import { mapAtom } from '@/atoms/jotai'
+import { mapAtom } from '@/lib/jotai'
 // Temp const var to populate
 
 export default function LeftSidebar() {

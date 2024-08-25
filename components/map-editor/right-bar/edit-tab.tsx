@@ -17,7 +17,7 @@ import {
   CommandList,
 } from '@/components/ui/command'
 
-import { currLayerAtom, mapAtom } from '@/atoms/jotai'
+import { currLayerAtom, mapAtom } from '@/lib/jotai'
 
 import CollapsibleVariables from './collapsible-variables'
 import Variablebar from './variablebar'

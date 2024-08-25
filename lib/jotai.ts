@@ -1,14 +1,13 @@
+import { MapSchemaDecodedType } from '@/core/_entities/z-schemas/map.schema'
 import { atom } from 'jotai'
-import { MapSchemaDecodedType } from '@/lib/types'
+
 
 // Init as None
 export const selectedEditOptionAtom = atom('')
 
 export const currLayerAtom = atom('')
 
-// Will have callback to API for every change
 // Init from API GET request
-
 // Define the initial state or default values if needed
 const EMPTY_MAP_DATA: MapSchemaDecodedType = {
   title: '',

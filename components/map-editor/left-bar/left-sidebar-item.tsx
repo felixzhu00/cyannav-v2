@@ -2,7 +2,7 @@ import React from 'react'
 import { Eye, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAtom } from 'jotai'
-import { currLayerAtom } from '@/atoms/jotai'
+import { currLayerAtom } from '@/lib/jotai'
 import { cn } from '@/lib/utils'
 
 type LeftSidebarItemProps = {

@@ -6,48 +6,26 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import ShareDialog from './share-dialog'
+import EditToolbar from './edit-toolbar'
+import { useAtom } from 'jotai'
+import { mapAtom } from '@/atoms/jotai'
 
-type MenuBarProps = {
-  title: string,
-  owner: string,
-  isPublished: boolean,
-  sharedUsers: string[] | undefined
-  forkedFrom: string[] | undefined    // Change DB model
-}
+// type MenuBarProps = {
+//   title: string,
+//   owner: string,
+//   isPublished: boolean,
+//   sharedUsers: string[] | undefined
+//   forkedFrom: string[] | undefined    // Change DB model
+// }
 
+export default function MenuBar() {
+  const [map, setMap] = useAtom(mapAtom)
 
-export default function MenuBar({title, owner, isPublished, sharedUsers, forkedFrom}:MenuBarProps) {
+  const { title, owner, isPublished, sharedUsers, forkedFrom } = map
+
   return (
     <div className="flex w-full items-center justify-between border-b-2 border-zinc-700 bg-zinc-900 p-4 text-white shadow">
-      {/* Left Section: File Options */}
-
-      <div className="flex-1">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="secondary"
-              className="flex flex-row items-center space-x-2 px-3"
-            >
-              <File className="mr-1 h-5 w-5" />
-              <ChevronDown className="h-3 w-3" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            align="start"
-            className="flex w-auto flex-col items-start"
-          >
-            <Button variant="ghost" className="w-full">
-              <span className="w-full text-left">Export</span>
-            </Button>
-            <Button variant="ghost" className="w-full text-left">
-              <span className="w-full text-left">Fork</span>
-            </Button>
-            <Button variant="ghost" className="w-full text-left">
-              <span className="w-full text-left">Download PNG</span>
-            </Button>
-          </PopoverContent>
-        </Popover>
-      </div>
+      <EditToolbar className="flex-1" />
 
       {/* TODO display where fork from */}
       {/* Center Section: Placeholder Name */}

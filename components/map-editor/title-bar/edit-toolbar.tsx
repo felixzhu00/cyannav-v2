@@ -79,7 +79,7 @@ export default function EditToolbar({ className }: { className: string }) {
             className={triggerStyle('minus')}
             onClick={() => setSelectedTrigger('minus')}
           >
-            <Minus className="h-5 w-5 -rotate-45" />
+            <Minus className="transform scale-x-125 scale-y-100 -rotate-45" />
             <ChevronDown className="h-3 w-3" />
           </MenubarTrigger>
           <MenubarContent>

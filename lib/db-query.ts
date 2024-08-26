@@ -24,15 +24,40 @@ export async function createUser(
     .pbkdf2Sync(password, salt, 100, 64, 'sha256') // TODO remeber to concatnate env secret to password
     .toString('hex')
 
+  console.log(hashedPassword)
   if (plan) userDetail.plan = plan
   if (profilePicture) userDetail.profilePicture = profilePicture
   if (favorite) userDetail.favorite = favorite
   if (dateCreated) userDetail.dateCreated = dateCreated
   if (salt) userDetail.salt = salt
-  if (hashedPassword) userDetail.hashedPassword = hashedPassword
+  if (hashedPassword) userDetail.password = hashedPassword
 
   const user = new User(userDetail)
+  console.log(user)
   return user.save()
+}
+
+export async function loginUser(email: string, password: string) {
+  try {
+    const user = await User.findOne({ email })
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    const hashedPassword = crypto
+      .pbkdf2Sync(password, user.salt, 100, 64, 'sha256')
+      .toString('hex')
+
+    if (hashedPassword !== user.password) {
+      throw new Error('Invalid password')
+    }
+
+    // If password matches, return the user
+    return user
+  } catch (e: any) {
+    throw new Error(e.message)
+  }
 }
 
 export async function createMap(

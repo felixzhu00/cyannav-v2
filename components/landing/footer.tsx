@@ -1,12 +1,14 @@
 'use client'
 import React from 'react'
 import Image from 'next/image'
-import logo from '@/public/cyannav_logo.png'
+import logo_white from '@/public/logo-text-white.png'
+import logo_black from '@/public/logo-text-black.png'
 import { Github, Linkedin, Twitter } from 'lucide-react'
 import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { useTheme } from 'next-themes'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -19,8 +21,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
+import ThemeSwitcher from '@/components/theme-toggle'
 
 const FormSchema = z.object({
   email: z.string().email({
@@ -29,6 +30,8 @@ const FormSchema = z.object({
 })
 
 export default function Footer() {
+  const { theme } = useTheme()
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -49,7 +52,13 @@ export default function Footer() {
       <div className="flex flex-row justify-between">
         {/* Footer Intro */}
         <div className="flex flex-col space-y-5">
-          <Image src={logo} alt="Logo" width={129} height={65} priority />
+          <Image
+            src={theme === 'dark' ? logo_white : logo_black}
+            alt="Logo"
+            width={129}
+            height={65}
+            priority
+          />
           <p className="text-sm font-medium">
             Create and design stunning maps to share with others.
           </p>
@@ -158,11 +167,7 @@ export default function Footer() {
           <Link href="/terms-of-service">Terms of Service</Link>
           <Link href="/cookie-policy">Cookie Policy</Link>
         </div>
-        <div className="flex items-center space-x-2">
-          <Label htmlFor="Light">Light</Label>
-          <Switch id="appearance-switch" />
-          <Label htmlFor="Dark">Dark</Label>
-        </div>
+        <ThemeSwitcher />
       </div>
     </footer>
   )

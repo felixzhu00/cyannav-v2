@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 
 export default function Home() {
   return (
-    <main className="mb-24 flex w-full flex-col space-y-40 px-[175px]">
+    <main className="mb-24 flex w-full flex-col space-y-40 px-24 md:px-44">
       <Intro />
       <Features />
       <Community />

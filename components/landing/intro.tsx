@@ -8,10 +8,10 @@ export default function Intro() {
   return (
     <section
       id="intro"
-      className="flex w-full flex-col items-center justify-center space-y-20 pt-40"
+      className="flex w-full flex-col items-center justify-center space-y-20 pt-40 text-center"
     >
       <h1 className="text-6xl font-bold">A New Map Editing Experience.</h1>
-      <h2 className="w-[854px] justify-center text-center text-2xl">
+      <h2 className="max-w-[854px] justify-center text-center text-2xl">
         Empowering <span className="font-semibold">map enthuasiasts</span> to{' '}
         <span className="font-semibold">create, share,</span> and{' '}
         <span className="font-semibold">collaborate</span> on stunning maps,

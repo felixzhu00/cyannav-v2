@@ -1,13 +1,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import placeholder from '@/public/map_placeholder.png'
 import { FcGoogle } from 'react-icons/fc'
 import { FaGithub, FaApple } from 'react-icons/fa'
+import LoginForm from '@/components/auth/LoginForm'
 
-export default function Page() {
+export default async function Page() {
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
       <div className="bg-muted hidden lg:block">
@@ -28,30 +27,7 @@ export default function Page() {
             </p>
           </div>
           <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@cyannav.com"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/forgot-password"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
-              <Input id="password" type="password" required />
-            </div>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
+            <LoginForm />
             <Button
               variant="outline"
               className="flex w-full flex-row space-x-2"

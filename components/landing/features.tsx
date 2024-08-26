@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import { LucideIcon } from 'lucide-react'
 import {
@@ -26,7 +24,7 @@ const FeatureCard: React.FC<FeatureProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center">
-      <div className="z-50 mb-[-30px] flex h-[60px] w-[60px] items-center justify-center rounded-full bg-zinc-200">
+      <div className="z-50 mb-[-30px] flex h-[60px] w-[60px] items-center justify-center rounded-full bg-zinc-200 dark:bg-zinc-900">
         <Icon height={30} width={30} />
       </div>
       <Card className="z-40 h-[340px] w-[350px] rounded-lg bg-zinc-100 px-[30px] py-[50px] shadow-lg">
@@ -36,7 +34,7 @@ const FeatureCard: React.FC<FeatureProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-base text-black">{description}</p>
+          <p className="text-base">{description}</p>
         </CardContent>
         <CardFooter>
           <p className="opacity-50">{comingSoon}</p>

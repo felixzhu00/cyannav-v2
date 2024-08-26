@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
-import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme()
@@ -14,10 +14,18 @@ export default function ThemeToggle() {
   }
 
   return (
-    <Button variant="outline" size="icon" onClick={toggleTheme}>
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      <span className="sr-only">Toggle theme</span>
-    </Button>
+    <div className="flex items-center space-x-2">
+      <Sun
+        className={`h-[1.2rem] w-[1.2rem] ${
+          theme === 'light' ? 'fill-current text-yellow-500' : 'text-gray-400'
+        }`}
+      />
+      <Switch id="appearance-switch" onClick={toggleTheme} />
+      <Moon
+        className={`h-[1.2rem] w-[1.2rem] ${
+          theme === 'dark' ? 'fill-current text-blue-500' : 'text-gray-400'
+        }`}
+      />
+    </div>
   )
 }

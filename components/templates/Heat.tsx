@@ -1,7 +1,8 @@
+'use client'
 import { FeatureCollection, Point } from 'geojson'
 import React, { useRef, useEffect, useCallback } from 'react'
 import maplibregl from 'maplibre-gl'
-import {centroid} from '@turf/turf'
+import { centroid } from '@turf/turf'
 import geojsonData from '../../public/america.geo.json'
 
 const geojson = geojsonData as FeatureCollection

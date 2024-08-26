@@ -4,6 +4,8 @@ import './globals.css'
 import Header from '@/components/landing/header'
 import Footer from '@/components/landing/footer'
 import { Toaster } from '@/components/ui/toaster'
+import ThemeProvider from '@/components/theme-provider'
+import SessionWrapper from '@/components/SessionWrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,14 +20,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Toaster />
-
-        <Header />
-        {children}
-        <Footer />
-      </body>
-    </html>
+    <SessionWrapper>
+      <html lang="en">
+        <body className={inter.className}>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <Toaster />
+            <Header />
+            {children}
+            <Footer />
+          </ThemeProvider>
+        </body>
+      </html>
+    </SessionWrapper>
   )
 }

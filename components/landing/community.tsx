@@ -39,9 +39,10 @@ export default function Community() {
                   <CardContent className="flex flex-col items-center justify-center">
                     <Image
                       src={mapPlaceholder}
-                      className="h-[220px] w-[310px]"
+                      className="h-[220px] w-[310px] rounded-t-lg"
                       width={310}
                       height={220}
+                      style={{ objectFit: 'cover' }}
                       alt="map image"
                     />
                     <div className="flex w-full flex-row items-center justify-between px-4 pt-6">

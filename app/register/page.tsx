@@ -1,21 +1,28 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { getServerSession } from 'next-auth'
+import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import RegisterForm from '@/components/auth/registerForm'
 import placeholder from '@/public/map_placeholder.png'
 import { FcGoogle } from 'react-icons/fc'
 import { FaGithub, FaApple } from 'react-icons/fa'
 
-export default function Page() {
+export default async function Page() {
+  const session = await getServerSession()
+  console.log(session)
+  if (session) {
+    redirect('/')
+  }
+
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
       <div className="bg-muted hidden lg:block">
         <Image
           src={placeholder}
           alt="Image"
-          width="1920"
-          height="1080"
+          width={1920}
+          height={1080}
           className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
       </div>
@@ -49,34 +56,9 @@ export default function Page() {
           </div>
 
           <hr className="my-4" />
-
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@cyannav.com"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-              </div>
-              <Input id="password" type="password" required />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
-              </div>
-              <Input id="confirm-password" type="password" required />
-            </div>
-            <Button type="submit" className="w-full">
-              Create Account
-            </Button>
-          </div>
+          <RegisterForm />
           <hr className="my-4" />
+
           <div className="text-center text-xs">
             By continuing, you agree to our{' '}
             <Link href="#" className="hover:underline">
@@ -86,7 +68,7 @@ export default function Page() {
             <Link href="#" className="hover:underline">
               Privacy Policy
             </Link>
-            {'.'}
+            .
           </div>
           <div className="text-center text-xs">
             Already have an account?{' '}

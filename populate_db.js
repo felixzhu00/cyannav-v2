@@ -47,10 +47,7 @@ const MapSchema = new Schema({
     type: String,
     required: true,
   },
-  isPublished: {
-    type: Boolean,
-    default: false,
-  },
+  isPublished: { type: String, default: 'private' },
   thumbnail: {
     type: Buffer,
   },
@@ -349,7 +346,7 @@ async function createBotMap(amount, userList, messageList) {
         title,
         owner,
         mapType,
-        true, // isPublished
+        'public', // isPublished
         finalBuffer, // Assuming geojson is a Buffer or compatible type
         undefined, // Optional thumbnail
         voteList, // Likes

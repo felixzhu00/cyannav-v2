@@ -8,7 +8,7 @@ export interface IMap {
   title: string
   owner: IUserDocument | IUserDocument['_id'] | Types.ObjectId
   mapType: string
-  isPublished: boolean
+  isPublished: "public" | "private" | "invited" 
   thumbnail?: Buffer
   geojson?: Buffer
   likes?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]

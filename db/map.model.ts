@@ -5,7 +5,7 @@ const MapSchema = new Schema<IMapDocument>({
   title: { type: String, required: true },
   owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   mapType: { type: String, required: true },
-  isPublished: { type: Boolean, default: false },
+  isPublished: { type: String, default: "private" },
   thumbnail: { type: Buffer },
   geojson: { type: Buffer },
   likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],

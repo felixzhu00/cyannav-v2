@@ -28,18 +28,36 @@ export default async function MapPage({ params }: { params: { id: string } }) {
     }
 
     const map = await response.json()
-
     // Zod Check
-    const validateDBMap = MapSchemaEncoded.safeParse(map)
+    // const validateDBMap = MapSchemaEncoded.safeParse(map)
 
-    if (!validateDBMap.success) {
-      throw new Error('Unexpected Map Encode Format')
-    }
+    // if (!validateDBMap.success) {
+    //   throw new Error('Unexpected Map Encode Format')
+    // }
+
+    // // Decode map.geojson
+    // const decodedGeo = decodeGeo(
+    //   validateDBMap.data.geojson
+    // ) as CustomFeatureCollection
+
+    // // Insert _self and _shared if not in geojson
+    // const updatedFeatures = decodedGeo.features.map(
+    //   (feature: CustomFeature) => ({
+    //     ...feature,
+    //     _self: feature._self || new Map<string, string | number>(),
+    //   })
+    // )
+    // const JsonFiledMap = {
+    //   ...validateDBMap.data,
+    //   geojson: {
+    //     ...decodedGeo,
+    //     features: updatedFeatures,
+    //     _shared: decodedGeo._shared || new Map<string, string | number>(),
+    //   },
+    // }
 
     // Decode map.geojson
-    const decodedGeo = decodeGeo(
-      validateDBMap.data.geojson
-    ) as CustomFeatureCollection
+    const decodedGeo = decodeGeo(map.geojson) as CustomFeatureCollection
 
     // Insert _self and _shared if not in geojson
     const updatedFeatures = decodedGeo.features.map(
@@ -48,8 +66,9 @@ export default async function MapPage({ params }: { params: { id: string } }) {
         _self: feature._self || new Map<string, string | number>(),
       })
     )
+
     const JsonFiledMap = {
-      ...validateDBMap.data,
+      ...map,
       geojson: {
         ...decodedGeo,
         features: updatedFeatures,
@@ -57,19 +76,20 @@ export default async function MapPage({ params }: { params: { id: string } }) {
       },
     }
 
-    // Zod Check
-    const validateDecodedMap = MapSchemaDecoded.safeParse(JsonFiledMap)
+    // // Zod Check
+    // const validateDecodedMap = MapSchemaDecoded.safeParse(JsonFiledMap)
 
-    if (!validateDecodedMap.success) {
-      throw new Error('Unexpected Map Decoded Format')
-    }
+    // if (!validateDecodedMap.success) {
+    //   throw new Error('Unexpected Map Decoded Format')
+    // }
 
-    if ('errors' in map) {
-      return <p>Error: {map.message}</p>
-    }
+    // if ('errors' in map) {
+    //   return <p>Error: {map.message}</p>
+    // }
 
     // Render the MapEditPage with the fetched map data
-    return <MapEditPage initialMap={validateDecodedMap.data} />
+    console.log(JsonFiledMap)
+    return <MapEditPage initialMap={JsonFiledMap} />
   } catch (error) {
     return <p>Error fetching map</p>
   }

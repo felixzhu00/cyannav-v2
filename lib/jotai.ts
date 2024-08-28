@@ -10,12 +10,12 @@ export const currLayerAtom = atom('')
 
 // Init from API GET request
 // Define the initial state or default values if needed
-const EMPTY_MAP_DATA: MapSchemaDecodedType = {
+const EMPTY_MAP_DATA= {
   _id: "0",
   title: '',
-  owner: '',
+  owner: {username:"" , email:""},
   mapType: '',
-  isPublished: false,
+  isPublished: "public",
   geojson: undefined,
   thumbnail: undefined,
   likes: [],

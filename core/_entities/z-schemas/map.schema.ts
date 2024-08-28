@@ -27,7 +27,7 @@ export const MapSchemaDecoded = z.object({
   title: z.string().min(1),
   owner: z.string().min(1), // Assuming `ObjectId` as a string for Zod validation
   mapType: z.string().min(1),
-  isPublished: z.boolean().default(false),
+  isPublished: z.string().default('public'),
   thumbnail: z.instanceof(Buffer).optional(),
   geojson: z
     .custom<FeatureCollection>(

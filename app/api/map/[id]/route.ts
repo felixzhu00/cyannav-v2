@@ -37,7 +37,7 @@ export async function GET(
     // Code above help Nextjs load model schema
 
     const map: IMapDocument | null = await Map.findById(id)
-      .populate('owner', 'username')
+      .populate('owner', 'username email')
       .populate({
         path: 'messages', // Populates the 'messages' field
         populate: {
@@ -45,6 +45,7 @@ export async function GET(
           select: 'username', // Only get the 'username' field from the User schema
         },
       })
+      .populate('sharedUsers', 'username email')
       .lean()
 
     if (!map) {
@@ -60,7 +61,10 @@ export async function GET(
     // Shape db.map into json map
     const transformedMap = {
       ...map,
-      owner: (map.owner as IUserDocument)?.username?.toString(),
+      owner: {
+        username: (map.owner as IUserDocument)?.username?.toString() || '', // Safely access and convert username to string, fallback to an empty string if undefined
+        email: (map.owner as IUserDocument)?.email?.toString() || '', // Safely access and convert email to string, fallback to an empty string if undefined
+      },
       geojson: map.geojson ? Buffer.from(map.geojson.buffer) : undefined,
       thumbnail: map.thumbnail ? Buffer.from(map.thumbnail) : undefined,
       messages: map.messages?.map((m) => {
@@ -71,13 +75,14 @@ export async function GET(
           author: author.username,
         }
       }),
-      sharedUsers: map.sharedUsers?.map((userId) =>
-        (userId as Types.ObjectId).toString()
-      ),
+      sharedUsers:
+        map.sharedUsers?.map((sharedUser) => ({
+          username: (sharedUser as IUserDocument)?.username?.toString() || '',
+          email: (sharedUser as IUserDocument)?.email?.toString() || '',
+        })) || [],
       forkedFrom: map.forkedFrom?.toString(),
       likes: map.likes?.map((likeId) => (likeId as Types.ObjectId).toString()),
     }
-
     return NextResponse.json(transformedMap)
   } catch (error) {
     console.error(error)

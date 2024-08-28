@@ -92,7 +92,7 @@ export default function Title() {
       )}
 
       <span className="mr-4 text-xl font-semibold text-zinc-400">/</span>
-      <span className="text-zinc-500">By {owner}</span>
+      <span className="text-zinc-500">By {owner.username}</span>
     </div>
   )
 }

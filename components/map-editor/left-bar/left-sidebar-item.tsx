@@ -1,14 +1,34 @@
 import React from 'react'
 import { Eye, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useAtom } from 'jotai'
+import { currLayerAtom } from '@/lib/jotai'
+import { cn } from '@/lib/utils'
 
 type LeftSidebarItemProps = {
   name: string
+  id: string
 }
 
-export default function LeftSidebarItem({ name }: LeftSidebarItemProps) {
+export default function LeftSidebarItem({ name, id }: LeftSidebarItemProps) {
+  const [currLayer, setCurrLayer] = useAtom(currLayerAtom)
+
+  const handleLayerChange = () => {
+    if (currLayer !== id) {
+      setCurrLayer(id)
+    } else {
+      setCurrLayer('')
+    }
+  }
+
   return (
-    <li className="flex w-full items-center justify-between rounded-md border border-transparent px-2 py-0.5 hover:border-blue-500">
+    <div
+      className={cn(
+        'flex w-full items-center justify-between rounded-md border border-transparent px-2 py-0.5 hover:border-blue-500',
+        currLayer === id && 'border-white-500'
+      )}
+      onClick={handleLayerChange}
+    >
       <span className="ml-2 overflow-hidden text-ellipsis whitespace-nowrap text-white">
         {name}
       </span>
@@ -20,6 +40,6 @@ export default function LeftSidebarItem({ name }: LeftSidebarItemProps) {
           <Eye className="h-4 w-4" />
         </Button>
       </div>
-    </li>
+    </div>
   )
 }

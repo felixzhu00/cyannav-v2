@@ -10,6 +10,8 @@ import { Input } from '../../ui/input'
 export default function CommentInput() {
   const [isFocused, setIsFocused] = useState(false)
 
+
+
   return (
     <div className='relative bottom-2'>
         <div className="flex items-center justify-between px-2">

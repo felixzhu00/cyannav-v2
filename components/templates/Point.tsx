@@ -1,4 +1,5 @@
 'use client'
+
 import { FeatureCollection, Point as PointType } from 'geojson'
 import React, { useRef, useEffect, useCallback, useMemo } from 'react'
 import maplibregl from 'maplibre-gl'

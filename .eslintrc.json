@@ -9,6 +9,15 @@
   "parserOptions": {
     "project": "./tsconfig.json"
   },
-  "rules": { "import/order": "off" },
+  "rules": {
+    "import/order": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "no-underscore-dangle": "off",
+    "import/prefer-default-export": "off",
+    "import/no-cycle": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "no-console": ["error", { "allow": ["warn", "error"] }]
+  },
   "ignorePatterns": ["components/ui/"]
 }

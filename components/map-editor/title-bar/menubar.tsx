@@ -1,64 +1,19 @@
 import { Button } from '@/components/ui/button'
-import { User, File, ChevronDown } from 'lucide-react'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { User } from 'lucide-react'
 import ShareDialog from './share-dialog'
+import EditToolbar from './edit-toolbar'
+import Title from './title'
 
-type MenuBarProps = {
-  title: string,
-  owner: string,
-  isPublished: boolean,
-  sharedUsers: string[] | undefined
-  forkedFrom: string[] | undefined    // Change DB model
-}
-
-
-export default function MenuBar({title, owner, isPublished, sharedUsers, forkedFrom}:MenuBarProps) {
+export default function MenuBar() {
   return (
-    <div className="flex w-full items-center justify-between border-b-2 border-zinc-700 bg-zinc-900 p-4 text-white shadow">
-      {/* Left Section: File Options */}
-
-      <div className="flex-1">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="secondary"
-              className="flex flex-row items-center space-x-2 px-3"
-            >
-              <File className="mr-1 h-5 w-5" />
-              <ChevronDown className="h-3 w-3" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            align="start"
-            className="flex w-auto flex-col items-start"
-          >
-            <Button variant="ghost" className="w-full">
-              <span className="w-full text-left">Export</span>
-            </Button>
-            <Button variant="ghost" className="w-full text-left">
-              <span className="w-full text-left">Fork</span>
-            </Button>
-            <Button variant="ghost" className="w-full text-left">
-              <span className="w-full text-left">Download PNG</span>
-            </Button>
-          </PopoverContent>
-        </Popover>
-      </div>
+    <div className="flex w-full items-center justify-between border-b-2 border-zinc-700 bg-zinc-900 text-white shadow">
+      <EditToolbar className="flex-1" />
 
       {/* TODO display where fork from */}
-      {/* Center Section: Placeholder Name */}
-      <div className="flex-1 text-center">
-        <span className="mr-4 text-xl font-semibold">{title}</span>
-        <span className="mr-4 text-xl font-semibold text-zinc-400">/</span>
-        <span className="text-zinc-500">By {owner}</span>
-      </div>
+      <Title/>
 
       {/* Right Section: Profile Icon and Share Option */}
-      <div className="flex flex-1 items-center justify-end space-x-4">
+      <div className="mr-4 flex flex-1 items-center justify-end space-x-4 py-4">
         <Button variant="secondary" size="sm">
           <User className="h-5 w-5" />
         </Button>

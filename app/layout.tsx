@@ -46,12 +46,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* <ThemeProvider>
-          {isMap && <Toaster />}
-          {isMap && <Header />} */}
+           {isMap && <Toaster />}
+           {isMap && <Header />}
           {children}
-          {/* {isMap && <Footer />}
-        </ThemeProvider> */}
+          {isMap && <Footer />}
       </body>
     </html>
   )

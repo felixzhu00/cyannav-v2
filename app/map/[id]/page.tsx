@@ -88,7 +88,6 @@ export default async function MapPage({ params }: { params: { id: string } }) {
     // }
 
     // Render the MapEditPage with the fetched map data
-    console.log(JsonFiledMap)
     return <MapEditPage initialMap={JsonFiledMap} />
   } catch (error) {
     return <p>Error fetching map</p>

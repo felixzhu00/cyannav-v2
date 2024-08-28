@@ -28,3 +28,5 @@ export interface CustomFeatureCollection extends FeatureCollection {
   features: CustomFeature[]
   _shared?: Map<string, string | number>
 }
+
+export interface MapFields extends Partial<IMapDocument> {}

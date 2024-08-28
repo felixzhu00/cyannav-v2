@@ -16,7 +16,8 @@
     "no-underscore-dangle": "off",
     "import/prefer-default-export": "off",
     "import/no-cycle": "off",
-    "@typescript-eslint/naming-convention": "off"
+    "@typescript-eslint/naming-convention": "off",
+    "no-console": ["error", { "allow": ["warn", "error"] }]
   },
   "ignorePatterns": ["components/ui/"]
 }

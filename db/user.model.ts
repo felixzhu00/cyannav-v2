@@ -7,7 +7,7 @@ const UserSchema = new Schema<IUserDocument>({
   password: { type: String, required: false },
   salt: { type: String, required: true },
   profilePicture: { type: Buffer },
-  favorite: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Map' }],
+  favorite: [{ type: Schema.Types.ObjectId, ref: 'Map' }],
   dateCreated: { type: Date, default: Date.now },
   plan: { type: String, enum: ['free', 'pro'], default: 'free' },
 })

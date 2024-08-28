@@ -1,10 +1,12 @@
 import MapEditPage from '@/components/map-editor/map-edit-page'
 import {
-  MapSchemaEncoded,
-  MapSchemaDecoded,
   CustomFeature,
   CustomFeatureCollection,
-} from '@/lib/types'
+} from '@/core/_entities/types/map.types'
+import {
+  MapSchemaDecoded,
+  MapSchemaEncoded,
+} from '@/core/_entities/z-schemas/map.schema'
 import { decodeGeo } from '@/lib/utils'
 
 export default async function MapPage({ params }: { params: { id: string } }) {
@@ -27,15 +29,12 @@ export default async function MapPage({ params }: { params: { id: string } }) {
 
     const map = await response.json()
 
-
     // Zod Check
     const validateDBMap = MapSchemaEncoded.safeParse(map)
 
     if (!validateDBMap.success) {
       throw new Error('Unexpected Map Encode Format')
     }
-
-    
 
     // Decode map.geojson
     const decodedGeo = decodeGeo(
@@ -58,12 +57,9 @@ export default async function MapPage({ params }: { params: { id: string } }) {
       },
     }
 
-
     // Zod Check
     const validateDecodedMap = MapSchemaDecoded.safeParse(JsonFiledMap)
 
-    console.log(validateDecodedMap.data)
-    
     if (!validateDecodedMap.success) {
       throw new Error('Unexpected Map Decoded Format')
     }

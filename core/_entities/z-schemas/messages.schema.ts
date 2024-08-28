@@ -21,5 +21,5 @@ export const MessageSchema = z.object({
 
 // Define Zod schema for IMessageDocument by extending IMessage
 export const MessageDocumentSchema = MessageSchema.extend({
-  _id: z.string().nonempty(),
+  _id: z.string().min(1),
 })

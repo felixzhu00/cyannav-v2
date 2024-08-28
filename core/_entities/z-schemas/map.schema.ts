@@ -3,6 +3,7 @@ import { MessageDocumentSchema } from './messages.schema'
 import { FeatureCollection } from 'geojson'
 
 export const MapSchemaEncoded = z.object({
+  _id: z.string(),
   title: z.string().min(1),
   owner: z.string().min(1), // Assuming `ObjectId` as a string for Zod validation
   mapType: z.string().min(1),
@@ -22,6 +23,7 @@ export const MapSchemaEncoded = z.object({
 })
 
 export const MapSchemaDecoded = z.object({
+  _id: z.string(),
   title: z.string().min(1),
   owner: z.string().min(1), // Assuming `ObjectId` as a string for Zod validation
   mapType: z.string().min(1),

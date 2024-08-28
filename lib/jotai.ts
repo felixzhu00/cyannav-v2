@@ -1,3 +1,4 @@
+import { IMap } from '@/core/_entities/types/map.types'
 import { MapSchemaDecodedType } from '@/core/_entities/z-schemas/map.schema'
 import { atom } from 'jotai'
 
@@ -10,6 +11,7 @@ export const currLayerAtom = atom('')
 // Init from API GET request
 // Define the initial state or default values if needed
 const EMPTY_MAP_DATA: MapSchemaDecodedType = {
+  _id: "0",
   title: '',
   owner: '',
   mapType: '',
@@ -25,3 +27,14 @@ const EMPTY_MAP_DATA: MapSchemaDecodedType = {
 
 // Atom for holding the map data, initially set to EMPTY_MAP_DATA
 export const mapAtom = atom(EMPTY_MAP_DATA)
+
+export const setMapFieldAtom = atom(
+  null,
+  (get, set, { field, value }: { field: keyof IMap; value: any }) => {
+    const currentMap = get(mapAtom);
+    set(mapAtom, {
+      ...currentMap,
+      [field]: value,
+    });
+  }
+);

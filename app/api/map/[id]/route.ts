@@ -7,10 +7,10 @@ import dbConnect from '@/db/dbConnect'
 import { IMapDocument } from '@/core/_entities/types/map.types'
 import { IUserDocument } from '@/core/_entities/types/user.types'
 import { IMessageDocument } from '@/core/_entities/types/messages.types'
+import { revalidatePath } from 'next/cache'
 
-// import User from '@/models/user'
-// import Message from '@/models/message'
-// import message from '@/models/message'
+import User from '@/db/user.model'
+import Message from '@/db/message.model'
 
 export async function GET(
   request: Request,
@@ -32,8 +32,9 @@ export async function GET(
     await dbConnect()
 
     // Uncomment this if there is an issue with nextjs saying that User, Message schema are not registered
-    // const user = await User.find()
-    // const message = await Message.find()
+    const user = await User.find()
+    const message = await Message.find()
+    // Code above help Nextjs load model schema
 
     const map: IMapDocument | null = await Map.findById(id)
       .populate('owner', 'username')
@@ -79,6 +80,7 @@ export async function GET(
 
     return NextResponse.json(transformedMap)
   } catch (error) {
+    console.error(error)
     return NextResponse.json(
       {
         errors: { server: ['Internal server error'] },
@@ -86,5 +88,48 @@ export async function GET(
       },
       { status: 500 }
     )
+  }
+}
+
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params
+
+  if (!id) {
+    return NextResponse.json(
+      {
+        errors: { id: ['Invalid ID'] },
+        message: 'Invalid ID',
+      },
+      { status: 400 }
+    )
+  }
+
+  const updateFields = await request.json() // Extract fields to be updated from the request body
+
+  try {
+    await dbConnect() // Ensure database connection
+
+    // Update the map in the database
+    const updatedMap = await Map.findByIdAndUpdate(
+      id,
+      updateFields, // Update fields based on the payload
+      { new: true } // Return the updated document
+    )
+
+    if (updatedMap) {
+      // Revalidate the specific path after the map is updated
+      // revalidatePath(`/map/${id}`)
+      console.log(id)
+      return NextResponse.json({
+        message: 'Map updated successfully',
+        map: updatedMap,
+      })
+    }
+    return NextResponse.json({ error: 'Map not found' }, { status: 404 })
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to update map' }, { status: 500 })
   }
 }

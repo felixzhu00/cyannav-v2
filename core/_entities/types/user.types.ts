@@ -5,9 +5,9 @@ import { IMapDocument } from './map.types'
 export interface IUser {
   username: string
   email: string
-  password: string
+  password?: string
   salt: string
-  profilePicture?: Buffer
+  profilePicture?: Buffer | string
   favorite?: IMapDocument[] | IMapDocument['_id'][] | Types.ObjectId[] // Array of Map references
   dateCreated?: Date
   plan?: 'free' | 'pro'

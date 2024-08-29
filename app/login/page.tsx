@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button'
 import placeholder from '@/public/map_placeholder.png'
 import { FcGoogle } from 'react-icons/fc'
 import { FaGithub, FaApple } from 'react-icons/fa'
-import LoginForm from '@/components/auth/LoginForm'
+import { redirect } from 'next/navigation'
+import { signIn, providerMap } from '@/lib/auth'
+import { AuthError } from 'next-auth'
 
 export default async function Page() {
   return (
@@ -23,40 +25,48 @@ export default async function Page() {
           <div className="grid gap-2 text-center">
             <h1 className="text-2xl font-bold">Login</h1>
             <p className="text-muted-foreground text-balance">
-              Enter your email below to login to your account
+              Sign in using one of the following providers
             </p>
           </div>
           <div className="grid gap-4">
-            <LoginForm />
-            <Button
-              variant="outline"
-              className="flex w-full flex-row space-x-2"
-            >
-              <FcGoogle className="text-lg" />
-              <p>Login with Google</p>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex w-full flex-row space-x-2"
-            >
-              <FaGithub className="text-lg" />
-              <p>Login with GitHub</p>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex w-full flex-row space-x-2"
-            >
-              <FaApple className="text-lg" />
-              <p>Login with Apple</p>
-            </Button>
+            <div className="flex flex-col gap-2">
+              {Object.values(providerMap).map((provider) => (
+                <form
+                  key={provider.id}
+                  action={async () => {
+                    'use server'
+                    try {
+                      await signIn(provider.id)
+                    } catch (error) {
+                      if (error instanceof AuthError) {
+                        return redirect(
+                          `${SIGNIN_ERROR_URL}?error=${error.type}`
+                        )
+                      }
+                      throw error
+                    }
+                  }}
+                >
+                  <Button
+                    type="submit"
+                    className="flex w-full flex-row items-center space-x-2 rounded-md border p-2 hover:bg-opacity-80"
+                  >
+                    {provider.id === 'google' && (
+                      <FcGoogle className="text-lg" />
+                    )}
+                    {provider.id === 'github' && (
+                      <FaGithub className="text-lg" />
+                    )}
+                    {provider.id === 'apple' && <FaApple className="text-lg" />}
+                    <span>Sign in with {provider.name}</span>
+                  </Button>
+                </form>
+              ))}
+            </div>
           </div>
+
           <hr className="my-2" />
-          <div className="text-center text-xs">
-            New to CyanNav?{' '}
-            <Link href="/signup" className="hover:underline">
-              Sign up
-            </Link>
-          </div>
+
           <div className="text-center text-xs">
             <Link href="#" className="hover:underline">
               Get help

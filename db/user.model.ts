@@ -6,15 +6,13 @@ const UserSchema = new Schema<IUserDocument>({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: false },
   salt: { type: String, required: true },
-  profilePicture: { type: Buffer },
+  profilePicture: { type: [Buffer, String] },
   favorite: [{ type: Schema.Types.ObjectId, ref: 'Map' }],
   dateCreated: { type: Date, default: Date.now },
   plan: { type: String, enum: ['free', 'pro'], default: 'free' },
 })
 
-delete models.User
-export default model<IUserDocument>('User', UserSchema)
+// Use the existing model if it exists, otherwise create a new one
+const User = models.User || model<IUserDocument>('User', UserSchema)
 
-// const User: Model<IUserDocument> =
-//   mongoose.models.User || mongoose.model<IUserDocument>('User', UserSchema)
-// export default User
+export default User

@@ -1,3 +1,5 @@
+// THIS FILE IS NOT BEING USED. PLEASE LEAVE HERE!
+
 'use client'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'

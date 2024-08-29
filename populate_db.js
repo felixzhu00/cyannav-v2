@@ -84,7 +84,7 @@ const MapSchema = new Schema({
 })
 
 // Check if the model already exists (to prevent recompilation during hot reloads)
-const Map = mongoose.models.Map || mongoose.model('Map', MapSchema)
+const MMap = mongoose.models.Map || mongoose.model('Map', MapSchema)
 
 const UserSchema = new Schema({
   username: {
@@ -126,12 +126,69 @@ const User = mongoose.models.User || mongoose.model('User', UserSchema)
 
 const mongoDB = 'mongodb://localhost:27017/cyan' // replace with db of your choice
 
-function addIdsToGeojsonFeatures(geojson) {
-  // Iterate over each feature and add an `id` using nanoid
-  geojson.features.forEach((feature) => {
-    feature.id = nanoid()
-  })
-  return geojson
+// Use during import new map
+export function convertToCustomFeatureCollection(geojson) {
+  if (geojson.type === 'FeatureCollection') {
+    const postGeo = geojson.features.map((feature) => ({
+      ...feature,
+      id: nanoid(),
+      _self: new Map(),
+    }))
+
+    const finalGeo = {
+      type: 'FeatureCollection',
+      features: postGeo,
+      _shared: new Map(),
+    }
+
+    return finalGeo
+  }
+
+  if (geojson.type === 'Feature') {
+    const finalGeo = {
+      ...geojson,
+      id: nanoid(),
+      _self: new Map(),
+    }
+
+    return {
+      type: 'FeatureCollection',
+      features: [finalGeo],
+      _shared: new Map(),
+    }
+  }
+
+  if (geojson.type === 'GeometryCollection') {
+    // Wrap GeometryCollection in a Feature
+    return {
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: nanoid(),
+          type: 'Feature',
+          geometry: geojson,
+          properties: {},
+          _self: new Map(),
+        },
+      ],
+      _shared: new Map(),
+    }
+  }
+
+  // Assume it's a Geometry type
+  return {
+    type: 'FeatureCollection',
+    features: [
+      {
+        id: nanoid(),
+        type: 'Feature',
+        geometry: geojson,
+        properties: {},
+        _self: new Map(),
+      },
+    ],
+    _shared: new Map(),
+  }
 }
 
 async function createUser(
@@ -190,7 +247,7 @@ async function createMap(
     dateCreated,
   }
 
-  const map = new Map(mapDetail)
+  const map = new MMap(mapDetail)
   return map.save()
 }
 
@@ -308,9 +365,10 @@ async function createBotMap(amount, userList, messageList) {
     // Generate title
     // const geojsonData = await GeoJSON.findById(geojson).exec(); // Assume GeoJSON is a Mongoose model for geojsonList
 
-    const geojsonWithIds = addIdsToGeojsonFeatures(geojsonData)
+    const geojsonCustom = convertToCustomFeatureCollection(geojsonData)
+    console.log(geojsonCustom)
 
-    const title = `${geojsonWithIds.features[0].properties.name} ${i}`
+    const title = `${geojsonCustom.features[0].properties.name} ${i}`
 
     // Randomly select owner
     const owner = userList[Math.floor(Math.random() * userList.length)].id
@@ -334,7 +392,7 @@ async function createBotMap(amount, userList, messageList) {
     dateCreated.setDate(baseDate.getDate() + i)
 
     // Use geobuf to encode data to buffer type
-    const buffer = geobuf.encode(geojsonWithIds, new Pbf())
+    const buffer = geobuf.encode(geojsonCustom, new Pbf())
     const finalBuffer = Buffer.from(buffer)
 
     const chatroomMessages = messageList.map((mess) => mess.id)
@@ -373,7 +431,7 @@ async function main() {
 
   // Clear existing data
   await User.deleteMany({})
-  await Map.deleteMany({})
+  await MMap.deleteMany({})
   await Message.deleteMany({})
   console.log('Cleared existing data')
 

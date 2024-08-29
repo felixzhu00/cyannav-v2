@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
 import { ChevronsUpDown, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,7 +21,10 @@ import { currLayerAtom, mapAtom } from '@/lib/jotai'
 import CollapsibleVariables from './collapsible-variables'
 import Variablebar from './variablebar'
 import { useAtom } from 'jotai'
-import { CustomFeatureCollection, CustomFeature } from '@/lib/types'
+import {
+  CustomFeature,
+  CustomFeatureCollection,
+} from '@/core/_entities/types/map.types'
 
 const findFeatureById = (
   id: string | null,
@@ -43,27 +45,31 @@ function VariableList({
   list: Map<string, string | number> | undefined
   listName: string
 }) {
-  if (!list) return <span>_self/_share not found</span> // If list is undefined, return null
+  if (!list)
+    return (
+      <span className="mr-5 text-center text-sm text-gray-500">
+        _self/_share not found
+      </span>
+    ) // If list is undefined, return null
 
   return (
     <div>
-      {list.size === 0 && (
+      {!Object.keys(list).length && (
         <div className="mr-5 text-center text-sm text-gray-500">
           Start by Adding a {listName} Variable
         </div>
       )}
-      {list.size > 0 &&
-        Array.from(list).map(([key, value], index) => (
-          <div
-            key={key.toString().concat(index.toString())}
-            className="w-full flex-col items-center space-y-1"
-          >
-            <label className="px-1" htmlFor={key}>
-              {value}
-            </label>
-            <input type={key} id={key} placeholder={key} />
-          </div>
-        ))}
+      {Array.from(list).map(([key, value], index) => (
+        <div
+          key={key.toString().concat(index.toString())}
+          className="w-full flex-col items-center space-y-1"
+        >
+          <label className="px-1" htmlFor={key}>
+            {value}
+          </label>
+          <input type={key} id={key} placeholder={key} />
+        </div>
+      ))}
     </div>
   )
 }
@@ -72,16 +78,13 @@ export default function EditTab() {
   const [open, setOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState('')
 
-  const [currLayer, setCurrLayer] = useAtom(currLayerAtom)
+  const [currLayer] = useAtom(currLayerAtom)
 
-  const [map, setMapAtom] = useAtom(mapAtom)
+  const [map] = useAtom(mapAtom)
 
   // Function to find the feature with the matching ID
 
-  const selectedFeature = findFeatureById(
-    currLayer,
-    map.geojson as CustomFeatureCollection
-  )
+  const selectedFeature = findFeatureById(currLayer, map.geojson)
 
   const localItems = selectedFeature?._self
   const gobalItems = (map.geojson as CustomFeatureCollection)._shared

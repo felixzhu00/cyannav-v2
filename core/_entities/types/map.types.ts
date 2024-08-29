@@ -8,7 +8,7 @@ export interface IMap {
   title: string
   owner: IUserDocument | IUserDocument['_id'] | Types.ObjectId
   mapType: string
-  isPublished: "public" | "private" | "invited" 
+  isPublished: 'public' | 'private' | 'invited'
   thumbnail?: Buffer
   geojson?: Buffer
   likes?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
@@ -21,12 +21,13 @@ export interface IMapDocument extends IMap, Document {}
 
 // Custom Feature Collection
 export interface CustomFeature extends Feature {
-  _self?: Map<string, string | number>
+  id: string;
+  _self: Map<string, string | number>; // Using Record to represent an object-like structure
 }
 
 export interface CustomFeatureCollection extends FeatureCollection {
-  features: CustomFeature[]
-  _shared?: Map<string, string | number>
+  features: CustomFeature[];
+  _shared: Map<string, string | number>; // Using Record to represent an object-like structure
 }
 
 export interface MapFields extends Partial<IMapDocument> {}

@@ -5,7 +5,6 @@ import { mapAtom } from '@/lib/jotai'
 import Choropleth from '../templates/Choropleth'
 import LeftSidebar from '@/components/map-editor/left-bar/left-sidebar'
 import RightSideBar from '@/components/map-editor/right-bar/right-sidebar'
-import { MapSchemaDecodedType } from '@/lib/types'
 
 import {
   ResizableHandle,
@@ -13,13 +12,20 @@ import {
   ResizablePanelGroup,
 } from '@/components/ui/resizable'
 import MenuBar from './title-bar/menubar'
+import { decodeGeo } from '@/lib/utils'
+import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 
-export default function MapEditPage({
-  initialMap,
-}: {
-  initialMap: MapSchemaDecodedType
-}) {
-  useHydrateAtoms([[mapAtom, initialMap]])
+export default function MapEditPage({ initialMap }: { initialMap: any }) {
+  // Define New Map with Decoded GeoJSON
+  const decodedMap = {
+    ...initialMap,
+    geojson: decodeGeo(initialMap.geojson) as CustomFeatureCollection,
+  }
+
+  // Hydrate Jotai Map Atom
+  useHydrateAtoms([[mapAtom, decodedMap]])
+  console.log(decodedMap.geojson)
+
 
   return (
     <div className="flex h-screen w-full flex-col">
@@ -41,7 +47,7 @@ export default function MapEditPage({
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={20}>
-            <RightSideBar/>
+            <RightSideBar />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

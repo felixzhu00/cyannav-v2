@@ -30,9 +30,12 @@ export async function updateMapFieldsUseCase(
     // Revalidate the specific path after the map is updated
     revalidatePath(`/map/${id}`)
 
+    // Get Keys of param
+    const keys = Object.keys(updateFields)
+
     // Return success
     return NextResponse.json({
-      message: 'Map updated successfully',
+      message: `Map ${keys.length === 1 ? keys[0] : keys} updated successfully`,
       map: updatedMap,
     })
   } catch (error) {

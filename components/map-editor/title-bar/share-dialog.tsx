@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useState } from 'react'
+import { useToast } from '@/components/ui/use-toast'
 
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text).then(
@@ -53,11 +54,68 @@ export default function DialogCloseButton() {
   const [map] = useAtom(mapAtom)
   const [, setMapField] = useAtom(setMapFieldAtom)
   const { _id, title, owner, sharedUsers, isPublished } = map
+  const { toast } = useToast()
 
   const [shareOption, setShareOption] = useState(isPublished)
-  console.log(shareOption)
-  const handleSelectChange = (value: string) => {
-    setShareOption(value)
+  const [userInput, setUserInput] = useState('')
+
+  const handleSelectChange = async (value: string) => {
+    try {
+      const response = await fetch(`/api/map/${_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isPublished: value }),
+      })
+
+      const result = await response.json()
+
+      toast({
+        description: result.message || result.error,
+      })
+
+      if (response.ok) {
+        setShareOption(result.map.isPublished) // Update the title state
+        setMapField({ field: 'isPublished', value: result.map.isPublished }) // Update the global title state
+      }
+    } catch (error) {
+      toast({
+        description: 'An error occurred while updating the publish status',
+      })
+    }
+  }
+
+  const handleUserAction = async (user: string, option: 'add' | 'remove') => {
+    try {
+      const response = await fetch(`/api/map/${_id}/shared-users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user, option }),
+      })
+
+      const result = await response.json()
+
+      toast({
+        description: result.message || result.error,
+      })
+
+      if (response.ok) {
+        if (option === 'add') {
+          setUserInput('') // Reset Input
+        }
+        // If length changes (deleted or added)
+        if (sharedUsers.length !== result.data.sharedUsers.length) {
+          setMapField({ field: 'sharedUsers', value: result.data.sharedUsers }) // Update the global sharedUser
+        }
+      }
+    } catch (error) {
+      toast({
+        description: 'An error occurred while updating user',
+      })
+    }
   }
 
   const url = `http://localhost:3000/api/map/${_id}`
@@ -72,8 +130,20 @@ export default function DialogCloseButton() {
           <DialogTitle>Share "{title}"</DialogTitle>
         </DialogHeader>
         <div className="flex flex-row items-center gap-4 py-2 pt-4">
-          <Input type="email" placeholder="Enter email/username to add user" />
-          <Button variant="secondary"> Add</Button>
+          <Input
+            type="email"
+            placeholder="Enter email to add user"
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+          />
+          <Button
+            variant="secondary"
+            onClick={() => {
+              handleUserAction(userInput, 'add')
+            }}
+          >
+            Add
+          </Button>
         </div>
         <div className="flex-col items-center py-2">
           <div className="font-bold">People With Access</div>
@@ -92,7 +162,8 @@ export default function DialogCloseButton() {
               <div className="text-sm text-gray-500">OWNER</div>
             </div>
 
-            {sharedUsers &&
+            {shareOption !== 'private' &&
+              sharedUsers &&
               sharedUsers.map(
                 (user: { username: string; email: string }, index) => (
                   <div
@@ -111,7 +182,13 @@ export default function DialogCloseButton() {
                         </span>
                       </div>
                     </div>
-                    <Button variant="secondary" className="p-3">
+                    <Button
+                      variant="secondary"
+                      className="p-3"
+                      onClick={() => {
+                        handleUserAction(user.email, 'remove')
+                      }}
+                    >
                       Remove
                     </Button>
                   </div>

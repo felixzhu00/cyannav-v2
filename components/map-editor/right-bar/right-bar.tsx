@@ -1,8 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import EditTab from './edit-tab'
-import CommentTab from './comment-tab'
+import EditTab from './edit-tab/edit-tab'
+import CommentTab from './chat-tab/comment-tab'
 
-export default function RightSideBar() {
+export default function RightBar() {
   return (
     <Tabs
       defaultValue="edit"

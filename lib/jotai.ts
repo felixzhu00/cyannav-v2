@@ -1,5 +1,10 @@
-import { CustomFeatureCollection, IMap } from '@/core/_entities/types/map.types'
+import {
+  CustomFeatureCollection,
+  IMap,
+  MapAtom,
+} from '@/core/_entities/types/map.types'
 import { atom } from 'jotai'
+import { editAllFeatureSelf, editFeatureSelf, editGeoShared } from './utils'
 
 // Init as None
 export const selectedEditOptionAtom = atom('')
@@ -15,7 +20,7 @@ const EMPTY_GEO: CustomFeatureCollection = {
   _shared: new Map<string, string | number>(),
 }
 
-const EMPTY_MAP_DATA = {
+const EMPTY_MAP_DATA: MapAtom = {
   _id: '0',
   title: '',
   owner: { username: '', email: '' },

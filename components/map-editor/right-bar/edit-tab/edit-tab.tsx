@@ -16,15 +16,16 @@ import {
   CommandList,
 } from '@/components/ui/command'
 
-import { currLayerAtom, mapAtom } from '@/lib/jotai'
-
 import CollapsibleVariables from './collapsible-variables'
-import Variablebar from './variablebar'
-import { useAtom } from 'jotai'
+import Variablebar from './variable-toolbar'
 import {
   CustomFeature,
   CustomFeatureCollection,
 } from '@/core/_entities/types/map.types'
+
+import { useAtom } from 'jotai'
+import { currLayerAtom, mapAtom } from '@/lib/jotai'
+import VariableList from './variable-list'
 
 const findFeatureById = (
   id: string | null,
@@ -35,42 +36,6 @@ const findFeatureById = (
   return (
     mapGeojson.features.find((feature: CustomFeature) => feature.id === id) ||
     null
-  )
-}
-
-function VariableList({
-  list,
-  listName,
-}: {
-  list: Map<string, string | number> | undefined
-  listName: string
-}) {
-  if (!list)
-    return (
-      <span className="mr-5 text-center text-sm text-gray-500">
-        _self/_share not found
-      </span>
-    ) // If list is undefined, return null
-
-  return (
-    <div>
-      {!Object.keys(list).length && (
-        <div className="mr-5 text-center text-sm text-gray-500">
-          Start by Adding a {listName} Variable
-        </div>
-      )}
-      {Array.from(list).map(([key, value], index) => (
-        <div
-          key={key.toString().concat(index.toString())}
-          className="w-full flex-col items-center space-y-1"
-        >
-          <label className="px-1" htmlFor={key}>
-            {value}
-          </label>
-          <input type={key} id={key} placeholder={key} />
-        </div>
-      ))}
-    </div>
   )
 }
 
@@ -109,7 +74,7 @@ export default function EditTab() {
       <CollapsibleVariables header="Global Variables">
         <VariableList list={gobalItems} listName="Global" />
         {/* By Feature Selection */}
-        <div className="w-full flex-col items-center gap-1.5 pt-4">
+        <div className="w-full flex-col items-center gap-1.5 pt-2">
           {/* Sub Header */}
           <Label className="px-1">By Feature</Label>
           {/* Dropdown with integrated search feature */}
@@ -125,16 +90,16 @@ export default function EditTab() {
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0">
+            <PopoverContent className="p-0 text-left" align="center">
               <Command>
                 {/* <CommandInput placeholder="Search item..." /> */}
                 <CommandList>
                   <CommandEmpty>No item found.</CommandEmpty>
-                  <CommandGroup>
+                  <CommandGroup className="p-0">
                     {localItems &&
-                      Array.from(localItems).map(([key]) => (
+                      Object.entries(localItems).map(([key]) => (
                         <CommandItem
-                          className="w-full"
+                          className="text-left"
                           key={key}
                           value={key}
                           onSelect={(currentValue) => {

@@ -101,3 +101,128 @@ export function convertToCustomFeatureCollection(
     _shared: new Map<string, string | number>(),
   }
 }
+
+export function editGeoShared(
+  currentGeo: CustomFeatureCollection,
+  key: string,
+  value: any,
+  action: 'addOrUpdate' | 'remove'
+) {
+  // Create a new Map instance based on the current _shared Map
+  const newShared = currentGeo._shared
+
+  if (action === 'addOrUpdate') {
+    if (value !== undefined) {
+      // Add or update the key with the new value
+      newShared[key] = value
+    }
+  } else if (action === 'remove') {
+    // Remove the key from the Map
+    delete newShared[key]
+  }
+
+  const newGeo = {
+    ...currentGeo,
+    _shared: newShared,
+  }
+
+  return newGeo
+}
+
+export function editFeatureSelf(
+  currentGeo: CustomFeatureCollection,
+  featureId: string,
+  key: string,
+  value: any,
+  action: 'addOrUpdate' | 'remove',
+  property?: boolean
+) {
+  // Find the feature by its ID
+  const featureIndex = currentGeo.features.findIndex(
+    (feature) => feature.id === featureId
+  )
+
+  // Feature not found in geojson
+  if (featureIndex === -1) {
+    return currentGeo
+  }
+
+  // Copy the current feature
+  const currentFeature = { ...currentGeo.features[featureIndex] }
+  let currentSelf = currentFeature._self
+
+  if (property) {
+    currentSelf = currentFeature.properties || {}
+  }
+
+  if (action === 'addOrUpdate') {
+    if (value !== undefined) {
+      // Add or update the key-value pair
+      currentSelf[key] = value
+      console.log(key, value, 'asddasd',currentSelf)
+    }
+  } else if (action === 'remove') {
+    // Remove the key from _self
+    delete currentSelf[key]
+  }
+
+  if (property) {
+    currentFeature.properties = currentSelf
+  } else {
+    // Update the feature with the modified _self
+    currentFeature._self = currentSelf
+  }
+
+  // Replace the modified feature in the geojson features array
+  const updatedFeatures = [...currentGeo.features]
+  updatedFeatures[featureIndex] = currentFeature
+
+  const newGeo = {
+    ...currentGeo,
+    features: updatedFeatures,
+  }
+  console.log(newGeo)
+
+
+  return newGeo
+}
+
+export function editAllFeatureSelf(
+  currentGeo: CustomFeatureCollection,
+  key: string,
+  value: any,
+  action: 'addOrUpdate' | 'remove',
+  property?: boolean
+) {
+  // Iterate over each feature in geojson.features and update _self
+  const updatedFeatures = currentGeo.features.map((feature) => {
+    let currentSelf = feature._self
+
+    if (property) {
+      currentSelf = feature.properties || {}
+    }
+
+    if (action === 'addOrUpdate') {
+      if (value !== undefined) {
+        // Add or update the key-value pair
+        currentSelf[key] = value
+      }
+    } else if (action === 'remove') {
+      // Remove the key from _self
+      delete currentSelf[key]
+    }
+
+    // Return the updated feature with modified _self
+    return {
+      ...feature,
+      _self: currentSelf,
+    }
+  })
+
+  const newGeo = {
+    ...currentGeo,
+    features: updatedFeatures,
+  }
+
+  return newGeo
+}

@@ -6,7 +6,7 @@ import {
   Collapsible,
   CollapsibleTrigger,
   CollapsibleContent,
-} from '../../ui/collapsible'
+} from '../../../ui/collapsible'
 
 type CollapsibleVariablesProps = {
   header: string
@@ -32,7 +32,7 @@ export default function CollapsibleVariables({
           )}
         </Button>
       </CollapsibleTrigger>
-      <CollapsibleContent className="p-4">{children}</CollapsibleContent>
+      <CollapsibleContent className="p-4 pt-1">{children}</CollapsibleContent>
     </Collapsible>
   )
 }

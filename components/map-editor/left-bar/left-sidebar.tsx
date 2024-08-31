@@ -12,6 +12,7 @@ export default function LeftSidebar() {
   const filterName = map.geojson?.features.map((feature) => [
     feature.properties?.name,
     feature?.id,
+    feature?.properties
   ])
 
   return (
@@ -24,6 +25,7 @@ export default function LeftSidebar() {
               key={tuple[0].concat(index.toString())}
               name={tuple[0]}
               id={tuple[1]}
+              properties={tuple[2]}
             />
           ))}
         </ul>

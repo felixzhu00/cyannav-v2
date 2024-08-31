@@ -4,7 +4,7 @@ import { useHydrateAtoms } from 'jotai/utils'
 import { mapAtom } from '@/lib/jotai'
 import Choropleth from '../templates/Choropleth'
 import LeftSidebar from '@/components/map-editor/left-bar/left-sidebar'
-import RightSideBar from '@/components/map-editor/right-bar/right-sidebar'
+import RightBar from '@/components/map-editor/right-bar/right-bar'
 
 import {
   ResizableHandle,
@@ -47,7 +47,7 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={20}>
-            <RightSideBar />
+            <RightBar />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

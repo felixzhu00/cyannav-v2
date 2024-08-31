@@ -21,13 +21,31 @@ export interface IMapDocument extends IMap, Document {}
 
 // Custom Feature Collection
 export interface CustomFeature extends Feature {
-  id: string;
-  _self: Map<string, string | number>; // Using Record to represent an object-like structure
+  id: string
+  _self: { [key: string]: any }
 }
 
 export interface CustomFeatureCollection extends FeatureCollection {
-  features: CustomFeature[];
-  _shared: Map<string, string | number>; // Using Record to represent an object-like structure
+  features: CustomFeature[]
+  _shared: { [key: string]: any }
 }
 
 export interface MapFields extends Partial<IMapDocument> {}
+
+export interface MapAtom {
+  _id: string
+  title: string
+  owner: {
+    username: string
+    email: string
+  }
+  mapType: string
+  isPublished: 'private' | 'public' | 'invited'
+  geojson: CustomFeatureCollection
+  thumbnail?: string
+  likes: string[]
+  messages: string[]
+  sharedUsers: string[]
+  dateCreated: Date
+  forkedFrom: string[]
+}

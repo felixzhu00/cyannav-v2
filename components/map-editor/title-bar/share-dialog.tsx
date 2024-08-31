@@ -1,10 +1,11 @@
-import { Check, Copy, Lock, Minus } from 'lucide-react'
+import { Copy, Lock } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -25,17 +26,8 @@ import {
 import { useState } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 
-const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text).then(
-    () => {
-      console.log('Text copied to clipboard successfully!')
-      // Optionally, you could show a toast notification or some UI feedback here
-    },
-    (err) => {
-      console.error('Failed to copy text: ', err)
-      // Handle the error appropriately, maybe show an error message
-    }
-  )
+const copyToClipboard = (text: string) => {
+  navigator.clipboard.writeText(text)
 }
 
 const shareOptions = {
@@ -127,7 +119,10 @@ export default function DialogCloseButton() {
       </DialogTrigger>
       <DialogContent className="gap-0 sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Share "{title}"</DialogTitle>
+          <DialogTitle>Share &quot;{title}&quot;</DialogTitle>
+          <DialogDescription className="sr-only">
+            Manage share options here
+          </DialogDescription>
         </DialogHeader>
         <div className="flex flex-row items-center gap-4 py-2 pt-4">
           <Input

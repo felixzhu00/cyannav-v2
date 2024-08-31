@@ -59,7 +59,6 @@ export default function Title() {
         })
 
         if (response.ok) {
-          setTitleText(result.map.title) // Update the title state
           setMapField({ field: 'title', value: result.map.title }) // Update the global title state
         }
       } catch (error) {

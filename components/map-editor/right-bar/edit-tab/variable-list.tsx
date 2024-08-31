@@ -22,10 +22,11 @@ export default function VariableList({
           Start by Adding a {listName} Variable
         </div>
       ) : (
-        Object.entries(list).map(([key, value]) => (
+        Object.entries(list).map(([key, value], index) => (
           <VariableListItem
+            key={key.concat(index.toString())}
             variablekey={key}
-            value={value}
+            value={value || ''}
             listName={listName}
           />
         ))

@@ -11,9 +11,13 @@ import {
 import {
   CustomFeature,
   CustomFeatureCollection,
+  IMapDocument,
 } from '@/core/_entities/types/map.types'
 import { nanoid } from 'nanoid'
-
+import { APIResponse } from '@/core/_entities/types/api.types'
+import { IUserDocument } from '@/core/_entities/types/user.types'
+import { IMessageDocument } from '@/core/_entities/types/messages.types'
+import { Types } from 'mongoose'
 // eslint-disable-next-line import/prefer-default-export
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -159,7 +163,6 @@ export function editFeatureSelf(
     if (value !== undefined) {
       // Add or update the key-value pair
       currentSelf[key] = value
-      console.log(key, value, 'asddasd',currentSelf)
     }
   } else if (action === 'remove') {
     // Remove the key from _self
@@ -181,8 +184,6 @@ export function editFeatureSelf(
     ...currentGeo,
     features: updatedFeatures,
   }
-  console.log(newGeo)
-
 
   return newGeo
 }
@@ -225,4 +226,76 @@ export function editAllFeatureSelf(
   }
 
   return newGeo
+}
+
+export function handleDBError(error: any): APIResponse {
+  let status = 500
+  let issue = 'Unexpected error occurred'
+  let message = 'An unexpected error occurred while processing your request.'
+
+  if (error instanceof mongoose.Error.ValidationError) {
+    status = 400
+    issue = `Validation error: ${error.message}`
+    message = 'Validation failed.'
+  } else if (error instanceof mongoose.Error.CastError) {
+    status = 400
+    issue = `Invalid format: ${error.message}`
+    message = 'Invalid input format.'
+  } else if (error instanceof mongoose.Error.ConnectionError) {
+    status = 500
+    issue = `Database connection error: ${error.message}`
+    message = 'Database connection issue.'
+  } else if (error instanceof mongoose.Error) {
+    // Generic Mongoose error
+    issue = `Mongoose error: ${error.message}`
+    message = 'A database error occurred.'
+  } else {
+    // Handle any non-Mongoose errors
+    issue = `General error: ${error.message}`
+    message = 'An error occurred while processing your request.'
+  }
+
+  return {
+    status,
+    error: issue,
+    message,
+  }
+}
+
+export function transformMap(map: IMapDocument) {
+  return {
+    ...map,
+    owner: {
+      username: (map.owner as IUserDocument)?.username?.toString() || '', // Safely access and convert username to string, fallback to an empty string if undefined
+      email: (map.owner as IUserDocument)?.email?.toString() || '', // Safely access and convert email to string, fallback to an empty string if undefined
+    },
+    geojson: map.geojson ? Buffer.from(map.geojson.buffer) : undefined,
+    thumbnail: map.thumbnail ? Buffer.from(map.thumbnail) : undefined,
+    messages: map.messages?.map((m) => {
+      // Explicitly assert the type of m.author
+      const author = (m as IMessageDocument).author as IUserDocument
+      return {
+        ...(m as IMessageDocument),
+        author: author.username,
+      }
+    }),
+    sharedUsers:
+      map.sharedUsers?.map((sharedUser) => ({
+        username: (sharedUser as IUserDocument)?.username?.toString() || '',
+        email: (sharedUser as IUserDocument)?.email?.toString() || '',
+      })) || [],
+    forkedFrom: map.forkedFrom?.toString(),
+    likes: map.likes?.map((likeId) => (likeId as Types.ObjectId).toString()),
+  }
+}
+export function createErrorResponse(
+  status: number,
+  message: string,
+  error: string
+): APIResponse {
+  return {
+    status,
+    error,
+    message,
+  }
 }

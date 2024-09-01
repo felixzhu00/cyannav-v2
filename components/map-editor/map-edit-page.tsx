@@ -24,8 +24,6 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
 
   // Hydrate Jotai Map Atom
   useHydrateAtoms([[mapAtom, decodedMap]])
-  console.log(decodedMap.geojson)
-
 
   return (
     <div className="flex h-screen w-full flex-col">

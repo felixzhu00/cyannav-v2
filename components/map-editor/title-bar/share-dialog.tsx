@@ -64,12 +64,12 @@ export default function DialogCloseButton() {
       const result = await response.json()
 
       toast({
-        description: result.message || result.error,
+        description: result.message,
       })
 
       if (response.ok) {
-        setShareOption(result.map.isPublished) // Update the title state
-        setMapField({ field: 'isPublished', value: result.map.isPublished }) // Update the global title state
+        setShareOption(result.payload.isPublished) // Update the title state
+        setMapField({ field: 'isPublished', value: result.payload.isPublished }) // Update the global title state
       }
     } catch (error) {
       toast({
@@ -91,7 +91,7 @@ export default function DialogCloseButton() {
       const result = await response.json()
 
       toast({
-        description: result.message || result.error,
+        description: result.message,
       })
 
       if (response.ok) {
@@ -99,8 +99,8 @@ export default function DialogCloseButton() {
           setUserInput('') // Reset Input
         }
         // If length changes (deleted or added)
-        if (sharedUsers.length !== result.data.sharedUsers.length) {
-          setMapField({ field: 'sharedUsers', value: result.data.sharedUsers }) // Update the global sharedUser
+        if (sharedUsers.length !== result.payload.sharedUsers.length) {
+          setMapField({ field: 'sharedUsers', value: result.payload.sharedUsers }) // Update the global sharedUser
         }
       }
     } catch (error) {

@@ -19,9 +19,8 @@ export default async function MapPage({ params }: { params: { id: string } }) {
     }
 
     const map = await response.json()
-    
     // Render the MapEditPage with the fetched map data
-    return <MapEditPage initialMap={map} />
+    return <MapEditPage initialMap={map.payload} />
   } catch (error) {
     return <p>Error fetching map</p>
   }

@@ -67,12 +67,24 @@ export default function EditTab() {
 
       {/* Collapsible for _Self/Local */}
       <CollapsibleVariables header="Local Variables">
-        <VariableList list={localItems} listName="Local" />
+        <VariableList
+          list={localItems}
+          currLayerId={currLayer}
+          mapId={map._id}
+          mapGeo={map.geojson}
+          listName="Local"
+        />
       </CollapsibleVariables>
 
       {/* Collapsible for _Share/Global */}
       <CollapsibleVariables header="Global Variables">
-        <VariableList list={gobalItems} listName="Global" />
+        <VariableList
+          list={gobalItems}
+          currLayerId={currLayer}
+          mapId={map._id}
+          mapGeo={map.geojson}
+          listName="Global"
+        />
         {/* By Feature Selection */}
         <div className="w-full flex-col items-center gap-1.5 pt-2">
           {/* Sub Header */}

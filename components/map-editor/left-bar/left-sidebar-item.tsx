@@ -32,6 +32,7 @@ export default function LeftSidebarItem({
   const handleToggleProperty = async (property: string) => {
     // init newGeo with a not null value
 
+    console.log("toggle proc")
     const newGeo = editFeatureSelf(
       map.geojson,
       id,
@@ -60,11 +61,11 @@ export default function LeftSidebarItem({
       const result = await response.json()
 
       toast({
-        description: result.message || result.error,
+        description: result.message,
       })
 
       if (response.ok) {
-        const decodedGeo = decodeGeo(result.map.geojson)
+        const decodedGeo = decodeGeo(result.payload.geojson)
         setMapField({ field: 'geojson', value: decodedGeo }) // Update the global title state
       }
     } catch (error) {

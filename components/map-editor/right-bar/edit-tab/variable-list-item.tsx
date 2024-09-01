@@ -1,78 +1,71 @@
 import { decodeGeo, editFeatureSelf, encodeGeo } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
-import { useAtomValue, useSetAtom } from 'jotai'
-import { currLayerAtom, mapAtom, setMapFieldAtom } from '@/lib/jotai'
+import { useSetAtom } from 'jotai'
+import { setMapFieldAtom } from '@/lib/jotai'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import TrashDialog from './trash-dialog'
 import { useEffect, useState } from 'react'
 import useDebounce from '@/lib/hooks/useDebounce'
+import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 
 export default function VariableListItem({
   variablekey,
   value,
   listName,
+  mapGeo,
+  mapId,
+  currLayerId,
 }: {
   variablekey: string
   value: any
   listName: string
+  mapGeo: CustomFeatureCollection
+  mapId: string
+  currLayerId: string
 }) {
-  const currLayer = useAtomValue(currLayerAtom)
-  const map = useAtomValue(mapAtom)
   const setMapField = useSetAtom(setMapFieldAtom)
 
   const [inputValue, setInputValue] = useState(value)
-  const debouncedInputValue = useDebounce(inputValue, 500)
-
-  const handleChangeValue = async () => {
-    const newGeo = editFeatureSelf(
-      map.geojson,
-      currLayer,
-      variablekey,
-      inputValue,
-      'addOrUpdate'
-    )
-
-    // Optimisic update
-    setMapField({ field: 'geojson', value: newGeo })
-
-    // Encode geoJSON
-    const encodedGeoJSON = encodeGeo(newGeo)
-
-    // Call Put API
-    try {
-      const response = await fetch(`/api/map/${map._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ geojson: encodedGeoJSON }),
-      })
-
-      const result = await response.json()
-
-      toast({
-        description: result.message || result.error,
-      })
-
-      if (response.ok) {
-        const decodedGeo = decodeGeo(result.map.geojson)
-        console.log(decodedGeo)
-
-        // setMapField({ field: 'geojson', value: decodedGeo }) // Might hinder user experience
-      }
-    } catch (error) {
-      toast({
-        description: 'An error occurred while updating the geojson',
-      })
-    }
-  }
+  // delay PUT request
+  const debouncedInputValue = useDebounce(inputValue)
 
   useEffect(() => {
     const updateVariable = async () => {
-      if (debouncedInputValue) {
-        await handleChangeValue()
-        console.log('trigger', debouncedInputValue)
+      const newGeo = editFeatureSelf(
+        mapGeo,
+        currLayerId,
+        variablekey,
+        debouncedInputValue,
+        'addOrUpdate'
+      )
+      // Encode geoJSON
+      const encodedGeoJSON = encodeGeo(newGeo)
+
+      // Call Put API
+      try {
+        const response = await fetch(`/api/map/${mapId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ geojson: encodedGeoJSON }),
+        })
+
+        const result = await response.json()
+
+        toast({
+          description: result.message,
+        })
+
+        if (response.ok) {
+          const decodedGeo = decodeGeo(result.payload.geojson)
+          setMapField({ field: 'geojson', value: decodedGeo }) // Might hinder user experience
+        }
+      } catch (error) {
+        toast({
+          description: 'An error occurred while updating the geojson',
+        })
       }
     }
 

@@ -1,11 +1,18 @@
+import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import VariableListItem from './variable-list-item'
 
 export default function VariableList({
   list,
   listName,
+  mapGeo,
+  mapId,
+  currLayerId,
 }: {
   list: { [key: string]: any } | undefined // undefine if _shared/_self does not exist
   listName: string
+  mapGeo: CustomFeatureCollection
+  mapId: string
+  currLayerId: string
 }) {
   if (!list)
     return (
@@ -14,7 +21,6 @@ export default function VariableList({
       </span>
     ) // If list is undefined, return null
 
-  console.log(Object.entries(list))
   return (
     <div>
       {Object.keys(list).length === 0 ? (
@@ -24,10 +30,13 @@ export default function VariableList({
       ) : (
         Object.entries(list).map(([key, value], index) => (
           <VariableListItem
-            key={key.concat(index.toString())}
+            key={key.concat(index.toString(), value.toString())}
             variablekey={key}
-            value={value || ''}
+            value={value.toString() || ''}
             listName={listName}
+            mapGeo={mapGeo}
+            mapId={mapId}
+            currLayerId={currLayerId}
           />
         ))
       )}

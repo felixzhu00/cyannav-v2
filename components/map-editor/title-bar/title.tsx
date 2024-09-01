@@ -55,11 +55,11 @@ export default function Title() {
         const result = await response.json()
 
         toast({
-          description: result.message || result.error,
+          description: result.message,
         })
 
         if (response.ok) {
-          setMapField({ field: 'title', value: result.map.title }) // Update the global title state
+          setMapField({ field: 'title', value: result.payload.title }) // Update the global title state
         }
       } catch (error) {
         toast({

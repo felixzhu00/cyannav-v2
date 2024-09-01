@@ -112,11 +112,11 @@ export default function VariableDialog({
       const result = await response.json()
 
       toast({
-        description: result.message || result.error,
+        description: result.message,
       })
 
       if (response.ok) {
-        const decodedGeo = decodeGeo(result.map.geojson)
+        const decodedGeo = decodeGeo(result.payload.geojson)
         setMapField({ field: 'geojson', value: decodedGeo }) // Update the global title state
       }
     } catch (error) {

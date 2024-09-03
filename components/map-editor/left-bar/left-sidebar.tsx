@@ -5,14 +5,14 @@ import { mapAtom } from '@/lib/jotai'
 // Temp const var to populate
 
 export default function LeftSidebar() {
-  const [map, ] = useAtom(mapAtom)
+  const [map] = useAtom(mapAtom)
 
   if (!map.geojson) return <div>GeoJSON not found</div>
 
   const filterName = map.geojson?.features.map((feature) => [
     feature.properties?.name,
-    feature?.id,
-    feature?.properties
+    feature.properties?._id,
+    feature?.properties,
   ])
 
   return (

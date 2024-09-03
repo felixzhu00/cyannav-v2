@@ -46,7 +46,10 @@ export function convertToCustomFeatureCollection(
   if (geojson.type === 'FeatureCollection') {
     const postGeo = geojson.features.map((feature) => ({
       ...feature,
-      id: nanoid(),
+      properties: {
+        ...feature.properties,
+        _id: nanoid(),
+      },
       _self: new Map<string, string | number>(),
     }))
 

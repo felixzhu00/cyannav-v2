@@ -32,7 +32,6 @@ export default function LeftSidebarItem({
   const handleToggleProperty = async (property: string) => {
     // init newGeo with a not null value
 
-    console.log("toggle proc")
     const newGeo = editFeatureSelf(
       map.geojson,
       id,

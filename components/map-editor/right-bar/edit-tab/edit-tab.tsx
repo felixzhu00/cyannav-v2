@@ -34,8 +34,9 @@ const findFeatureById = (
   if (!id || !mapGeojson || !mapGeojson.features) return null
 
   return (
-    mapGeojson.features.find((feature: CustomFeature) => feature.id === id) ||
-    null
+    mapGeojson.features.find(
+      (feature: CustomFeature) => feature?.properties?._id === id
+    ) || null
   )
 }
 

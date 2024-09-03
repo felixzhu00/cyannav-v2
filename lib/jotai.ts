@@ -4,7 +4,7 @@ import {
   MapAtom,
 } from '@/core/_entities/types/map.types'
 import { atom } from 'jotai'
-import { editAllFeatureSelf, editFeatureSelf, editGeoShared } from './utils'
+import maplibregl from 'maplibre-gl';
 
 // Init as None
 export const selectedEditOptionAtom = atom('')
@@ -48,3 +48,6 @@ export const setMapFieldAtom = atom(
     })
   }
 )
+
+
+export const mapLibreAtom = atom<maplibregl.Map | null>(null);

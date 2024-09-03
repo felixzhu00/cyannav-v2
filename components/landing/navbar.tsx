@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Session } from 'next-auth'
-import SignOut from '@/components/landing/signOut'
+import SignOut from '@/components/landing/sign-out'
 
 interface NavbarProps {
   session: Session | null
@@ -85,9 +85,13 @@ const Navbar: React.FC<NavbarProps> = ({ session }) => {
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="text-sm font-medium">
-                  <DropdownMenuItem className="flex flex-row items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    <p>Account Settings</p>
+                  <DropdownMenuItem asChild>
+                    <Link href="/user?view=settings" passHref>
+                      <div className="flex flex-row items-center gap-2">
+                        <Settings className="h-4 w-4" />
+                        <p>Account Settings</p>
+                      </div>
+                    </Link>
                   </DropdownMenuItem>
                   <SignOut />
                 </DropdownMenuContent>

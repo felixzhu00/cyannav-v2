@@ -26,8 +26,6 @@ export default function RootLayout({
   // Get the referer URL from the headers, or fall back to an empty string
   const refererUrl = headersList.get('referer') || ''
 
-
-
   if (refererUrl) {
     try {
       // Create a URL object from the referer URL
@@ -46,10 +44,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-           {isMap && <Toaster />}
-           {isMap && <Header />}
-          {children}
-          {isMap && <Footer />}
+        {isMap && <Toaster />}
+        {<Header />}
+        {children}
+        <Footer />
       </body>
     </html>
   )

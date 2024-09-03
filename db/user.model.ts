@@ -13,6 +13,8 @@ const UserSchema = new Schema<IUserDocument>({
 })
 
 // Use the existing model if it exists, otherwise create a new one
-const User = models.User || model<IUserDocument>('User', UserSchema)
+delete models.User
+// const User = models.User || model<IUserDocument>('User', UserSchema)
+export default model<IUserDocument>('User', UserSchema)
 
-export default User
+// export default User

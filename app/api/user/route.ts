@@ -1,0 +1,29 @@
+import { NextResponse } from 'next/server'
+import checkUsernameUseCase from '@/core/use-cases/user/check-username.use-case'
+
+export async function GET(request: Request) {
+  const url = new URL(request.url)
+  const username = url.searchParams.get('username')
+
+  try {
+    const res = await checkUsernameUseCase(username as string)
+
+    if ('error' in res) {
+      return NextResponse.json({ message: res.message }, { status: res.status })
+    }
+    return NextResponse.json({
+      message: res.message,
+      payload: res.payload,
+      status: res.status,
+    })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      {
+        error: { server: ['Internal Server Error'] },
+        message: 'Internal Server Error',
+      },
+      { status: 500 }
+    )
+  }
+}

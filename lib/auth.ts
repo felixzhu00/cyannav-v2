@@ -21,6 +21,7 @@ const providers: Provider[] = [
       }
       return user
     },
+    allowDangerousEmailAccountLinking: true, // TEMP FIX
   }),
   Google({
     profile(profile: GoogleProfile) {
@@ -33,6 +34,7 @@ const providers: Provider[] = [
       }
       return user
     },
+    allowDangerousEmailAccountLinking: true, // TEMP FIX
   }),
 ]
 

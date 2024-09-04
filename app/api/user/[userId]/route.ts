@@ -1,0 +1,30 @@
+import { NextResponse } from 'next/server'
+import deleteUserUseCase from '@/core/use-cases/user/delete-user.use-case'
+
+export async function DELETE(request: Request) {
+  const body = await request.json()
+  const userId = body.userId
+  const email = body.email
+
+  try {
+    const res = await deleteUserUseCase(userId, email)
+
+    if ('error' in res) {
+      return NextResponse.json({ message: res.message }, { status: res.status })
+    }
+
+    return NextResponse.json({
+      message: res.message,
+      status: res.status,
+    })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      {
+        error: { server: ['Internal Server Error'] },
+        message: 'Internal Server Error',
+      },
+      { status: 500 }
+    )
+  }
+}

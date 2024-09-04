@@ -3,7 +3,6 @@ import dbConnect from '@/db/dbConnect'
 
 export async function updateUsernameById(id: string, newUsername: string) {
   await dbConnect()
-  //   console.log(id)
   try {
     // Find the user by ID
     const user = await User.findById(id)

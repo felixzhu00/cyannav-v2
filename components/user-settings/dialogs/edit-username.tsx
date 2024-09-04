@@ -13,20 +13,15 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
+import { useSession } from 'next-auth/react'
 
 interface EditUsernameProps {
-  session: Session | null
-  onUsernameUpdate: (newUsername: string) => void // Add this line
+  onUsernameUpdate: (newUsername: string) => void
 }
 
-interface Session {
-  user: {
-    username: string
-  }
-  userId: string
-}
+export function EditUsername({ onUsernameUpdate }: EditUsernameProps) {
+  const { data: session } = useSession()
 
-export function EditUsername({ session, onUsernameUpdate }: EditUsernameProps) {
   const [username, setUsername] = useState(session?.user?.username)
   const [isUsernameValid, setIsUsernameValid] = useState<{
     message: null

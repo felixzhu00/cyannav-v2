@@ -1,25 +1,48 @@
-import React from 'react'
+'use client'
+import React, { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { CircleUserRound } from 'lucide-react'
-import { Session } from 'next-auth'
-// import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { EditUsername } from '@/components/user-settings/dialogs/edit-username'
 import { DeleteAccount } from '@/components/user-settings/dialogs/delete-account'
 import { PfpUpload } from '@/components/user-settings/dialogs/pfp-upload'
+
 interface ProfileSettingsProps {
   session: Session | null
 }
 
+interface Session {
+  user: {
+    username: string
+    image: string
+    email: string
+  }
+  userId: string
+}
+
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({ session }) => {
+  const [currentSession, setCurrentSession] = useState(session)
+
+  const handleUsernameUpdate = (newUsername: string) => {
+    if (currentSession && currentSession.user) {
+      setCurrentSession({
+        ...currentSession,
+        user: {
+          ...currentSession.user,
+          username: newUsername,
+        },
+      })
+    }
+  }
+
   return (
     <div className="flex flex-col items-center space-y-14">
       <div className="flex flex-col items-center space-y-5">
-        {session && session.user ? (
+        {currentSession && currentSession.user ? (
           <Avatar className="h-36 w-36 rounded-full border border-zinc-200 dark:border-zinc-700">
             <AvatarImage
-              src={session.user.image ?? undefined}
+              src={currentSession.user.image ?? undefined}
               className="h-36 w-36"
             />
             <AvatarFallback className="h-36 w-36">
@@ -43,9 +66,12 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ session }) => {
               disabled
               type="text"
               id="username"
-              placeholder={session?.user?.username ?? 'Username'}
+              placeholder={currentSession?.user?.username ?? 'Username'}
             />
-            <EditUsername session={session} />
+            <EditUsername
+              session={currentSession}
+              onUsernameUpdate={handleUsernameUpdate}
+            />
           </div>
         </div>
         <div className="grid w-full max-w-xl items-center gap-1.5">
@@ -55,7 +81,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ session }) => {
               disabled
               type="email"
               id="email"
-              placeholder={session?.user?.email ?? 'email'}
+              placeholder={currentSession?.user?.email ?? 'email'}
             />
           </div>
         </div>

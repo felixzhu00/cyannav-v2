@@ -24,13 +24,13 @@ export function renderFill(
     paint: {
       'fill-color': [
         'case',
-        ['boolean', ['feature-state', 'visible'], true],
+        ['boolean', ['feature-state', 'visible'], false],
         '#000000', // Color for visible features
         'rgba(0,0,0,0)', // Transparent color for hidden features
       ],
       'fill-opacity': [
         'case',
-        ['boolean', ['feature-state', 'visible'], true],
+        ['boolean', ['feature-state', 'visible'], false],
         0.4, // Opacity for visible features
         0, // Fully transparent for hidden features
       ],
@@ -59,7 +59,7 @@ export function renderFill(
       ],
       'line-width': [
         'case',
-        ['boolean', ['feature-state', 'visible'], true],
+        ['boolean', ['feature-state', 'visible'], false],
         [
           'case',
           ['boolean', ['feature-state', 'selected'], false],

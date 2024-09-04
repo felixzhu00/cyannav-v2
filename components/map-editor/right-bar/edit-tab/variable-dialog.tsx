@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { ColorPicker } from '@/components/ui/color-picker'
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,15 @@ import {
 } from '@/lib/utils'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useState } from 'react'
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+} from '@/components/ui/select'
+import NumberInput from '@/components/ui/number-input'
 
 export default function VariableDialog({
   type,
@@ -33,18 +43,15 @@ export default function VariableDialog({
   // Initialize state for the selected radio option
   const [selectedValue, setSelectedValue] = useState('selected')
   const [variableName, setVariableName] = useState('')
-  const [variableValue, setVariableValue] = useState('')
+  const [variableValue, setVariableValue] = useState<string | number>('')
+  const [variableType, setVariableType] = useState('string')
 
   const setMapField = useSetAtom(setMapFieldAtom)
   const featureId = useAtomValue(currLayerAtom)
 
   const map = useAtomValue(mapAtom)
 
-  // Handle changes in radio group
-  const handleRadioChange = (value: string) => {
-    setSelectedValue(value)
-  }
-
+  console.log(selectedValue, variableName, variableType, variableValue)
   // Handle changes in input fields
   const handleVariableNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVariableName(e.target.value)
@@ -76,14 +83,14 @@ export default function VariableDialog({
           map.geojson,
           featureId,
           variableName,
-          variableValue,
+          { payload: variableValue, variableType },
           'addOrUpdate'
         )
       } else {
         newGeo = editAllFeatureSelf(
           map.geojson,
           variableName,
-          variableValue,
+          { payload: variableValue, variableType },
           'addOrUpdate'
         )
       }
@@ -92,7 +99,7 @@ export default function VariableDialog({
       newGeo = editGeoShared(
         map.geojson,
         variableName,
-        variableValue,
+        { payload: variableValue, variableType },
         'addOrUpdate'
       )
     }
@@ -143,7 +150,7 @@ export default function VariableDialog({
             defaultValue="selected"
             className="flex justify-center space-x-4 py-4 pb-2"
             value={selectedValue}
-            onValueChange={handleRadioChange}
+            onValueChange={setSelectedValue}
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="selected" id="r1" />
@@ -156,6 +163,30 @@ export default function VariableDialog({
           </RadioGroup>
         )}
 
+        <RadioGroup
+          defaultValue="string"
+          className="flex justify-center space-x-4 py-4 pb-2"
+          value={variableType}
+          onValueChange={setVariableType}
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="string" id="r1" />
+            <Label htmlFor="r1">String</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="color" id="r2" />
+            <Label htmlFor="r2">Color</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="boolean" id="r2" />
+            <Label htmlFor="r2">Boolean</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="number" id="r2" />
+            <Label htmlFor="r2">Number</Label>
+          </div>
+        </RadioGroup>
+
         <div className="grid gap-4 py-4">
           <div className="items-left flex flex-col gap-4">
             <Label htmlFor="name" className="pl-2 font-semibold">
@@ -164,7 +195,7 @@ export default function VariableDialog({
             <Input
               id="name"
               placeholder="Est. Population"
-              className="text-sm text-gray-500"
+              className="text-sm"
               value={variableName}
               onChange={handleVariableNameChange}
             />
@@ -173,13 +204,64 @@ export default function VariableDialog({
             <Label htmlFor="username" className="pl-2 font-semibold">
               Variable Value
             </Label>
-            <Input
-              id="value"
-              placeholder="123456789"
-              className="text-sm text-gray-500"
-              value={variableValue}
-              onChange={handleVariableValueChange}
-            />
+            {variableType === 'string' && (
+              <Input
+                id="value"
+                placeholder="123456789"
+                className="text-sm"
+                value={variableValue}
+                onChange={handleVariableValueChange}
+              />
+            )}
+
+            {variableType === 'color' && (
+              <div className="flex flex-row">
+                <Input
+                  id="value"
+                  placeholder="#FFFFFF"
+                  className="text-sm"
+                  value={variableValue}
+                  onChange={handleVariableValueChange}
+                />
+                <ColorPicker
+                  className="aspect-square"
+                  value={variableValue.toString() || ''}
+                  onChange={setVariableValue}
+                />
+              </div>
+            )}
+
+            {variableType === 'boolean' && (
+              <div className="flex flex-row">
+                <Select
+                  value={variableValue.toString() || ''}
+                  onValueChange={setVariableValue}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="true">True</SelectItem>
+                      <SelectItem value="false">False</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {variableType === 'number' && (
+              <div className="flex flex-row">
+                <Input
+                  type="number"
+                  id="value"
+                  placeholder="111111"
+                  className="text-sm"
+                  value={variableValue}
+                  onChange={handleVariableValueChange}
+                />
+              </div>
+            )}
           </div>
         </div>
         <DialogFooter>

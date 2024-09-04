@@ -20,7 +20,7 @@ export default function VariableList({
         _self/_share not found
       </span>
     ) // If list is undefined, return null
-
+  
   const privateVariables = ['_id', '_visible', '_lock']
   return (
     <div>
@@ -34,13 +34,14 @@ export default function VariableList({
           if (!privateVariables.includes(key)) {
             return (
               <VariableListItem
-                key={key.concat(index.toString(), value.toString())}
+                key={key.concat(index.toString(), value.payload?.toString())}
                 variablekey={key}
-                value={value.toString() || ''}
+                value={value.payload?.toString() || ''}
                 listName={listName}
                 mapGeo={mapGeo}
                 mapId={mapId}
                 currLayerId={currLayerId}
+                variableType={value.variableType}
               />
             )
           }

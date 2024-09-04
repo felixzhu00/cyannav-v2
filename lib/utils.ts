@@ -238,7 +238,7 @@ export function editAllFeatureSelf(
     features: updatedFeatures,
   }
 
-  return newGeo
+  return newGeo as CustomFeatureCollection
 }
 
 export function handleDBError(error: any): APIResponse {

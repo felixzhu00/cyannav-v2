@@ -146,7 +146,7 @@ export function editFeatureSelf(
 ) {
   // Find the feature by its ID
   const featureIndex = currentGeo.features.findIndex(
-    (feature) => feature.id === featureId
+    (feature) => feature?.properties?._id === featureId
   )
 
   // Feature not found in geojson

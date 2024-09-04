@@ -1,7 +1,7 @@
 'use client'
 
 import { useHydrateAtoms } from 'jotai/utils'
-import { mapAtom } from '@/lib/jotai'
+import { currLayerAtom, mapAtom } from '@/lib/jotai'
 import LeftSidebar from '@/components/map-editor/left-bar/left-sidebar'
 import RightBar from '@/components/map-editor/right-bar/right-bar'
 
@@ -14,26 +14,33 @@ import MenuBar from './title-bar/menubar'
 import { decodeGeo } from '@/lib/utils'
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import { useMapLibre } from '@/lib/hooks/useMapLibre'
+import { useSetAtom } from 'jotai'
+import { applyClick, applyHover, renderFill } from '@/lib/map-render'
 
 export default function MapEditPage({ initialMap }: { initialMap: any }) {
-  // Define New Map with Decoded GeoJSON
+  // Decode the initial map data
   const decodedMap = {
     ...initialMap,
     geojson: decodeGeo(initialMap.geojson) as CustomFeatureCollection,
   }
 
-  // Hydrate Jotai Map Atom
+  const setCurrLayer = useSetAtom(currLayerAtom)
+
+  // Hydrate Jotai map atom
   useHydrateAtoms([[mapAtom, decodedMap]])
 
   // Use the custom useMapLibre hook
   const { mapContainer } = useMapLibre({
-    containerId: 'map-container',
     styleUrl: 'https://demotiles.maplibre.org/style.json',
+    onMapLoad: (mapRef) => {
+      renderFill({ current: mapRef }, decodedMap.geojson) // Render layers with fill style
+      applyHover({ current: mapRef }) // Apply hover event listener
+      applyClick({ current: mapRef }, setCurrLayer) // Apply click event listener
+    },
   })
 
   return (
     <div className="flex h-screen w-full flex-col">
-      {/* Fixed Top MenuBar */}
       <MenuBar />
       <div className="flex h-screen justify-between">
         <ResizablePanelGroup direction="horizontal">
@@ -42,7 +49,6 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
           </ResizablePanel>
           <ResizableHandle withHandle />
 
-          {/* Main Content */}
           <ResizablePanel defaultSize={60}>
             <div
               className="flex h-full max-h-[calc(100vh-74px)] flex-grow justify-center border-x-2 border-zinc-700"
@@ -50,7 +56,6 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
               id="map-container"
             >
               {/* Your main content goes here */}
-              {/* <Choropleth/> */}
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />

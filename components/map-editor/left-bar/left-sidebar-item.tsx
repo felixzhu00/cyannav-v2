@@ -1,8 +1,14 @@
 import React from 'react'
 import { Eye, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
-import { currLayerAtom, mapAtom, setMapFieldAtom } from '@/lib/jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
+import {
+  currLayerAtom,
+  mapAtom,
+  setCurrLayerSelectAtom,
+  setMapFieldAtom,
+  setToggleFeatureStateAtom,
+} from '@/lib/jotai'
 import { cn, decodeGeo, editFeatureSelf, encodeGeo } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
 
@@ -17,15 +23,18 @@ export default function LeftSidebarItem({
   id,
   properties,
 }: LeftSidebarItemProps) {
-  const [currLayer, setCurrLayer] = useAtom(currLayerAtom)
+  const currLayer = useAtomValue(currLayerAtom)
   const map = useAtomValue(mapAtom)
   const setMapField = useSetAtom(setMapFieldAtom)
 
+  const setCurrLayerStyle = useSetAtom(setCurrLayerSelectAtom)
+  const setToggleFeatureState = useSetAtom(setToggleFeatureStateAtom)
+
   const handleLayerChange = () => {
     if (currLayer !== id) {
-      setCurrLayer(id)
+      setCurrLayerStyle(id)
     } else {
-      setCurrLayer('')
+      setCurrLayerStyle('')
     }
   }
 
@@ -66,6 +75,7 @@ export default function LeftSidebarItem({
       if (response.ok) {
         const decodedGeo = decodeGeo(result.payload.geojson)
         setMapField({ field: 'geojson', value: decodedGeo }) // Update the global title state
+        setToggleFeatureState(id, 'visible')
       }
     } catch (error) {
       toast({

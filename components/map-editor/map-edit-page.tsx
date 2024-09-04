@@ -26,6 +26,7 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
 
   const setCurrLayer = useSetAtom(currLayerAtom)
 
+  console.log(decodedMap)
   // Hydrate Jotai map atom
   useHydrateAtoms([[mapAtom, decodedMap]])
 

@@ -45,9 +45,10 @@ export default function LeftSidebarItem({
       map.geojson,
       id,
       property,
-      properties[property] === undefined ? false : !properties[property],
-      'addOrUpdate',
-      true
+      properties._self[property] === undefined
+        ? false
+        : !properties._self[property],
+      'addOrUpdate'
     )
 
     // Optimisic update
@@ -101,13 +102,13 @@ export default function LeftSidebarItem({
           size="icon"
           onClick={(e) => {
             e.stopPropagation()
-            handleToggleProperty('lock')
+            handleToggleProperty('_lock')
           }}
         >
           <Lock
             className={cn(
               'h-4 w-4',
-              properties.lock === false ? 'text-gray-500' : ''
+              properties._self._lock === false ? 'text-gray-500' : ''
             )}
           />
         </Button>
@@ -116,13 +117,13 @@ export default function LeftSidebarItem({
           size="icon"
           onClick={(e) => {
             e.stopPropagation()
-            handleToggleProperty('visible')
+            handleToggleProperty('_visible')
           }}
         >
           <Eye
             className={cn(
               'h-4 w-4',
-              properties.visible === false ? 'text-gray-500' : ''
+              properties._self._visible === false ? 'text-gray-500' : ''
             )}
           />
         </Button>

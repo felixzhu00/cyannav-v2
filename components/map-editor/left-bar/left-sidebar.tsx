@@ -10,7 +10,7 @@ export default function LeftSidebar() {
   if (!map.geojson) return <div>GeoJSON not found</div>
 
   const filterName = map.geojson?.features.map((feature) => [
-    feature.properties?.name,
+    feature.properties?._self.name,
     feature.properties?._id,
     feature?.properties,
   ])

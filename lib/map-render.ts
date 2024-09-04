@@ -84,7 +84,8 @@ export function renderFill(
 
       features.forEach((feature) => {
         const id = feature.id as string // Ensure id is string
-        const visible = feature.properties.visible === true // Assuming 'visible' is a boolean property
+        const selfObject = JSON.parse(feature.properties._self)
+        const visible = selfObject._visible === true // Assuming 'visible' is a boolean property
         map.current?.setFeatureState(
           { source: 'geojson-data', id },
           { visible }

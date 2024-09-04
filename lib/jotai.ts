@@ -58,7 +58,7 @@ export const setCurrLayerSelectAtom = atom(
     if (!sources) return
 
     mapRef.querySourceFeatures('geojson-data').forEach((feature) => {
-      const id = feature.id as string // Ensure id is string
+      const id = feature.properties._id as string // Ensure id is string
       mapRef.setFeatureState(
         { source: 'geojson-data', id },
         { selected: id === featureId }
@@ -80,7 +80,7 @@ export const setToggleFeatureStateAtom = atom(
 
     const feature = mapRef
       .querySourceFeatures('geojson-data')
-      .find((f) => f.id === featureId)
+      .find((f) => f.properties._id === featureId)
 
     if (feature) {
       // Set the feature state

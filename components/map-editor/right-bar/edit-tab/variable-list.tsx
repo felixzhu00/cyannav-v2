@@ -21,6 +21,7 @@ export default function VariableList({
       </span>
     ) // If list is undefined, return null
 
+  const privateVariables = ['_id', '_visible', '_lock']
   return (
     <div>
       {Object.keys(list).length === 0 ? (
@@ -28,17 +29,23 @@ export default function VariableList({
           Start by Adding a {listName} Variable
         </div>
       ) : (
-        Object.entries(list).map(([key, value], index) => (
-          <VariableListItem
-            key={key.concat(index.toString(), value.toString())}
-            variablekey={key}
-            value={value.toString() || ''}
-            listName={listName}
-            mapGeo={mapGeo}
-            mapId={mapId}
-            currLayerId={currLayerId}
-          />
-        ))
+        Object.entries(list).map(([key, value], index) => {
+          // Add the condition here
+          if (!privateVariables.includes(key)) {
+            return (
+              <VariableListItem
+                key={key.concat(index.toString(), value.toString())}
+                variablekey={key}
+                value={value.toString() || ''}
+                listName={listName}
+                mapGeo={mapGeo}
+                mapId={mapId}
+                currLayerId={currLayerId}
+              />
+            )
+          }
+          return null
+        })
       )}
     </div>
   )

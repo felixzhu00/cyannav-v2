@@ -9,7 +9,6 @@ import {
   GeoJSON,
 } from 'geojson'
 import {
-  CustomFeature,
   CustomFeatureCollection,
   IMapDocument,
 } from '@/core/_entities/types/map.types'
@@ -44,13 +43,17 @@ export function convertToCustomFeatureCollection(
   geojson: GeoJSON
 ): CustomFeatureCollection {
   if (geojson.type === 'FeatureCollection') {
-    const postGeo = geojson.features.map((feature) => ({
+    const postGeo = geojson.features.map((feature, index) => ({
       ...feature,
       properties: {
+        name: feature.properties?.name || `Feature${index}`,
         ...feature.properties,
-        _id: nanoid(),
+        _self: {
+          _id: nanoid(),
+          _visible: true,
+          _lock: false,
+        },
       },
-      _self: new Map<string, string | number>(),
     }))
 
     const finalGeo = {
@@ -65,13 +68,20 @@ export function convertToCustomFeatureCollection(
   if (geojson.type === 'Feature') {
     const finalGeo = {
       ...geojson,
-      id: nanoid(),
-      _self: new Map<string, string | number>(),
+      properties: {
+        ...geojson.properties,
+        _id: nanoid(),
+        _self: {
+          name: geojson.properties?.name || `Feature`,
+          _visible: true,
+          _lock: false,
+        },
+      },
     }
 
     return {
       type: 'FeatureCollection',
-      features: [finalGeo as CustomFeature],
+      features: [finalGeo],
       _shared: new Map<string, string | number>(),
     }
   }
@@ -82,11 +92,16 @@ export function convertToCustomFeatureCollection(
       type: 'FeatureCollection',
       features: [
         {
-          id: nanoid(),
           type: 'Feature',
           geometry: geojson as GeometryCollection,
-          properties: {},
-          _self: new Map<string, string | number>(),
+          properties: {
+            _id: nanoid(),
+            _self: {
+              name: `Feature`,
+              _visible: true,
+              _lock: false,
+            },
+          },
         },
       ],
       _shared: new Map<string, string | number>(),
@@ -98,11 +113,16 @@ export function convertToCustomFeatureCollection(
     type: 'FeatureCollection',
     features: [
       {
-        id: nanoid(),
         type: 'Feature',
         geometry: geojson as Geometry,
-        properties: {},
-        _self: new Map<string, string | number>(),
+        properties: {
+          _id: nanoid(),
+          _self: {
+            name: `Feature`,
+            visible: true,
+            lock: false,
+          },
+        },
       },
     ],
     _shared: new Map<string, string | number>(),
@@ -141,14 +161,12 @@ export function editFeatureSelf(
   featureId: string,
   key: string,
   value: any,
-  action: 'addOrUpdate' | 'remove',
-  property?: boolean
+  action: 'addOrUpdate' | 'remove'
 ) {
   // Find the feature by its ID
   const featureIndex = currentGeo.features.findIndex(
     (feature) => feature?.properties?._id === featureId
   )
-
   // Feature not found in geojson
   if (featureIndex === -1) {
     return currentGeo
@@ -156,11 +174,11 @@ export function editFeatureSelf(
 
   // Copy the current feature
   const currentFeature = { ...currentGeo.features[featureIndex] }
-  let currentSelf = currentFeature._self
 
-  if (property) {
-    currentSelf = currentFeature.properties || {}
-  }
+  // See if properties exisit on currentGeo (Should exisit if properly imported)
+  if (!currentFeature.properties) return currentGeo
+
+  const currentSelf = currentFeature.properties._self
 
   if (action === 'addOrUpdate') {
     if (value !== undefined) {
@@ -172,12 +190,8 @@ export function editFeatureSelf(
     delete currentSelf[key]
   }
 
-  if (property) {
-    currentFeature.properties = currentSelf
-  } else {
-    // Update the feature with the modified _self
-    currentFeature._self = currentSelf
-  }
+  // Update the feature with the modified _self
+  currentFeature.properties._self = currentSelf
 
   // Replace the modified feature in the geojson features array
   const updatedFeatures = [...currentGeo.features]
@@ -195,16 +209,12 @@ export function editAllFeatureSelf(
   currentGeo: CustomFeatureCollection,
   key: string,
   value: any,
-  action: 'addOrUpdate' | 'remove',
-  property?: boolean
+  action: 'addOrUpdate' | 'remove'
 ) {
   // Iterate over each feature in geojson.features and update _self
   const updatedFeatures = currentGeo.features.map((feature) => {
-    let currentSelf = feature._self
-
-    if (property) {
-      currentSelf = feature.properties || {}
-    }
+    if (!feature.properties) return currentGeo
+    const currentSelf = feature.properties._self
 
     if (action === 'addOrUpdate') {
       if (value !== undefined) {

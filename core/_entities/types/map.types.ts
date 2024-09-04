@@ -20,13 +20,8 @@ export interface IMap {
 export interface IMapDocument extends IMap, Document {}
 
 // Custom Feature Collection
-export interface CustomFeature extends Feature {
-  id: string
-  _self: { [key: string]: any }
-}
-
 export interface CustomFeatureCollection extends FeatureCollection {
-  features: CustomFeature[]
+  features: Feature[]
   _shared: { [key: string]: any }
 }
 

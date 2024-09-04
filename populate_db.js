@@ -129,13 +129,17 @@ const mongoDB = 'mongodb://localhost:27017/cyan' // replace with db of your choi
 // Use during import new map
 export function convertToCustomFeatureCollection(geojson) {
   if (geojson.type === 'FeatureCollection') {
-    const postGeo = geojson.features.map((feature) => ({
+    const postGeo = geojson.features.map((feature, index) => ({
       ...feature,
       properties: {
         ...feature.properties,
         _id: nanoid(),
+        _self: {
+          name: feature.properties.name || `Feature${index}`,
+          _visible: true,
+          _lock: false,
+        },
       },
-      _self: new Map(),
     }))
 
     const finalGeo = {
@@ -150,8 +154,16 @@ export function convertToCustomFeatureCollection(geojson) {
   if (geojson.type === 'Feature') {
     const finalGeo = {
       ...geojson,
-      id: nanoid(),
-      _self: new Map(),
+      properties: {
+        ...geojson.properties,
+        _id: nanoid(),
+
+        _self: {
+          name: geojson.properties.name,
+          _visible: true,
+          _lock: false,
+        },
+      },
     }
 
     return {
@@ -167,11 +179,18 @@ export function convertToCustomFeatureCollection(geojson) {
       type: 'FeatureCollection',
       features: [
         {
-          id: nanoid(),
           type: 'Feature',
           geometry: geojson,
-          properties: {},
-          _self: new Map(),
+          properties: {
+            ...geojson.properties,
+            _id: nanoid(),
+
+            _self: {
+              name: geojson.properties.name,
+              _visible: true,
+              _lock: false,
+            },
+          },
         },
       ],
       _shared: new Map(),
@@ -183,11 +202,17 @@ export function convertToCustomFeatureCollection(geojson) {
     type: 'FeatureCollection',
     features: [
       {
-        id: nanoid(),
         type: 'Feature',
         geometry: geojson,
-        properties: {},
-        _self: new Map(),
+        properties: {
+          ...geojson.properties,
+          _id: nanoid(),
+          _self: {
+            name: 'Geometry',
+            _visible: true,
+            _lock: false,
+          },
+        },
       },
     ],
     _shared: new Map(),
@@ -369,7 +394,6 @@ async function createBotMap(amount, userList, messageList) {
     // const geojsonData = await GeoJSON.findById(geojson).exec(); // Assume GeoJSON is a Mongoose model for geojsonList
 
     const geojsonCustom = convertToCustomFeatureCollection(geojsonData)
-    console.log(geojsonCustom)
 
     const title = `${geojsonCustom.features[0].properties.name} ${i}`
 

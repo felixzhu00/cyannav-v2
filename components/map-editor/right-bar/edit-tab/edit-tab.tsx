@@ -18,10 +18,7 @@ import {
 
 import CollapsibleVariables from './collapsible-variables'
 import Variablebar from './variable-toolbar'
-import {
-  CustomFeature,
-  CustomFeatureCollection,
-} from '@/core/_entities/types/map.types'
+import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 
 import { useAtom } from 'jotai'
 import { currLayerAtom, mapAtom } from '@/lib/jotai'
@@ -34,9 +31,8 @@ const findFeatureById = (
   if (!id || !mapGeojson || !mapGeojson.features) return null
 
   return (
-    mapGeojson.features.find(
-      (feature: CustomFeature) => feature?.properties?._id === id
-    ) || null
+    mapGeojson.features.find((feature) => feature?.properties?._id === id) ||
+    null
   )
 }
 
@@ -52,7 +48,7 @@ export default function EditTab() {
 
   const selectedFeature = findFeatureById(currLayer, map.geojson)
 
-  const localItems = selectedFeature?._self
+  const localItems = selectedFeature?.properties?._self
   const gobalItems = (map.geojson as CustomFeatureCollection)._shared
 
   if (!selectedFeature)

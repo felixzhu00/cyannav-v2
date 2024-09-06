@@ -40,19 +40,21 @@ export default function LeftSidebarItem({
 
   const handleToggleProperty = async (property: string) => {
     // init newGeo with a not null value
+    const changeValue =
+      properties._self[property] === undefined
+        ? false
+        : !properties._self[property]
 
     const newGeo = editFeatureSelf(
       map.geojson,
       id,
       property,
-      properties._self[property] === undefined
-        ? false
-        : !properties._self[property],
+      changeValue,
       'addOrUpdate'
     )
 
     // Optimisic update
-    setMapField({ field: 'geojson', value: newGeo })
+    // setMapField({ field: 'geojson', value: newGeo })
 
     // Encode geoJSON
     const encodedGeoJSON = encodeGeo(newGeo)
@@ -75,8 +77,13 @@ export default function LeftSidebarItem({
 
       if (response.ok) {
         const decodedGeo = decodeGeo(result.payload.geojson)
+
         setMapField({ field: 'geojson', value: decodedGeo }) // Update the global title state
-        setToggleFeatureState(id, 'visible')
+        setToggleFeatureState(
+          id,
+          property,
+          changeValue
+        )
       }
     } catch (error) {
       toast({

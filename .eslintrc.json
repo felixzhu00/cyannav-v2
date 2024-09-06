@@ -18,7 +18,8 @@
     "import/no-cycle": "off",
     "@typescript-eslint/naming-convention": "off",
     "no-console": ["error", { "allow": ["warn", "error"] }],
-    "react-hooks/exhaustive-deps": "off"
+    "react-hooks/exhaustive-deps": "off",
+    "react/require-default-props": "off"
   },
   "ignorePatterns": ["components/ui/"]
 }

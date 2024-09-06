@@ -46,7 +46,7 @@ export function renderFill(
     paint: {
       'line-color': [
         'case',
-        ['boolean', ['feature-state', 'visible'], true],
+        ['boolean', ['feature-state', 'visible'], false],
         [
           'case',
           ['boolean', ['feature-state', 'selected'], false],
@@ -86,6 +86,7 @@ export function renderFill(
         const id = feature.id as string // Ensure id is string
         const selfObject = JSON.parse(feature.properties._self)
         const visible = selfObject._visible === true // Assuming 'visible' is a boolean property
+
         map.current?.setFeatureState(
           { source: 'geojson-data', id },
           { visible }

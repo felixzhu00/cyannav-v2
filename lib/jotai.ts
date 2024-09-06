@@ -72,7 +72,7 @@ export const setCurrLayerSelectAtom = atom(
 
 export const setToggleFeatureStateAtom = atom(
   null,
-  (get, set, featureId: string, stateKey: string) => {
+  (get, set, featureId: string, stateKey: string, stateValue) => {
     const mapRef = get(mapLibreAtom)
     if (!mapRef) return
     const sources = mapRef.getSource('geojson-data')
@@ -83,17 +83,10 @@ export const setToggleFeatureStateAtom = atom(
       .find((f) => f.properties._id === featureId)
 
     if (feature) {
-      // Set the feature state
-      const currentState = mapRef.getFeatureState({
-        source: 'geojson-data',
-        id: featureId,
-      })
-      // Toggle state
-      const newState = !currentState[stateKey]
       // Set the new state
       mapRef.setFeatureState(
         { source: 'geojson-data', id: featureId },
-        { [stateKey]: newState }
+        { [stateKey.substring(1)]: stateValue }
       )
     }
   }

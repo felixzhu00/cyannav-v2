@@ -17,6 +17,7 @@ import { APIResponse } from '@/core/_entities/types/api.types'
 import { IUserDocument } from '@/core/_entities/types/user.types'
 import { IMessageDocument } from '@/core/_entities/types/messages.types'
 import { Types } from 'mongoose'
+import { toast } from '@/components/ui/use-toast'
 // eslint-disable-next-line import/prefer-default-export
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -151,6 +152,36 @@ export function editGeoShared(
   const newGeo = {
     ...currentGeo,
     _shared: newShared,
+  }
+
+  return newGeo
+}
+export function editGeoSharedNested(
+  currentGeo: CustomFeatureCollection,
+  key: string,
+  value: any,
+  action: 'addOrUpdate' | 'remove'
+) {
+  const mapMode = currentGeo._shared.mode
+  // Create a new Map instance based on the current _shared Map
+  const newMapMode = currentGeo._shared[mapMode] || {}
+
+  if (action === 'addOrUpdate') {
+    if (value !== undefined) {
+      // Add or update the key with the new value
+      newMapMode[key] = value
+    }
+  } else if (action === 'remove') {
+    // Remove the key from the Map
+    delete newMapMode[key]
+  }
+
+  const newGeo = {
+    ...currentGeo,
+    _shared: {
+      ...currentGeo._shared,
+      [mapMode]: newMapMode,
+    },
   }
 
   return newGeo
@@ -310,5 +341,81 @@ export function createErrorResponse(
     status,
     error,
     message,
+  }
+}
+
+export async function editMapGeo(
+  mapGeo: CustomFeatureCollection,
+  mapId: string,
+  currLayerId: string,
+  key: string,
+  value: any,
+  updateOption: 'addOrUpdate' | 'remove',
+  editFunction: string,
+  type?: string
+) {
+  if (!mapGeo || !mapId || !currLayerId) return null
+
+  let newGeo = mapGeo
+
+  if (editFunction === 'editGeoShared') {
+    newGeo = editGeoShared(
+      mapGeo,
+      key,
+      type ? { payload: value, variableType: type } : value,
+      updateOption
+    )
+  }
+  if (editFunction === 'editGeoSharedNested') {
+    newGeo = editGeoSharedNested(
+      mapGeo,
+      key,
+      type ? { payload: value, variableType: type } : value,
+      updateOption
+    )
+  }
+
+  if (editFunction === 'editFeatureSelf') {
+    newGeo = editFeatureSelf(
+      mapGeo,
+      currLayerId,
+      key,
+      type ? { payload: value, variableType: type } : value,
+      updateOption
+    )
+  }
+  if (editFunction === 'editAllFeatureSelf') {
+    newGeo = editAllFeatureSelf(
+      mapGeo,
+      key,
+      type ? { payload: value, variableType: type } : value,
+      updateOption
+    )
+  }
+
+  try {
+    // Encode geoJSON
+    const encodedGeoJSON = encodeGeo(newGeo)
+
+    // Call Put API
+    const response = await fetch(`/api/map/${mapId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ geojson: encodedGeoJSON }),
+    })
+
+    const result = await response.json()
+
+    toast({
+      description: result.message,
+    })
+    return result
+  } catch (error) {
+    toast({
+      description: 'An error occurred while updating the geojson',
+    })
+    return error
   }
 }

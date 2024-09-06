@@ -1,5 +1,4 @@
-import { decodeGeo, editFeatureSelf, encodeGeo } from '@/lib/utils'
-import { toast } from '@/components/ui/use-toast'
+import { decodeGeo, editMapGeo } from '@/lib/utils'
 import { useSetAtom } from 'jotai'
 import { setMapFieldAtom } from '@/lib/jotai'
 import { Label } from '@/components/ui/label'
@@ -9,6 +8,7 @@ import { useEffect, useState } from 'react'
 import useDebounce from '@/lib/hooks/useDebounce'
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import { ColorPicker } from '@/components/ui/color-picker'
+
 import {
   Select,
   SelectTrigger,
@@ -19,184 +19,147 @@ import {
 } from '@/components/ui/select'
 
 export default function VariableListItem({
-  variablekey,
-  value,
+  varKey,
+  varValue,
   listName,
   mapGeo,
   mapId,
   currLayerId,
-  variableType,
+  varType,
+  hasTrash,
+  selectOptions = [],
 }: {
-  variablekey: string
-  value: any
+  varKey: string
+  varValue: any
   listName: string
   mapGeo: CustomFeatureCollection
   mapId: string
   currLayerId: string
-  variableType: 'string' | 'number' | 'color' | 'boolean'
+  varType: 'string' | 'number' | 'color' | 'select'
+  hasTrash: boolean
+  selectOptions?: string[]
 }) {
   const setMapField = useSetAtom(setMapFieldAtom)
   // TODO check if isValid boolean and color
-  const [inputValue, setInputValue] = useState(value)
+  const [inputValue, setInputValue] = useState(varValue)
   // delay PUT request
   const debouncedInputValue = useDebounce(inputValue)
 
   const updateVariable = async () => {
-    const newGeo = editFeatureSelf(
+    const result = await editMapGeo(
       mapGeo,
+      mapId,
       currLayerId,
-      variablekey,
-      { payload: debouncedInputValue, variableType },
-      'addOrUpdate'
+      varKey,
+      { payload: debouncedInputValue, variableType: varType },
+      'addOrUpdate',
+      listName === 'Local' ? 'editFeatureSelf' : 'editGeoSharedNested'
     )
-    // Encode geoJSON
-    const encodedGeoJSON = encodeGeo(newGeo)
 
-    // Call Put API
-    try {
-      const response = await fetch(`/api/map/${mapId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ geojson: encodedGeoJSON }),
-      })
-
-      const result = await response.json()
-
-      toast({
-        description: result.message,
-      })
-
-      if (response.ok) {
-        const decodedGeo = decodeGeo(result.payload.geojson)
-        setMapField({ field: 'geojson', value: decodedGeo }) // Might hinder user experience
-      }
-    } catch (error) {
-      toast({
-        description: 'An error occurred while updating the geojson',
-      })
+    if (result.payload) {
+      const decodedGeo = decodeGeo(result.payload.geojson)
+      setMapField({ field: 'geojson', value: decodedGeo }) // Might hinder user experience
     }
   }
 
   const handleOnBlurColor = () => {
     if (inputValue.length !== 7) {
-      setInputValue(value)
+      setInputValue(varValue)
     } else {
       updateVariable()
     }
   }
 
   useEffect(() => {
-    if (value !== inputValue) {
-      if (variableType !== 'color') {
+    if (varValue !== inputValue) {
+      if (varType !== 'color') {
         updateVariable()
       }
     }
   }, [debouncedInputValue])
 
-  console.log(variableType)
-  return (
-    <>
-      {variableType === 'string' && (
-        <div className="flex w-full flex-col items-start gap-1.5 pt-2">
-          <Label className="px-1" htmlFor={variablekey}>
-            {variablekey}
-          </Label>
-          <div className="flex w-full flex-row items-center">
-            <Input
-              type="text" // Adjusted to "text" since inputType is "string"
-              id={variablekey}
-              placeholder={variablekey}
-              className="flex-1"
-              onChange={(e) => {
-                setInputValue(e.target.value)
-              }}
-              value={inputValue}
-            />
-            <TrashDialog
-              variableName={variablekey}
-              collapsibleName={listName}
-            />
-          </div>
-        </div>
-      )}
-      {variableType === 'color' && (
-        <div className="flex w-full flex-col items-start justify-between gap-1.5 pt-2">
-          <Label className="px-1" htmlFor={variablekey}>
-            {variablekey}
-          </Label>
-          <div className="flex w-full flex-row">
-            <Input
-              id="value"
-              placeholder="#FFFFFF"
-              className="text-sm"
-              onBlur={handleOnBlurColor}
-              value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value)
-              }}
-            />
-            <ColorPicker
-              className="aspect-square"
-              value={inputValue}
-              onChange={setInputValue}
-            />
-            <TrashDialog
-              variableName={variablekey}
-              collapsibleName={listName}
-            />
-          </div>
-        </div>
-      )}
-      {variableType === 'number' && (
-        <div className="flex w-full flex-col items-start justify-between gap-1.5 pt-2">
-          <Label className="px-1" htmlFor={variablekey}>
-            {variablekey}
-          </Label>
-          <div className="flex w-full flex-row">
-            <Input
-              type="number"
-              id="value"
-              placeholder="111111"
-              className="text-sm"
-              value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value)
-              }}
-            />
-            <TrashDialog
-              variableName={variablekey}
-              collapsibleName={listName}
-            />
-          </div>
-        </div>
-      )}
+  const renderInput = () => {
+    if (varType === 'string') {
+      return (
+        <Input
+          type="text" // Adjusted to "text" since inputType is "string"
+          id={varKey}
+          placeholder={varKey}
+          className="flex-1"
+          onChange={(e) => {
+            setInputValue(e.target.value)
+          }}
+          value={inputValue}
+        />
+      )
+    }
+    if (varType === 'number') {
+      return (
+        <Input
+          type="number"
+          id="value"
+          placeholder="111111"
+          className="text-sm"
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value)
+          }}
+        />
+      )
+    }
+    if (varType === 'color') {
+      return (
+        <>
+          <Input
+            id="value"
+            placeholder="#FFFFFF"
+            className="text-sm"
+            onBlur={handleOnBlurColor}
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value)
+            }}
+          />
+          <ColorPicker
+            className="aspect-square"
+            value={inputValue}
+            onChange={setInputValue}
+          />
+        </>
+      )
+    }
+    if (varType === 'select' && selectOptions) {
+      return (
+        <Select value={inputValue} onValueChange={setInputValue}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {selectOptions.map((option, index) => (
+                <SelectItem key={option + index.toString()} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      )
+    }
+    return <div>Invalid variableType{varValue}</div>
+  }
 
-      {variableType === 'boolean' && (
-        <div className="flex w-full flex-col items-start justify-between gap-1.5 pt-2">
-          <Label className="px-1" htmlFor={variablekey}>
-            {variablekey}
-          </Label>
-          <div className="flex w-full flex-row">
-            <Select value={inputValue} onValueChange={setInputValue}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="true">True</SelectItem>
-                  <SelectItem value="false">False</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <TrashDialog
-              variableName={variablekey}
-              collapsibleName={listName}
-            />
-          </div>
-        </div>
-      )}
-    </>
+  return (
+    <div className="flex w-full flex-col items-start gap-1.5 pt-2">
+      <Label className="px-1" htmlFor={varKey}>
+        {varKey}
+      </Label>
+      <div className="flex w-full flex-row items-center">
+        {renderInput()}
+        {hasTrash && (
+          <TrashDialog variableName={varKey} collapsibleName={listName} />
+        )}
+      </div>
+    </div>
   )
 }

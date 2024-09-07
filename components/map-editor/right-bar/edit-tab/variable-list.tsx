@@ -136,13 +136,11 @@ export default function VariableList({
               return (
                 <VariableListItem
                   key={key + index.toString()}
-                  varKey={key}
-                  varValue={value || { payload: '', variableType: 'string' }}
+                  inputObject={{ [key]: value }}
                   listName={listName}
                   mapGeo={mapGeo}
                   mapId={mapId}
                   currLayerId={currLayerId}
-                  varType={value.variableType || 'string'}
                   hasTrash={key !== 'name'}
                 />
               )
@@ -152,6 +150,9 @@ export default function VariableList({
         </>
       )
     }
+    // varKey={key}
+    // varValue={value || { payload: '', variableType: 'string' }}
+    // varType={value.variableType || 'string'}
 
     if (listName === 'Global') {
       return (
@@ -179,28 +180,21 @@ export default function VariableList({
                 (
                   Object.entries(list[selectMode] || mapModes[selectMode]) as [
                     string,
-                    { payload?: string | number; variableType?: string },
+                    {
+                      payload: string | number
+                      variableType: 'string' | 'number' | 'color' | 'select'
+                    },
                   ][]
                 ).map(([key, value]) => {
                   if (!privateVariablesGlobal.includes(key)) {
                     return (
                       <VariableListItem
                         key={nanoid()}
-                        varKey={key}
-                        varValue={
-                          value || { payload: '', variableType: 'string' }
-                        }
+                        inputObject={{ [key]: value }}
                         listName={listName}
                         mapGeo={mapGeo}
                         mapId={mapId}
                         currLayerId={currLayerId}
-                        varType={
-                          (value.variableType as
-                            | 'string'
-                            | 'number'
-                            | 'color'
-                            | 'select') || 'string'
-                        }
                         hasTrash={false}
                       />
                     )

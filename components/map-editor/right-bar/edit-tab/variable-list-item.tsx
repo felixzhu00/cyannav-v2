@@ -4,7 +4,7 @@ import { mapLibreAtom, setMapFieldAtom } from '@/lib/jotai'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import TrashDialog from './trash-dialog'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import { ColorPicker } from '@/components/ui/color-picker'
 import {
@@ -16,27 +16,22 @@ import {
   SelectItem,
 } from '@/components/ui/select'
 import { editLayerStyleGlobal } from '@/lib/map-render'
-import usePrevious from '@/lib/hooks/usePrevious'
 
 export default function VariableListItem({
-  varKey,
-  varValue,
+  inputObject,
   listName,
   mapGeo,
   mapId,
   currLayerId,
-  varType,
   hasTrash,
   selectOptions = [],
   byFeature = '',
 }: {
-  varKey: string
-  varValue: { [key: string]: any }
+  inputObject: { [key: string]: any }
   listName: string
   mapGeo: CustomFeatureCollection
   mapId: string
   currLayerId: string
-  varType: 'string' | 'number' | 'color' | 'select'
   hasTrash: boolean
   selectOptions?: string[]
   byFeature?: string
@@ -44,18 +39,27 @@ export default function VariableListItem({
   const setMapField = useSetAtom(setMapFieldAtom)
   const mapLibre = useAtomValue(mapLibreAtom)
 
-  const [inputValue, setInputValue] = useState<string>(
-    varValue.payload.toString()
-  )
+  // Destructure Logic
+  const [[varKey, propValue]] = Object.entries(inputObject)
+
+  const varValue =
+    propValue.payload !== undefined
+      ? propValue.payload.toString()
+      : propValue.toString()
+  const varType = propValue.variableType || 'string'
+
+  // React Hooks
+  const [inputValue, setInputValue] = useState<string>(varValue)
   const transientName = useRef('')
 
+  // Updates Jotai Atom and Backend
   const updateVariable = async (payload: string) => {
     const result = await editMapGeo(
       mapGeo,
       mapId,
       currLayerId,
       varKey,
-      { ...varValue, payload },
+      { ...propValue, payload },
       'addOrUpdate',
       listName === 'Local' ? 'editFeatureSelf' : 'editGeoSharedNested'
     )
@@ -66,6 +70,7 @@ export default function VariableListItem({
     }
   }
 
+  // Updates MapLibre ref
   const handleInputChange = (value: string) => {
     setInputValue(value)
     if (listName === 'Global') {
@@ -75,7 +80,7 @@ export default function VariableListItem({
         editLayerStyleGlobal(
           mapLibre,
           {
-            ...varValue,
+            ...propValue,
             payload: varType === 'number' ? parseFloat(value) : value,
           },
           byFeature
@@ -85,30 +90,28 @@ export default function VariableListItem({
   }
 
   const handleBlur = () => {
-    console.log('trigger', transientName.current, inputValue)
     // This will only trigger if they blur AND the name has changed
     if (transientName.current !== inputValue) {
       // Update the transient name value
       transientName.current = inputValue
 
-      console.log('asdasd')
       // Do other on blur analytics stuff
       let validValue =
         varType === 'number' ? parseFloat(inputValue) : inputValue
 
       if (Number.isNaN(validValue)) {
-        validValue = varValue.payload
+        validValue = propValue.payload
       }
 
       if (varType === 'number') {
         validValue = Math.max(
-          varValue.range[0],
-          Math.min(varValue.range[1], Number(validValue))
+          propValue?.range[0],
+          Math.min(propValue?.range[1], Number(validValue))
         )
       }
 
       if (varType === 'color' && inputValue.length !== 7) {
-        validValue = varValue.payload
+        validValue = propValue.payload
       }
 
       if (validValue !== inputValue) {
@@ -119,6 +122,8 @@ export default function VariableListItem({
   }
 
   const renderInput = () => {
+    // the payload type can be 'string' | 'number' | 'color' | 'select'
+
     if (varType === 'string') {
       return (
         <Input
@@ -139,7 +144,7 @@ export default function VariableListItem({
           id="value"
           placeholder="111111"
           className="text-sm"
-          step="0.01"
+          step={propValue?.range[2] || '1'}
           value={inputValue}
           onChange={(e) => handleInputChange(e.target.value)}
           onBlur={handleBlur} // Blur handling
@@ -184,7 +189,7 @@ export default function VariableListItem({
         </Select>
       )
     }
-    return <div>Invalid variableType {varValue.payload}</div>
+    return <div>Invalid Variable Type {varType}</div>
   }
 
   return (

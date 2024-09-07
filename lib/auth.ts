@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth'
+import NextAuth, { type DefaultSession } from 'next-auth'
 import type { NextAuthConfig } from 'next-auth'
 import { MongoDBAdapter } from '@auth/mongodb-adapter'
 import client from '@/lib/db'
@@ -9,32 +9,50 @@ import GitHub from 'next-auth/providers/github'
 import type { Provider } from 'next-auth/providers'
 import User from '@/db/user.model'
 
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      profilePicture: string
+      username: string
+      email: string
+    }
+    userId: string & DefaultSession['user']
+  }
+}
+
+// Helper function to fetch image as Buffer using fetch
+async function fetchImageAsBuffer(url: string): Promise<Buffer> {
+  const response = await fetch(url)
+  const arrayBuffer = await response.arrayBuffer()
+  return Buffer.from(arrayBuffer)
+}
+
 const providers: Provider[] = [
   GitHub({
-    profile(profile: GitHubProfile) {
+    profile: async (profile: GitHubProfile) => {
+      const profilePictureBuffer = await fetchImageAsBuffer(profile.avatar_url)
       const user = {
-        // id: profile.id.toString(),
         username: profile.name || profile.login,
         email: profile.email,
         salt: '1',
-        image: profile.avatar_url,
+        profilePicture: profilePictureBuffer,
       }
       return user
     },
-    allowDangerousEmailAccountLinking: true, // TEMP FIX
+    allowDangerousEmailAccountLinking: true,
   }),
   Google({
-    profile(profile: GoogleProfile) {
+    profile: async (profile: GoogleProfile) => {
+      const profilePictureBuffer = await fetchImageAsBuffer(profile.picture)
       const user = {
-        // id: profile.id,
         username: profile.name,
         email: profile.email,
         salt: '1',
-        image: profile.picture,
+        profilePicture: profilePictureBuffer,
       }
       return user
     },
-    allowDangerousEmailAccountLinking: true, // TEMP FIX
+    allowDangerousEmailAccountLinking: true,
   }),
 ]
 
@@ -49,6 +67,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
   pages: {
     signIn: '/login',
+  },
+  callbacks: {
+    session({ session, user }) {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          userId: user.id,
+        },
+      }
+    },
   },
 } satisfies NextAuthConfig)
 

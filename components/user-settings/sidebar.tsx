@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 export default function Sidebar({ view }: { view: string | string[] }) {
   return (
     <div>
-      <div className="z-40 inline-block h-[893px] max-w-xs bg-zinc-100">
+      <div className="z-40 inline-block h-full max-w-xs bg-zinc-100">
         <div className="h-full space-y-8 px-6 pt-12">
           <Link
             href="/"

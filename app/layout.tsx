@@ -5,15 +5,16 @@ import Header from '@/components/landing/header'
 import Footer from '@/components/landing/footer'
 import { Toaster } from '@/components/ui/toaster'
 import { headers } from 'next/headers'
-import ThemeToggle from '@/components/theme-toggle'
-import ThemeProvider from '@/components/theme-provider'
+// import ThemeToggle from '@/components/theme-toggle'
+// import ThemeProvider from '@/components/theme-provider'
+import SessionWrapper from '@/components/session-wrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
-// export const metadata: Metadata = {
-//   title: 'CyanNav v2',
-//   description: 'Defining a new world in map editing.',
-// }
+export const metadata: Metadata = {
+  title: 'CyanNav v2',
+  description: 'Defining a new world in map editing.',
+}
 
 export default function RootLayout({
   children,
@@ -44,10 +45,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {isMap && <Toaster />}
-        {<Header />}
-        {children}
-        <Footer />
+        <SessionWrapper>
+          {isMap && <Toaster />}
+          {<Header />}
+          {children}
+          <Footer />
+        </SessionWrapper>
       </body>
     </html>
   )

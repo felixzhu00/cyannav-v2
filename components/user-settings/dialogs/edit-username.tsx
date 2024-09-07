@@ -1,4 +1,3 @@
-'use client'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,32 +11,42 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { toast } from '@/components/ui/use-toast'
+import { useSession } from 'next-auth/react'
 
 interface EditUsernameProps {
-  session: Session | null
+  onUsernameUpdate: (newUsername: string) => void
 }
 
-interface Session {
-  user: {
-    username: string
-  }
-}
+export function EditUsername({ onUsernameUpdate }: EditUsernameProps) {
+  const { data: session } = useSession()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-export function EditUsername({ session }: EditUsernameProps) {
-  const [username, setUsername] = useState(session?.user?.username)
-
+  const [username, setUsername] = useState(session?.user?.username || '')
   const [isUsernameValid, setIsUsernameValid] = useState<{
-    message: null
+    message: null | string
     availability: boolean
   }>({
     message: null,
-    availability: true,
+    availability: false,
   })
   const [checking, setChecking] = useState(false)
 
+  const userId = session?.userId
+
+  const handleDialogOpenChange = (isOpen: boolean) => {
+    setIsDialogOpen(isOpen)
+
+    if (isOpen) {
+      // Reset state when the dialog is opened
+      setUsername(session?.user?.username || '')
+      setIsUsernameValid({ message: null, availability: false })
+      setChecking(false)
+    }
+  }
+
   const checkUsername = async () => {
     setChecking(true)
-
     try {
       const response = await fetch(`/api/user?username=${username}`, {
         method: 'GET',
@@ -59,8 +68,51 @@ export function EditUsername({ session }: EditUsernameProps) {
     }
   }
 
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!isUsernameValid.availability) {
+      toast({
+        variant: 'destructive',
+        description:
+          'Username is not available. Please choose a different one.',
+      })
+      return
+    }
+
+    try {
+      const response = await fetch('/api/user', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, username }),
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        toast({
+          description: 'Username updated successfully!',
+        })
+        onUsernameUpdate(username as string)
+      } else {
+        toast({
+          variant: 'destructive',
+          description: `Error: ${result.message}`,
+        })
+      }
+    } catch (error) {
+      console.error('Failed to update username:', error)
+      toast({
+        variant: 'destructive',
+        description: 'Failed to update username. Please try again later.',
+      })
+    }
+  }
+
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
         <Button>Edit</Button>
       </DialogTrigger>
@@ -72,7 +124,7 @@ export function EditUsername({ session }: EditUsernameProps) {
             checking its availability before saving.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-4 py-4">
+        <form onSubmit={onSubmit} className="flex flex-col gap-4 py-4">
           <div className="flex flex-row items-center gap-4">
             <Label htmlFor="username" className="text-right">
               Username
@@ -94,12 +146,14 @@ export function EditUsername({ session }: EditUsernameProps) {
               {isUsernameValid.message}
             </div>
           )}
-        </div>
-        <DialogFooter>
-          <Button type="submit" disabled={!isUsernameValid.availability}>
-            Save changes
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <DialogTrigger asChild>
+              <Button type="submit" disabled={!isUsernameValid.availability}>
+                Save changes
+              </Button>
+            </DialogTrigger>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

@@ -16,11 +16,19 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Session } from 'next-auth'
 import SignOut from '@/components/landing/sign-out'
 
 interface NavbarProps {
   session: Session | null
+}
+
+interface Session {
+  user: {
+    username: string
+    profilePicture: string
+    email: string
+  }
+  userId: string
 }
 
 const Navbar: React.FC<NavbarProps> = ({ session }) => {
@@ -78,7 +86,9 @@ const Navbar: React.FC<NavbarProps> = ({ session }) => {
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar className="h-10 w-10 rounded-full border border-zinc-200 dark:border-zinc-700">
-                    <AvatarImage src={session.user.image ?? undefined} />
+                    <AvatarImage
+                      src={`data:image/jpeg;base64,${session.user.profilePicture}`}
+                    />
                     <AvatarFallback className="h-10 w-10">
                       <CircleUserRound />
                     </AvatarFallback>

@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button'
 import placeholder from '@/public/map_placeholder.png'
 import { FcGoogle } from 'react-icons/fc'
 import { FaGithub, FaApple } from 'react-icons/fa'
-import { redirect } from 'next/navigation'
 import { signIn, providerMap } from '@/lib/auth'
 import { AuthError } from 'next-auth'
+import { redirect } from 'next/navigation'
 
 export default async function Page() {
   return (
@@ -36,7 +36,9 @@ export default async function Page() {
                   action={async () => {
                     'use server'
                     try {
-                      await signIn(provider.id)
+                      await signIn(provider.id, {
+                        redirectTo: '/user?view=settings',
+                      })
                     } catch (error) {
                       if (error instanceof AuthError) {
                         return redirect(

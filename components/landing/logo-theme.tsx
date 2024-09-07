@@ -15,7 +15,7 @@ export default function LogoTheme() {
         alt="Logo"
         width={157}
         height={65}
-        objectFit="cover"
+        className="object-contain"
         priority
       />
     </Link>

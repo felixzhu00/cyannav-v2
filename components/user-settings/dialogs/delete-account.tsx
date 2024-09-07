@@ -21,7 +21,7 @@ export function DeleteAccount() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const userId = session?.user?.id
+    const userId = session?.userId
 
     if (!userId) {
       return

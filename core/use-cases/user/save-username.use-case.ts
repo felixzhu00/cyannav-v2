@@ -1,4 +1,4 @@
-import { updateUsernameById } from '@/core/data-access/user/updateUsernameById.persistence'
+import { updateUsernameById } from '@/core/data-access/user/update-username-by-id.persistence'
 
 export default async function saveUsernameUseCase(
   id: string,

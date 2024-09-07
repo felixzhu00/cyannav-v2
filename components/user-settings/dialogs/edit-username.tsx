@@ -1,4 +1,3 @@
-'use client'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,18 +20,30 @@ interface EditUsernameProps {
 
 export function EditUsername({ onUsernameUpdate }: EditUsernameProps) {
   const { data: session } = useSession()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const [username, setUsername] = useState(session?.user?.username)
+  const [username, setUsername] = useState(session?.user?.username || '')
   const [isUsernameValid, setIsUsernameValid] = useState<{
-    message: null
+    message: null | string
     availability: boolean
   }>({
     message: null,
-    availability: true,
+    availability: false,
   })
   const [checking, setChecking] = useState(false)
 
   const userId = session?.userId
+
+  const handleDialogOpenChange = (isOpen: boolean) => {
+    setIsDialogOpen(isOpen)
+
+    if (isOpen) {
+      // Reset state when the dialog is opened
+      setUsername(session?.user?.username || '')
+      setIsUsernameValid({ message: null, availability: false })
+      setChecking(false)
+    }
+  }
 
   const checkUsername = async () => {
     setChecking(true)
@@ -101,7 +112,7 @@ export function EditUsername({ onUsernameUpdate }: EditUsernameProps) {
   }
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
         <Button>Edit</Button>
       </DialogTrigger>

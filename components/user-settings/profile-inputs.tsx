@@ -24,7 +24,7 @@ const ProfileSettings: React.FC = () => {
         {session && session.user ? (
           <Avatar className="h-36 w-36 rounded-full border border-zinc-200 dark:border-zinc-700">
             <AvatarImage
-              src={session.user.profilePicture}
+              src={`data:image/jpeg;base64,${session.user.profilePicture}`}
               className="h-36 w-36"
             />
             <AvatarFallback className="h-36 w-36">

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { auth } from '@/lib/auth'
 import Navbar from './navbar'
-import LogoTheme from './logoTheme'
+import LogoTheme from './logo-theme'
 
 export default async function Header() {
   const session = await auth()

@@ -87,7 +87,7 @@ const Navbar: React.FC<NavbarProps> = ({ session }) => {
                 <DropdownMenuTrigger>
                   <Avatar className="h-10 w-10 rounded-full border border-zinc-200 dark:border-zinc-700">
                     <AvatarImage
-                      src={session.user.profilePicture ?? undefined}
+                      src={`data:image/jpeg;base64,${session.user.profilePicture}`}
                     />
                     <AvatarFallback className="h-10 w-10">
                       <CircleUserRound />

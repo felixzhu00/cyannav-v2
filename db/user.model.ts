@@ -6,7 +6,7 @@ const UserSchema = new Schema<IUserDocument>({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: false },
   salt: { type: String, required: true },
-  profilePicture: { type: String },
+  profilePicture: { type: Buffer },
   favorite: [{ type: Schema.Types.ObjectId, ref: 'Map' }],
   dateCreated: { type: Date, default: Date.now },
   plan: { type: String, enum: ['free', 'pro'], default: 'free' },

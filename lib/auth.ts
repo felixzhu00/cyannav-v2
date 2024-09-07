@@ -10,9 +10,6 @@ import type { Provider } from 'next-auth/providers'
 import User from '@/db/user.model'
 
 declare module 'next-auth' {
-  /**
-   * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
-   */
   interface Session {
     user: {
       profilePicture: string
@@ -22,32 +19,40 @@ declare module 'next-auth' {
     userId: string & DefaultSession['user']
   }
 }
+
+// Helper function to fetch image as Buffer using fetch
+async function fetchImageAsBuffer(url: string): Promise<Buffer> {
+  const response = await fetch(url)
+  const arrayBuffer = await response.arrayBuffer()
+  return Buffer.from(arrayBuffer)
+}
+
 const providers: Provider[] = [
   GitHub({
-    profile(profile: GitHubProfile) {
+    profile: async (profile: GitHubProfile) => {
+      const profilePictureBuffer = await fetchImageAsBuffer(profile.avatar_url)
       const user = {
-        // id: profile.id.toString(), // Uncomment if needed
         username: profile.name || profile.login,
         email: profile.email,
         salt: '1',
-        profilePicture: profile.avatar_url,
+        profilePicture: profilePictureBuffer,
       }
       return user
     },
-    allowDangerousEmailAccountLinking: true, // TEMP FIX
+    allowDangerousEmailAccountLinking: true,
   }),
   Google({
-    profile(profile: GoogleProfile) {
+    profile: async (profile: GoogleProfile) => {
+      const profilePictureBuffer = await fetchImageAsBuffer(profile.picture)
       const user = {
-        // id: profile.id, // Uncomment if needed
         username: profile.name,
         email: profile.email,
         salt: '1',
-        profilePicture: profile.picture,
+        profilePicture: profilePictureBuffer,
       }
       return user
     },
-    allowDangerousEmailAccountLinking: true, // TEMP FIX
+    allowDangerousEmailAccountLinking: true,
   }),
 ]
 
@@ -64,12 +69,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: '/login',
   },
   callbacks: {
-    async session({ session, user }) {
-      // Adding user.id or _id to session object
-      if (user) {
-        session.userId = user.id // or session.userId = user._id
+    session({ session, user }) {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          userId: user.id,
+        },
       }
-      return session
     },
   },
 } satisfies NextAuthConfig)

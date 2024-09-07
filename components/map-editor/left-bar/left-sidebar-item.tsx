@@ -32,6 +32,7 @@ export default function LeftSidebarItem({
 
   const handleLayerChange = () => {
     if (currLayer !== id) {
+      
       setCurrLayerStyle(id)
     } else {
       setCurrLayerStyle('')

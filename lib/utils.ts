@@ -349,48 +349,26 @@ export async function editMapGeo(
   mapId: string,
   currLayerId: string,
   key: string,
-  value: any,
+  value: { [key: string]: any } | string,
   updateOption: 'addOrUpdate' | 'remove',
-  editFunction: string,
-  type?: string
+  editFunction: string
 ) {
   if (!mapGeo || !mapId || !currLayerId) return null
 
   let newGeo = mapGeo
 
   if (editFunction === 'editGeoShared') {
-    newGeo = editGeoShared(
-      mapGeo,
-      key,
-      type ? { payload: value, variableType: type } : value,
-      updateOption
-    )
+    newGeo = editGeoShared(mapGeo, key, value, updateOption)
   }
   if (editFunction === 'editGeoSharedNested') {
-    newGeo = editGeoSharedNested(
-      mapGeo,
-      key,
-      type ? { payload: value, variableType: type } : value,
-      updateOption
-    )
+    newGeo = editGeoSharedNested(mapGeo, key, value, updateOption)
   }
 
   if (editFunction === 'editFeatureSelf') {
-    newGeo = editFeatureSelf(
-      mapGeo,
-      currLayerId,
-      key,
-      type ? { payload: value, variableType: type } : value,
-      updateOption
-    )
+    newGeo = editFeatureSelf(mapGeo, currLayerId, key, value, updateOption)
   }
   if (editFunction === 'editAllFeatureSelf') {
-    newGeo = editAllFeatureSelf(
-      mapGeo,
-      key,
-      type ? { payload: value, variableType: type } : value,
-      updateOption
-    )
+    newGeo = editAllFeatureSelf(mapGeo, key, value, updateOption)
   }
 
   try {
@@ -419,3 +397,35 @@ export async function editMapGeo(
     return error
   }
 }
+
+// Function to find min and max of a property
+export function findMinMax(
+  propertyName: string,
+  geojson: CustomFeatureCollection
+): {
+  min: number | undefined
+  max: number | undefined
+} {
+  // Extract the property values and filter out non-numeric values
+  const { features } = geojson
+
+  return features.reduce<{
+    min: number | undefined
+    max: number | undefined
+  }>(
+    (acc, feature) => {
+      if (feature.properties) {
+        // Check if properties is not null
+        const value = feature.properties[propertyName]
+        if (typeof value === 'number') {
+          if (acc.min === undefined || value < acc.min) acc.min = value
+          if (acc.max === undefined || value > acc.max) acc.max = value
+        }
+      }
+      return acc
+    },
+    { min: undefined, max: undefined }
+  )
+}
+
+export const isValidHex = (str: string) => /^#([0-9A-Fa-f]{3}){1,2}$/.test(str)

@@ -26,7 +26,6 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
 
   const setCurrLayer = useSetAtom(currLayerAtom)
 
-  console.log(decodedMap)
   // Hydrate Jotai map atom
   useHydrateAtoms([[mapAtom, decodedMap]])
 
@@ -34,9 +33,9 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
   const { mapContainer } = useMapLibre({
     styleUrl: 'https://demotiles.maplibre.org/style.json',
     onMapLoad: (mapRef) => {
-      renderFill({ current: mapRef }, decodedMap.geojson) // Render layers with fill style
-      applyHover({ current: mapRef }) // Apply hover event listener
-      applyClick({ current: mapRef }, setCurrLayer) // Apply click event listener
+      renderFill(mapRef, decodedMap.geojson) // Render layers with fill style
+      applyHover(mapRef) // Apply hover event listener
+      applyClick(mapRef, setCurrLayer) // Apply click event listener
     },
   })
 

@@ -35,18 +35,47 @@ export default function VariableList({
 
   const mapModes = {
     choropleth: {
-      'Border Color': { payload: '#FFFFFF', variableType: 'color' },
-      'Border Width': { payload: 2, variableType: 'number' },
-      'Layer Opacity': { payload: 0.75, variableType: 'number' },
-      'Layer Min Color': { payload: '#FFEDA0', variableType: 'color' },
-      'Layer Max Color': { payload: '#E31A1C', variableType: 'color' },
+      'Border Color': {
+        payload: '#FFFFFF',
+        variableType: 'color',
+        layer: 'outline-layer',
+        property: 'line-color',
+        index: -1,
+      },
+      'Border Width': {
+        payload: 2,
+        variableType: 'number',
+        layer: 'outline-layer',
+        property: 'line-width',
+        index: -1,
+        range: [0.5, 12, 0.1], // min,max,step
+      },
+      // 'Layer Opacity': {
+      //   payload: 0.75,
+      //   variableType: 'number',
+      //   layer: 'geojson-layer',
+      //   property: 'fill-opacity',
+      //   index: -1,
+      //   range: [0.01, 1, 0.01],
+      // },
+      // 'Layer Min Color': {
+      //   payload: '#FFEDA0',
+      //   variableType: 'color',
+      //   layer: 'geojson-layer',
+      //   property: 'fill-color',
+      //   index: 4,
+      // },
+      // 'Layer Max Color': {
+      //   payload: '#E31A1C',
+      //   variableType: 'color',
+      //   layer: 'geojson-layer',
+      //   property: 'fill-color',
+      //   index: 6,
+      // },
     },
     heatmap: {
-      'Heat Map Weight': { payload: '#FFFFFF', variableType: 'color' },
-      'Heat Map Intensity': { payload: 2, variableType: 'number' },
-      'Layer Opacity': { payload: 0.75, variableType: 'number' },
-      'Layer Min Color': { payload: '#FFEDA0', variableType: 'color' },
-      'Layer Max Color': { payload: '#E31A1C', variableType: 'color' },
+      'Heat Map Radius': { payload: 2, variableType: 'number' },
+      'Heat Map Opacity': { payload: 0.75, variableType: 'number' },
     },
     none: {},
   }
@@ -75,6 +104,7 @@ export default function VariableList({
         'editGeoShared'
       )
     }
+
     setSelectMode(newMode) // Set the new mode
   }
 
@@ -107,7 +137,7 @@ export default function VariableList({
                 <VariableListItem
                   key={key + index.toString()}
                   varKey={key}
-                  varValue={value.payload?.toString() || value || ''}
+                  varValue={value || { payload: '', variableType: 'string' }}
                   listName={listName}
                   mapGeo={mapGeo}
                   mapId={mapId}
@@ -157,7 +187,9 @@ export default function VariableList({
                       <VariableListItem
                         key={nanoid()}
                         varKey={key}
-                        varValue={value.payload?.toString() || value || ''}
+                        varValue={
+                          value || { payload: '', variableType: 'string' }
+                        }
                         listName={listName}
                         mapGeo={mapGeo}
                         mapId={mapId}

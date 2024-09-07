@@ -1,14 +1,12 @@
-import { decodeGeo, editMapGeo } from '@/lib/utils'
-import { useSetAtom } from 'jotai'
-import { setMapFieldAtom } from '@/lib/jotai'
+import { decodeGeo, editMapGeo, isValidHex } from '@/lib/utils'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { mapLibreAtom, setMapFieldAtom } from '@/lib/jotai'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import TrashDialog from './trash-dialog'
-import { useEffect, useState } from 'react'
-import useDebounce from '@/lib/hooks/useDebounce'
+import { useEffect, useRef, useState } from 'react'
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import { ColorPicker } from '@/components/ui/color-picker'
-
 import {
   Select,
   SelectTrigger,
@@ -17,6 +15,8 @@ import {
   SelectGroup,
   SelectItem,
 } from '@/components/ui/select'
+import { editLayerStyleGlobal } from '@/lib/map-render'
+import usePrevious from '@/lib/hooks/usePrevious'
 
 export default function VariableListItem({
   varKey,
@@ -28,9 +28,10 @@ export default function VariableListItem({
   varType,
   hasTrash,
   selectOptions = [],
+  byFeature = '',
 }: {
   varKey: string
-  varValue: any
+  varValue: { [key: string]: any }
   listName: string
   mapGeo: CustomFeatureCollection
   mapId: string
@@ -38,58 +39,96 @@ export default function VariableListItem({
   varType: 'string' | 'number' | 'color' | 'select'
   hasTrash: boolean
   selectOptions?: string[]
+  byFeature?: string
 }) {
   const setMapField = useSetAtom(setMapFieldAtom)
-  // TODO check if isValid boolean and color
-  const [inputValue, setInputValue] = useState(varValue)
-  // delay PUT request
-  const debouncedInputValue = useDebounce(inputValue)
+  const mapLibre = useAtomValue(mapLibreAtom)
 
-  const updateVariable = async () => {
+  const [inputValue, setInputValue] = useState<string>(
+    varValue.payload.toString()
+  )
+  const transientName = useRef('')
+
+  const updateVariable = async (payload: string) => {
     const result = await editMapGeo(
       mapGeo,
       mapId,
       currLayerId,
       varKey,
-      { payload: debouncedInputValue, variableType: varType },
+      { ...varValue, payload },
       'addOrUpdate',
       listName === 'Local' ? 'editFeatureSelf' : 'editGeoSharedNested'
     )
 
     if (result.payload) {
       const decodedGeo = decodeGeo(result.payload.geojson)
-      setMapField({ field: 'geojson', value: decodedGeo }) // Might hinder user experience
+      setMapField({ field: 'geojson', value: decodedGeo })
     }
   }
 
-  const handleOnBlurColor = () => {
-    if (inputValue.length !== 7) {
-      setInputValue(varValue)
-    } else {
-      updateVariable()
-    }
-  }
-
-  useEffect(() => {
-    if (varValue !== inputValue) {
-      if (varType !== 'color') {
-        updateVariable()
+  const handleInputChange = (value: string) => {
+    setInputValue(value)
+    if (listName === 'Global') {
+      if (
+        varType === 'color' ? value.length === 7 && isValidHex(value) : true
+      ) {
+        editLayerStyleGlobal(
+          mapLibre,
+          {
+            ...varValue,
+            payload: varType === 'number' ? parseFloat(value) : value,
+          },
+          byFeature
+        )
       }
     }
-  }, [debouncedInputValue])
+  }
+
+  const handleBlur = () => {
+    console.log('trigger', transientName.current, inputValue)
+    // This will only trigger if they blur AND the name has changed
+    if (transientName.current !== inputValue) {
+      // Update the transient name value
+      transientName.current = inputValue
+
+      console.log('asdasd')
+      // Do other on blur analytics stuff
+      let validValue =
+        varType === 'number' ? parseFloat(inputValue) : inputValue
+
+      if (Number.isNaN(validValue)) {
+        validValue = varValue.payload
+      }
+
+      if (varType === 'number') {
+        validValue = Math.max(
+          varValue.range[0],
+          Math.min(varValue.range[1], Number(validValue))
+        )
+      }
+
+      if (varType === 'color' && inputValue.length !== 7) {
+        validValue = varValue.payload
+      }
+
+      if (validValue !== inputValue) {
+        handleInputChange(validValue.toString())
+      }
+      updateVariable(validValue.toString())
+    }
+  }
 
   const renderInput = () => {
     if (varType === 'string') {
       return (
         <Input
-          type="text" // Adjusted to "text" since inputType is "string"
+          type="text"
           id={varKey}
           placeholder={varKey}
           className="flex-1"
-          onChange={(e) => {
-            setInputValue(e.target.value)
-          }}
+          onChange={(e) => handleInputChange(e.target.value)}
           value={inputValue}
+          onBlur={handleBlur} // Blur handling
         />
       )
     }
@@ -100,10 +139,10 @@ export default function VariableListItem({
           id="value"
           placeholder="111111"
           className="text-sm"
+          step="0.01"
           value={inputValue}
-          onChange={(e) => {
-            setInputValue(e.target.value)
-          }}
+          onChange={(e) => handleInputChange(e.target.value)}
+          onBlur={handleBlur} // Blur handling
         />
       )
     }
@@ -114,16 +153,15 @@ export default function VariableListItem({
             id="value"
             placeholder="#FFFFFF"
             className="text-sm"
-            onBlur={handleOnBlurColor}
             value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value)
-            }}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onBlur={handleBlur} // Blur handling
           />
           <ColorPicker
             className="aspect-square"
             value={inputValue}
-            onChange={setInputValue}
+            onChange={handleInputChange}
+            setIsBlurred={handleBlur}
           />
         </>
       )
@@ -146,7 +184,7 @@ export default function VariableListItem({
         </Select>
       )
     }
-    return <div>Invalid variableType{varValue}</div>
+    return <div>Invalid variableType {varValue.payload}</div>
   }
 
   return (

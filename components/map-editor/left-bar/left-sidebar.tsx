@@ -2,7 +2,6 @@ import React from 'react'
 import LeftSidebarItem from './left-sidebar-item'
 import { useAtom } from 'jotai'
 import { mapAtom } from '@/lib/jotai'
-import { nanoid } from 'nanoid'
 // Temp const var to populate
 
 export default function LeftSidebar() {
@@ -23,7 +22,7 @@ export default function LeftSidebar() {
         <ul className="w-full">
           {filterName?.map((tuple) => (
             <LeftSidebarItem
-              key={nanoid()}
+              key={tuple[0] + tuple[1]}
               name={tuple[0]}
               id={tuple[1]}
               properties={tuple[2]}

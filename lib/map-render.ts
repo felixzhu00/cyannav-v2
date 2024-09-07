@@ -1,22 +1,23 @@
 /* eslint-disable no-param-reassign */
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
-import { MutableRefObject } from 'react'
+import maplibregl from 'maplibre-gl'
+import { findMinMax } from './utils'
 
 export function renderFill(
-  map: MutableRefObject<maplibregl.Map | null>,
+  mapRef: maplibregl.Map | null,
   mapGeo: CustomFeatureCollection
 ) {
-  if (!map.current) return
+  if (!mapRef) return
 
   // Add empty GeoJSON source for drawn features
-  map.current.addSource('geojson-data', {
+  mapRef.addSource('geojson-data', {
     type: 'geojson',
     data: mapGeo,
     promoteId: '_id',
   })
 
   // Add a Fill layer of geoJSON with visibility control
-  map.current.addLayer({
+  mapRef.addLayer({
     id: 'geojson-layer',
     type: 'fill',
     source: 'geojson-data',
@@ -38,7 +39,7 @@ export function renderFill(
   })
 
   // Add an Outline layer of geoJSON with visibility control
-  map.current.addLayer({
+  mapRef.addLayer({
     id: 'outline-layer',
     type: 'line',
     source: 'geojson-data',
@@ -78,44 +79,41 @@ export function renderFill(
     // Check if source data is geojson-data
     if (
       e.sourceId === 'geojson-data' &&
-      map.current?.isSourceLoaded('geojson-data')
+      mapRef?.isSourceLoaded('geojson-data')
     ) {
-      const features = map.current.querySourceFeatures('geojson-data')
+      const features = mapRef.querySourceFeatures('geojson-data')
 
       features.forEach((feature) => {
         const id = feature.id as string // Ensure id is string
         const selfObject = JSON.parse(feature.properties._self)
         const visible = selfObject._visible === true // Assuming 'visible' is a boolean property
 
-        map.current?.setFeatureState(
-          { source: 'geojson-data', id },
-          { visible }
-        )
+        mapRef?.setFeatureState({ source: 'geojson-data', id }, { visible })
       })
       // Remove the event listener after it has run
-      map.current?.off('sourcedata', onSourceData)
+      mapRef?.off('sourcedata', onSourceData)
     }
   }
 
   // Attach the sourcedata event listener
-  map.current.on('sourcedata', onSourceData)
+  mapRef.on('sourcedata', onSourceData)
 }
 
-export function applyHover(map: MutableRefObject<maplibregl.Map | null>) {
-  if (!map || !map.current) return
+export function applyHover(mapRef: maplibregl.Map | null) {
+  if (!mapRef) return
 
   // Map Hover Logic
   let hoveredFeatureId = ''
 
-  map.current.on('mousemove', 'geojson-layer', (e) => {
-    const features = map.current?.queryRenderedFeatures(e.point, {
+  mapRef.on('mousemove', 'geojson-layer', (e) => {
+    const features = mapRef?.queryRenderedFeatures(e.point, {
       layers: ['geojson-layer'],
     })
 
     if (!features || features.length === 0) {
       return
     }
-    if (!map.current) {
+    if (!mapRef) {
       return
     }
 
@@ -124,14 +122,14 @@ export function applyHover(map: MutableRefObject<maplibregl.Map | null>) {
     if (hoveredFeatureId !== featureId) {
       // Reset the hover state of the previously hovered feature
       if (hoveredFeatureId) {
-        map.current.setFeatureState(
+        mapRef.setFeatureState(
           { source: 'geojson-data', id: hoveredFeatureId },
           { hover: false }
         )
       }
 
       // Set the hover state for the new feature
-      map.current.setFeatureState(
+      mapRef.setFeatureState(
         { source: 'geojson-data', id: featureId },
         { hover: true }
       )
@@ -140,14 +138,14 @@ export function applyHover(map: MutableRefObject<maplibregl.Map | null>) {
       hoveredFeatureId = featureId
 
       // Change the cursor style
-      map.current.getCanvas().style.cursor = 'pointer'
+      mapRef.getCanvas().style.cursor = 'pointer'
     }
   })
 
-  map.current.on('mouseleave', 'geojson-layer', () => {
-    if (!map.current) return
+  mapRef.on('mouseleave', 'geojson-layer', () => {
+    if (!mapRef) return
     if (hoveredFeatureId) {
-      map.current.setFeatureState(
+      mapRef.setFeatureState(
         { source: 'geojson-data', id: hoveredFeatureId },
         { hover: false }
       )
@@ -157,20 +155,20 @@ export function applyHover(map: MutableRefObject<maplibregl.Map | null>) {
     hoveredFeatureId = ''
 
     // Reset the cursor style
-    map.current.getCanvas().style.cursor = ''
+    mapRef.getCanvas().style.cursor = ''
   })
 }
 
 export function applyClick(
-  map: MutableRefObject<maplibregl.Map | null>,
+  mapRef: maplibregl.Map | null,
   setCurrLayer: (update: (prevLayerId: string) => string) => void
 ) {
-  if (!map || !map.current) return
+  if (!mapRef) return
 
   // Add the click event listener
-  map.current.on('click', 'geojson-layer', (e) => {
-    if (!map.current) return
-    const features = map.current.queryRenderedFeatures(e.point, {
+  mapRef.on('click', 'geojson-layer', (e) => {
+    if (!mapRef) return
+    const features = mapRef.queryRenderedFeatures(e.point, {
       layers: ['geojson-layer'],
     })
 
@@ -179,22 +177,22 @@ export function applyClick(
     const featureId = features[0].properties._id
 
     setCurrLayer((prevLayerId) => {
-      if (!map.current) return ''
+      if (!mapRef) return ''
       if (prevLayerId === featureId) {
-        map.current.setFeatureState(
+        mapRef.setFeatureState(
           { source: 'geojson-data', id: featureId },
           { selected: false }
         )
         return '' // Deselect if already selected
       }
       if (prevLayerId) {
-        map.current.setFeatureState(
+        mapRef.setFeatureState(
           { source: 'geojson-data', id: prevLayerId },
           { selected: false }
         )
       }
 
-      map.current.setFeatureState(
+      mapRef.setFeatureState(
         { source: 'geojson-data', id: featureId },
         { selected: true }
       )
@@ -204,22 +202,19 @@ export function applyClick(
 }
 
 export function toggleFeatureVisibility(
-  map: MutableRefObject<maplibregl.Map | null>,
+  mapRef: maplibregl.Map | null,
   featureId: string,
   visible: boolean
 ) {
   // Check if map is valid
-  if (!map || !map.current) return
+  if (!mapRef) return
 
   // Update the feature state for the specified feature
-  map.current.setFeatureState(
-    { source: 'geojson-data', id: featureId },
-    { visible }
-  )
+  mapRef.setFeatureState({ source: 'geojson-data', id: featureId }, { visible })
 
   // Optionally, update the fill and outline styles based on feature state
   // Add or update Fill layer with visibility control
-  map.current.setPaintProperty('geojson-layer', 'fill-color', [
+  mapRef.setPaintProperty('geojson-layer', 'fill-color', [
     'case',
     ['boolean', ['feature-state', 'visible'], false],
     '#000000', // Color for visible features
@@ -227,10 +222,64 @@ export function toggleFeatureVisibility(
   ])
 
   // Add or update Outline layer with visibility control
-  map.current.setPaintProperty('outline-layer', 'line-width', [
+  mapRef.setPaintProperty('outline-layer', 'line-width', [
     'case',
     ['boolean', ['feature-state', 'visible'], false],
     2, // Width for visible features
     0, // Width for hidden features (no outline)
   ])
+}
+
+export function editLayerStyleGlobal(
+  mapRef: maplibregl.Map | null,
+  value: { [key: string]: any }, // index 0,1,2 is usual not for data
+  byFeature?: string
+) {
+  // Check if map is valid
+  if (!mapRef) return
+
+  // Check if value properly exist
+  if (!value.layer || !value.property || !value.payload || !value.index) return
+
+  if (value.index === -1) {
+    if (mapRef.getLayer(value.layer)) {
+      // Change the fill color of a fill layer
+      mapRef.setPaintProperty(value.layer, value.property, value.payload)
+    }
+  } else {
+    const currentPaintProperties = mapRef.getPaintProperty(
+      value.layer,
+      value.property
+    )
+
+    // Update just the color values
+    if (currentPaintProperties && Array.isArray(currentPaintProperties)) {
+      // Make a copy of the array to avoid direct mutation
+      const updatedPaintProperties = [...currentPaintProperties]
+
+      // Update the specific index with the new value
+      updatedPaintProperties[value.index] = value.payload
+
+      // Make sure Max and Min is up to date
+      if (byFeature) {
+        const source = mapRef.getSource('geojson-data')
+        if (source && source instanceof maplibregl.GeoJSONSource) {
+          const data = source._data as CustomFeatureCollection // Type assertion
+          const minMax = findMinMax(byFeature, data)
+
+          if (minMax.min && minMax.max) {
+            updatedPaintProperties[3] = minMax.min
+            updatedPaintProperties[5] = minMax.max
+          }
+        }
+      }
+
+      // Set the new paint property with updated values
+      mapRef.setPaintProperty(
+        value.layer,
+        value.property,
+        updatedPaintProperties
+      )
+    }
+  }
 }

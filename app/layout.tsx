@@ -5,8 +5,8 @@ import Header from '@/components/landing/header'
 import Footer from '@/components/landing/footer'
 import { Toaster } from '@/components/ui/toaster'
 import { headers } from 'next/headers'
-// import ThemeToggle from '@/components/theme-toggle'
-// import ThemeProvider from '@/components/theme-provider'
+// import ThemeToggle from '@/components/theme-toggle';
+// import ThemeProvider from '@/components/theme-provider';
 import SessionWrapper from '@/components/session-wrapper'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -44,11 +44,11 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} flex min-h-screen flex-col`}>
         <SessionWrapper>
           {isMap && <Toaster />}
-          {<Header />}
-          {children}
+          <Header />
+          <main className="flex-grow">{children}</main>
           <Footer />
         </SessionWrapper>
       </body>

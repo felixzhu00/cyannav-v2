@@ -6,9 +6,16 @@ import { FcGoogle } from 'react-icons/fc'
 import { FaGithub, FaApple } from 'react-icons/fa'
 import { signIn, providerMap } from '@/lib/auth'
 import { AuthError } from 'next-auth'
+import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
 export default async function Page() {
+  const session = await auth()
+
+  if (session) {
+    redirect('/dashboard?view=recent-maps')
+  }
+
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
       <div className="bg-muted hidden lg:block">
@@ -37,13 +44,14 @@ export default async function Page() {
                     'use server'
                     try {
                       await signIn(provider.id, {
-                        redirectTo: '/user?view=settings',
+                        redirectTo: '/dashboard?view=recent-maps',
                       })
                     } catch (error) {
                       if (error instanceof AuthError) {
-                        return redirect(
-                          `${SIGNIN_ERROR_URL}?error=${error.type}`
-                        )
+                        return
+                        // redirect(
+                        //   `${SIGNIN_ERROR_URL}?error=${error.type}`
+                        // )
                       }
                       throw error
                     }

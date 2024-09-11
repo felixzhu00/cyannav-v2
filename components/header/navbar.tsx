@@ -1,5 +1,5 @@
 import React from 'react'
-import { CircleUserRound, Settings, Bell, HelpCircle } from 'lucide-react'
+import { CircleUserRound, Settings, HelpCircle } from 'lucide-react'
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -19,6 +19,7 @@ import Link from 'next/link'
 import SignOut from '@/components/landing/sign-out'
 import { auth } from '@/lib/auth'
 import UpgradeButton from './upgrade-button'
+import Notification from './notifications'
 
 export default async function Navbar() {
   const session = await auth()
@@ -32,7 +33,7 @@ export default async function Navbar() {
               <UpgradeButton />
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Bell className="h-7 w-7 cursor-pointer" />
+              <Notification />
             </NavigationMenuItem>
             <NavigationMenuItem>
               <HelpCircle className="h-7 w-7 cursor-pointer" />

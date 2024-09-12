@@ -1,113 +1,133 @@
 /* eslint-disable no-param-reassign */
-import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
+import {
+  CustomFeature,
+  CustomFeatureCollection,
+} from '@/core/_entities/types/map.types'
 import maplibregl from 'maplibre-gl'
 import { findMinMax } from './utils'
+import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 
-export function renderFill(
+// Adds source, fill, outline layer to maplibre mapRef for ONE feature
+function addFeatureSourceAndLayer(
   mapRef: maplibregl.Map | null,
-  mapGeo: CustomFeatureCollection
+  sourceRef: { [key: string]: string[] },
+  feature: Feature<Geometry, GeoJsonProperties>
 ) {
-  if (!mapRef) return
+  const featureId = feature.id as string
+  const selfObject = JSON.parse(feature.properties?.visible || '{}')
+  const visible = selfObject === true // Assuming 'visible' is a boolean property
 
-  // Add empty GeoJSON source for drawn features
-  mapRef.addSource('geojson-data', {
+  if (!mapRef) return
+  // Add a source for the feature
+  mapRef.addSource(featureId, {
     type: 'geojson',
-    data: mapGeo,
-    promoteId: '_id',
+    data: {
+      type: 'FeatureCollection',
+      features: [feature],
+    },
+    promoteId: 'id',
   })
 
-  // Add a Fill layer of geoJSON with visibility control
+  // Add a fill layer for the feature
   mapRef.addLayer({
-    id: 'geojson-layer',
+    id: `${featureId}-fill`,
     type: 'fill',
-    source: 'geojson-data',
+    source: featureId,
     layout: {},
     paint: {
       'fill-color': [
         'case',
-        ['boolean', ['feature-state', 'visible'], false],
-        '#000000', // Color for visible features
+        ['boolean', ['feature-state', 'visible'], visible],
+        [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          '#407a4f', // Color for selected features
+          ['boolean', ['feature-state', 'hover'], false],
+          '#40587a', // Color for hovered features
+          '#000000', // Default color
+        ],
         'rgba(0,0,0,0)', // Transparent color for hidden features
       ],
       'fill-opacity': [
         'case',
-        ['boolean', ['feature-state', 'visible'], false],
-        0.4, // Opacity for visible features
+        ['boolean', ['feature-state', 'visible'], visible],
+        [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          1, // Opacity for selected features
+          ['boolean', ['feature-state', 'hover'], false],
+          1, // Opacity for hovered features
+          0.4, // Default opacity
+        ],
         0, // Fully transparent for hidden features
       ],
     },
   })
 
-  // Add an Outline layer of geoJSON with visibility control
+  // Add an outline layer for the feature
   mapRef.addLayer({
-    id: 'outline-layer',
+    id: `${featureId}-outline`,
     type: 'line',
-    source: 'geojson-data',
+    source: featureId,
     layout: {},
     paint: {
       'line-color': [
         'case',
-        ['boolean', ['feature-state', 'visible'], false],
-        [
-          'case',
-          ['boolean', ['feature-state', 'selected'], false],
-          '#404040', // Color for selected features
-          ['boolean', ['feature-state', 'hover'], false],
-          '#4f8dff', // Color for hovered features
-          '#FFFFFF', // Default color
-        ],
+        ['boolean', ['feature-state', 'visible'], visible],
+        '#FFFFFF', // Color for visible features
         'rgba(0,0,0,0)', // Transparent color for hidden features
       ],
       'line-width': [
         'case',
-        ['boolean', ['feature-state', 'visible'], false],
-        [
-          'case',
-          ['boolean', ['feature-state', 'selected'], false],
-          2, // Width for selected features
-          ['boolean', ['feature-state', 'hover'], false],
-          2, // Width for hovered features
-          1, // Default width
-        ],
+        ['boolean', ['feature-state', 'visible'], visible],
+        1, // Width for visible features
         0, // Width for hidden features
       ],
     },
   })
 
-  // Function runs when source data is loaded
-  function onSourceData(e: maplibregl.MapSourceDataEvent) {
-    // Check if source data is geojson-data
-    if (
-      e.sourceId === 'geojson-data' &&
-      mapRef?.isSourceLoaded('geojson-data')
-    ) {
-      const features = mapRef.querySourceFeatures('geojson-data')
-
-      features.forEach((feature) => {
-        const id = feature.id as string // Ensure id is string
-        const selfObject = JSON.parse(feature.properties._self)
-        const visible = selfObject._visible === true // Assuming 'visible' is a boolean property
-
-        mapRef?.setFeatureState({ source: 'geojson-data', id }, { visible })
-      })
-      // Remove the event listener after it has run
-      mapRef?.off('sourcedata', onSourceData)
-    }
-  }
-
-  // Attach the sourcedata event listener
-  mapRef.on('sourcedata', onSourceData)
+  // Add source to sourceMap
+  sourceRef[featureId] = [`${featureId}-fill`, `${featureId}-outline`]
 }
 
-export function applyHover(mapRef: maplibregl.Map | null) {
+// Removes source, fill, outline layer to maplibre mapRef for ONE feature
+function removeSourceAndLayers(
+  mapRef: maplibregl.Map,
+  sourceRef: { [key: string]: string[] },
+  sourceId: string
+) {
+  // Check if the source exists
+  if (!mapRef.getSource(sourceId)) return
+
+  // Get all the layers in the map
+  const { layers } = mapRef.getStyle()
+
+  // Loop through layers and remove the ones that reference the source
+  if (layers) {
+    layers.forEach((layer) => {
+      if ('source' in layer && layer.source === sourceId) {
+        mapRef.removeLayer(layer.id)
+      }
+    })
+  }
+
+  // Remove the source
+  mapRef.removeSource(sourceId)
+
+  // Pop source from sourceMap
+  delete sourceRef[sourceId]
+}
+
+export function applyHover(mapRef: maplibregl.Map | null, sourceId: string) {
   if (!mapRef) return
 
   // Map Hover Logic
   let hoveredFeatureId = ''
 
-  mapRef.on('mousemove', 'geojson-layer', (e) => {
+  // Mouse inside Layer
+  mapRef.on('mousemove', `${sourceId}-fill`, (e) => {
     const features = mapRef?.queryRenderedFeatures(e.point, {
-      layers: ['geojson-layer'],
+      layers: [`${sourceId}-fill`],
     })
 
     if (!features || features.length === 0) {
@@ -123,14 +143,14 @@ export function applyHover(mapRef: maplibregl.Map | null) {
       // Reset the hover state of the previously hovered feature
       if (hoveredFeatureId) {
         mapRef.setFeatureState(
-          { source: 'geojson-data', id: hoveredFeatureId },
+          { source: sourceId, id: hoveredFeatureId },
           { hover: false }
         )
       }
 
       // Set the hover state for the new feature
       mapRef.setFeatureState(
-        { source: 'geojson-data', id: featureId },
+        { source: sourceId, id: featureId },
         { hover: true }
       )
 
@@ -142,11 +162,12 @@ export function applyHover(mapRef: maplibregl.Map | null) {
     }
   })
 
-  mapRef.on('mouseleave', 'geojson-layer', () => {
+  // Mouse outside Layer
+  mapRef.on('mouseleave', `${sourceId}-fill`, () => {
     if (!mapRef) return
     if (hoveredFeatureId) {
       mapRef.setFeatureState(
-        { source: 'geojson-data', id: hoveredFeatureId },
+        { source: sourceId, id: hoveredFeatureId },
         { hover: false }
       )
     }
@@ -161,78 +182,66 @@ export function applyHover(mapRef: maplibregl.Map | null) {
 
 export function applyClick(
   mapRef: maplibregl.Map | null,
-  setCurrLayer: (update: (prevLayerId: string) => string) => void
+  drawRef: any,
+  sourceRef: { [key: string]: string[] },
+  setCurrLayer: (update: (prevLayerId: string) => string) => void,
+  sourceId: string
 ) {
   if (!mapRef) return
 
   // Add the click event listener
-  mapRef.on('click', 'geojson-layer', (e) => {
+  mapRef.on('click', `${sourceId}-fill`, async (e) => {
     if (!mapRef) return
     const features = mapRef.queryRenderedFeatures(e.point, {
-      layers: ['geojson-layer'],
+      layers: [`${sourceId}-fill`],
     })
 
     if (!features || !features.length) return
 
-    const featureId = features[0].properties._id
+    const featureId = features[0].id as string
 
     setCurrLayer((prevLayerId) => {
       if (!mapRef) return ''
       if (prevLayerId === featureId) {
-        mapRef.setFeatureState(
-          { source: 'geojson-data', id: featureId },
-          { selected: false }
-        )
         return '' // Deselect if already selected
       }
-      if (prevLayerId) {
-        mapRef.setFeatureState(
-          { source: 'geojson-data', id: prevLayerId },
-          { selected: false }
-        )
-      }
-
-      mapRef.setFeatureState(
-        { source: 'geojson-data', id: featureId },
-        { selected: true }
-      )
       return featureId // Select new feature
     })
+
+    if (drawRef.getMode() === 'simple_select') {
+      const source = mapRef.getSource(sourceId) as maplibregl.GeoJSONSource
+
+      if (source) {
+        const sourceData = await source.getData() // Get the source data
+        removeSourceAndLayers(mapRef, sourceRef, sourceId)
+        // Add feature to draw object
+        drawRef.add(sourceData)
+
+        // Programmically change edit this new draw object
+        drawRef.changeMode('simple_select', { featureIds: [featureId] })
+      }
+    }
   })
 }
 
-export function toggleFeatureVisibility(
+export function renderMap(
   mapRef: maplibregl.Map | null,
-  featureId: string,
-  visible: boolean
+  sourceRef: { [key: string]: string[] },
+  drawRef: any,
+  setCurrLayer: (update: (prevLayerId: string) => string) => void,
+  mapGeo: CustomFeatureCollection
 ) {
-  // Check if map is valid
-  if (!mapRef) return
-
-  // Update the feature state for the specified feature
-  mapRef.setFeatureState({ source: 'geojson-data', id: featureId }, { visible })
-
-  // Optionally, update the fill and outline styles based on feature state
-  // Add or update Fill layer with visibility control
-  mapRef.setPaintProperty('geojson-layer', 'fill-color', [
-    'case',
-    ['boolean', ['feature-state', 'visible'], false],
-    '#000000', // Color for visible features
-    'rgba(0,0,0,0)', // Transparent color for hidden features
-  ])
-
-  // Add or update Outline layer with visibility control
-  mapRef.setPaintProperty('outline-layer', 'line-width', [
-    'case',
-    ['boolean', ['feature-state', 'visible'], false],
-    2, // Width for visible features
-    0, // Width for hidden features (no outline)
-  ])
+  // Iterate over features and add individual sources and layers
+  mapGeo.features.forEach((feature) => {
+    addFeatureSourceAndLayer(mapRef, sourceRef, feature)
+    applyClick(mapRef, drawRef, sourceRef, setCurrLayer, feature.id as string)
+  })
 }
 
 export function editLayerStyleGlobal(
   mapRef: maplibregl.Map | null,
   value: { [key: string]: any }, // index 0,1,2 is usual not for data
+  featureId:string,
   byFeature?: string
 ) {
   // Check if map is valid
@@ -262,7 +271,7 @@ export function editLayerStyleGlobal(
 
       // Make sure Max and Min is up to date
       if (byFeature) {
-        const source = mapRef.getSource('geojson-data')
+        const source = mapRef.getSource(featureId)
         if (source && source instanceof maplibregl.GeoJSONSource) {
           const data = source._data as CustomFeatureCollection // Type assertion
           const minMax = findMinMax(byFeature, data)
@@ -280,6 +289,38 @@ export function editLayerStyleGlobal(
         value.property,
         updatedPaintProperties
       )
+    } else {
+      // paintProperty is single digit and not array
+      // Load default paintProperty with value : { [key: string]: any }
     }
   }
 }
+
+// export function toggleFeatureVisibility(
+//   mapRef: maplibregl.Map | null,
+//   featureId: string,
+//   visible: boolean
+// ) {
+//   // Check if map is valid
+//   if (!mapRef) return
+
+//   // Update the feature state for the specified feature
+//   mapRef.setFeatureState({ source: 'geojson-data', id: featureId }, { visible })
+
+//   // Optionally, update the fill and outline styles based on feature state
+//   // Add or update Fill layer with visibility control
+//   mapRef.setPaintProperty('geojson-layer', 'fill-color', [
+//     'case',
+//     ['boolean', ['feature-state', 'visible'], false],
+//     '#000000', // Color for visible features
+//     'rgba(0,0,0,0)', // Transparent color for hidden features
+//   ])
+
+//   // Add or update Outline layer with visibility control
+//   mapRef.setPaintProperty('outline-layer', 'line-width', [
+//     'case',
+//     ['boolean', ['feature-state', 'visible'], false],
+//     2, // Width for visible features
+//     0, // Width for hidden features (no outline)
+//   ])
+// }

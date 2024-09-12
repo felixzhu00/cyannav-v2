@@ -1,125 +1,174 @@
-import { selectedEditOptionAtom } from '@/lib/jotai'
-import {
-  Menubar,
-  MenubarMenu,
-  MenubarTrigger,
-  MenubarContent,
-  MenubarItem,
-  MenubarSeparator,
-} from '@/components/ui/menubar'
+import { mapDrawAtom } from '@/lib/jotai'
+import { Menubar } from '@/components/ui/menubar'
 import { cn } from '@/lib/utils'
-import { useAtom } from 'jotai'
+import { useAtomValue } from 'jotai'
 import {
   MousePointer,
-  Square,
   Circle,
   Spline,
   Minus,
   Type,
   MapPin,
   File,
-  ChevronDown,
+  Ruler,
+  Pencil,
+  Pentagon,
+  Dot,
+  Image as ImageIcon,
+  MapPinPlus,
+  GitFork,
+  Download,
+  RectangleHorizontal,
 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import SelectMenuBar from './select-menu-bar'
+
+const menu = [
+  [
+    {
+      label: 'Cursor',
+      icon: <MousePointer className="h-5 w-5" />,
+      draw: 'simple_select',
+    },
+    {
+      label: 'Measure',
+      icon: <Ruler className="h-5 w-5" />,
+      draw: undefined, // TODO
+    },
+  ],
+  [
+    {
+      label: 'Text',
+      icon: <Type className="h-5 w-5" />,
+      draw: undefined, // TODO
+    },
+    {
+      label: 'Draw',
+      icon: <Pencil className="h-5 w-5" />,
+      draw: undefined, // TODO
+    },
+  ],
+  [
+    {
+      label: 'Line',
+      icon: <Minus className="-rotate-45 scale-x-125 scale-y-100 transform" />,
+      draw: 'draw_line_string',
+    },
+    {
+      label: 'Spline',
+      icon: <Spline className="h-5 w-5" />,
+      draw: undefined, // TODO
+    },
+  ],
+  [
+    {
+      label: 'Rectangle',
+      icon: <RectangleHorizontal className="h-5 w-5" />,
+      // draw: 'draw_rectangle',
+    },
+    {
+      label: 'Circle',
+      icon: <Circle className="h-5 w-5" />,
+      // draw: 'draw_circle',
+    },
+    {
+      label: 'Polygon',
+      icon: <Pentagon className="h-5 w-5" />,
+      draw: 'draw_polygon',
+    },
+  ],
+  [
+    {
+      label: 'Marker',
+      icon: <MapPin className="h-5 w-5" />,
+      draw: undefined, // TODO
+    },
+    {
+      label: 'Custom Marker',
+      icon: <MapPinPlus className="h-5 w-5" />,
+      draw: undefined, // TODO
+    },
+    {
+      label: 'Point',
+      icon: <Dot className="h-5 w-5" />,
+      draw: 'draw_point',
+    },
+  ],
+]
+
+const file = [
+  // Trigger Icon Only
+  {
+    label: 'Trigger',
+    icon: <File className="h-5 w-5" />,
+    draw: undefined,
+  },
+  // Dropdown Options
+  {
+    label: 'Export',
+    icon: <Download className="h-5 w-5" />,
+    draw: undefined,
+  },
+  {
+    label: 'Fork',
+    icon: <GitFork className="h-5 w-5" />,
+    draw: undefined,
+  },
+  {
+    label: 'Download PNG',
+    icon: <ImageIcon className="h-5 w-5" />,
+    draw: undefined,
+  },
+]
 
 export default function EditToolbar({ className }: { className: string }) {
-  // State to track the selected trigger
-  const [selectedTrigger, setSelectedTrigger] = useAtom(selectedEditOptionAtom)
+  // TODO add tooltip for each menuCol
+  const drawRef = useAtomValue(mapDrawAtom)
 
-  // Helper function to determine the class names
-  const triggerStyle = (triggerId: string) =>
-    cn(
-      'flex flex-row items-center space-x-2 px-3 h-full aspect-square justify-center',
-      'bg-transparent dark:bg-transparent',
-      'hover:bg-zinc-700 dark:hover:bg-zinc-700',
-      {
-        'bg-blue-800 dark:bg-blue-800 hover:bg-blue-800 dark:hover:bg-blue-800':
-          selectedTrigger === triggerId, // Change background color when selected
-      }
-    )
+  const [currSelectedMode, setCurrSelectedMode] = useState({
+    menuColIndex: 0, // Row of "menu" matrix
+    menuItemIndex: 0, // Col of "menu" matrix
+  }) // postion in "menu" matrix, default to cursor
+
+  useEffect(() => {
+    // Get the label and draw from matrix
+    if (drawRef) {
+      console.log(
+        menu[currSelectedMode.menuColIndex][currSelectedMode.menuItemIndex]
+          .label
+      )
+      const current =
+        menu[currSelectedMode.menuColIndex][currSelectedMode.menuItemIndex]
+      const currentLabel = current.label
+      const currentDraw = current.draw
+
+      if (currentDraw) drawRef.changeMode(currentDraw)
+
+      console.log(currentLabel)
+    }
+  }, [currSelectedMode, drawRef])
 
   return (
     <div className={cn('h-full flex-1', className)}>
       <Menubar className="inline-flex h-full space-x-0 border-0 bg-transparent p-0 dark:bg-transparent">
-        <MenubarMenu>
-          <MenubarTrigger
-            className={triggerStyle('file')}
-            onClick={() => setSelectedTrigger('file')}
-          >
-            <File className="mr-1 h-5 w-5" />
-            <ChevronDown className="h-3 w-3" />
-          </MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem>Export</MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem>Fork</MenubarItem>
-            <MenubarItem>Download PNG</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-
-        <MenubarMenu>
-          <MenubarTrigger
-            className={triggerStyle('pointer')}
-            onClick={() => setSelectedTrigger('pointer')}
-          >
-            <MousePointer className="h-5 w-5" />
-          </MenubarTrigger>
-        </MenubarMenu>
-
-        <MenubarMenu>
-          <MenubarTrigger
-            className={triggerStyle('type')}
-            onClick={() => setSelectedTrigger('type')}
-          >
-            <Type className="h-5 w-5" />
-          </MenubarTrigger>
-        </MenubarMenu>
-
-        <MenubarMenu>
-          <MenubarTrigger
-            className={triggerStyle('minus')}
-            onClick={() => setSelectedTrigger('minus')}
-          >
-            <Minus className="transform scale-x-125 scale-y-100 -rotate-45" />
-            <ChevronDown className="h-3 w-3" />
-          </MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem>
-              <Spline className="h-5 w-5" /> Spline
-            </MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem>
-              <Minus className="h-5 w-5 -rotate-45" /> Line
-            </MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-
-        <MenubarMenu>
-          <MenubarTrigger
-            className={triggerStyle('circle')}
-            onClick={() => setSelectedTrigger('circle')}
-          >
-            <Circle className="h-5 w-5" />
-            <ChevronDown className="h-3 w-3" />
-          </MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem>
-              <Square className="h-5 w-5" /> Square
-            </MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem>
-              <Circle className="h-5 w-5" /> Circle
-            </MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-
-        <MenubarMenu>
-          <MenubarTrigger
-            className={triggerStyle('pin')}
-            onClick={() => setSelectedTrigger('pin')}
-          >
-            <MapPin className="h-5 w-5" />
-          </MenubarTrigger>
-        </MenubarMenu>
+        {/* File Option : using SelectMenuBar just for identical styling */}
+        <SelectMenuBar
+          items={file}
+          setCurrSelectedMode={() => {}} // Dummy prop
+          menuColIndex={-1} // Dummy prop
+          isActive={false}
+          isFile
+        />
+        {/* Menu Columns */}
+        {menu.map((menuCol, index) => (
+          <SelectMenuBar
+            key={menuCol[0].label}
+            items={menuCol}
+            setCurrSelectedMode={setCurrSelectedMode}
+            menuColIndex={index}
+            isActive={currSelectedMode.menuColIndex === index}
+          />
+        ))}
       </Menubar>
     </div>
   )

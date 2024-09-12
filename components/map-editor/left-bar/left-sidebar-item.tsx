@@ -30,9 +30,10 @@ export default function LeftSidebarItem({
   const setCurrLayerStyle = useSetAtom(setCurrLayerSelectAtom)
   const setToggleFeatureState = useSetAtom(setToggleFeatureStateAtom)
 
+  // console.log("rerender", properties)
+
   const handleLayerChange = () => {
     if (currLayer !== id) {
-      
       setCurrLayerStyle(id)
     } else {
       setCurrLayerStyle('')
@@ -41,11 +42,11 @@ export default function LeftSidebarItem({
 
   const handleToggleProperty = async (property: string) => {
     // init newGeo with a not null value
+    // console.log("asdasd",properties[property] === undefined)
     const changeValue =
-      properties._self[property] === undefined
-        ? false
-        : !properties._self[property]
+      properties[property] === undefined ? false : !properties[property]
 
+    // console.log(changeValue)
     const newGeo = editFeatureSelf(
       map.geojson,
       id,
@@ -80,11 +81,7 @@ export default function LeftSidebarItem({
         const decodedGeo = decodeGeo(result.payload.geojson)
 
         setMapField({ field: 'geojson', value: decodedGeo }) // Update the global title state
-        setToggleFeatureState(
-          id,
-          property,
-          changeValue
-        )
+        setToggleFeatureState(id, property, changeValue)
       }
     } catch (error) {
       toast({
@@ -110,13 +107,13 @@ export default function LeftSidebarItem({
           size="icon"
           onClick={(e) => {
             e.stopPropagation()
-            handleToggleProperty('_lock')
+            handleToggleProperty('lock')
           }}
         >
           <Lock
             className={cn(
               'h-4 w-4',
-              properties._self._lock === false ? 'text-gray-500' : ''
+              properties.lock === false ? 'text-gray-500' : ''
             )}
           />
         </Button>
@@ -125,13 +122,13 @@ export default function LeftSidebarItem({
           size="icon"
           onClick={(e) => {
             e.stopPropagation()
-            handleToggleProperty('_visible')
+            handleToggleProperty('visible')
           }}
         >
           <Eye
             className={cn(
               'h-4 w-4',
-              properties._self._visible === false ? 'text-gray-500' : ''
+              properties.visible === false ? 'text-gray-500' : ''
             )}
           />
         </Button>

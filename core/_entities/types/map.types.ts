@@ -1,7 +1,7 @@
 import { Document, Types } from 'mongoose'
 import { FeatureCollection, Feature } from 'geojson'
 import { IUserDocument } from './user.types'
-import { IMessageDocument } from './messages.types'
+import { IMessageDocument, MessageFields } from './messages.types'
 
 // DB MAP Structure
 export interface IMap {
@@ -21,8 +21,12 @@ export interface IMapDocument extends IMap, Document {}
 
 // Custom Feature Collection
 export interface CustomFeatureCollection extends FeatureCollection {
-  features: Feature[]
+  features: CustomFeature[]
   _shared: { [key: string]: any }
+}
+
+export interface CustomFeature extends Feature {
+  id: string
 }
 
 export interface MapFields extends Partial<IMapDocument> {}
@@ -39,7 +43,7 @@ export interface MapAtom {
   geojson: CustomFeatureCollection
   thumbnail?: string
   likes: string[]
-  messages: string[]
+  messages: MessageFields[]
   sharedUsers: string[]
   dateCreated: Date
   forkedFrom: string[]

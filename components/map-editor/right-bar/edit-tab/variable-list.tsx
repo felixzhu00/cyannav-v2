@@ -50,28 +50,28 @@ export default function VariableList({
         index: -1,
         range: [0.5, 12, 0.1], // min,max,step
       },
-      // 'Layer Opacity': {
-      //   payload: 0.75,
-      //   variableType: 'number',
-      //   layer: 'geojson-layer',
-      //   property: 'fill-opacity',
-      //   index: -1,
-      //   range: [0.01, 1, 0.01],
-      // },
-      // 'Layer Min Color': {
-      //   payload: '#FFEDA0',
-      //   variableType: 'color',
-      //   layer: 'geojson-layer',
-      //   property: 'fill-color',
-      //   index: 4,
-      // },
-      // 'Layer Max Color': {
-      //   payload: '#E31A1C',
-      //   variableType: 'color',
-      //   layer: 'geojson-layer',
-      //   property: 'fill-color',
-      //   index: 6,
-      // },
+      'Layer Opacity': {
+        payload: 0.75,
+        variableType: 'number',
+        layer: 'geojson-layer',
+        property: 'fill-opacity',
+        index: -1,
+        range: [0.01, 1, 0.01],
+      },
+      'Layer Min Color': {
+        payload: '#FFEDA0',
+        variableType: 'color',
+        layer: 'geojson-layer',
+        property: 'fill-color',
+        index: 4,
+      },
+      'Layer Max Color': {
+        payload: '#E31A1C',
+        variableType: 'color',
+        layer: 'geojson-layer',
+        property: 'fill-color',
+        index: 6,
+      },
     },
     heatmap: {
       'Heat Map Radius': { payload: 2, variableType: 'number' },
@@ -85,6 +85,7 @@ export default function VariableList({
   ) => {
     // create default option for map mode if map mode does not exist
     if (!list[newMode]) {
+      // add default option into _shared
       await editMapGeo(
         mapGeo,
         mapId,
@@ -94,17 +95,20 @@ export default function VariableList({
         'addOrUpdate',
         'editGeoShared'
       )
-      await editMapGeo(
-        mapGeo,
-        mapId,
-        currLayerId,
-        'mode',
-        newMode,
-        'addOrUpdate',
-        'editGeoShared'
-      )
+
+      // make sure that center exisit in _self if heatmap
     }
 
+    // Change mode in the backend
+    await editMapGeo(
+      mapGeo,
+      mapId,
+      currLayerId,
+      'mode',
+      newMode,
+      'addOrUpdate',
+      'editGeoShared'
+    )
     setSelectMode(newMode) // Set the new mode
   }
 
@@ -116,7 +120,7 @@ export default function VariableList({
     )
   }
 
-  const privateVariablesLocal = ['_id', '_visible', '_lock']
+  const privateVariablesLocal = ['id', 'visible', 'lock']
   const privateVariablesGlobal = ['mode']
 
   const renderList = () => {
@@ -132,10 +136,10 @@ export default function VariableList({
       return (
         <>
           {Object.entries(list).map(([key, value], index) => {
-            if (!privateVariablesLocal.includes(key)) {
+            if (!privateVariablesLocal.includes(key) && !key.startsWith('_+')) {
               return (
                 <VariableListItem
-                  key={key + index.toString()}
+                  key={value.payload + index.toString()}
                   inputObject={{ [key]: value }}
                   listName={listName}
                   mapGeo={mapGeo}
@@ -150,9 +154,6 @@ export default function VariableList({
         </>
       )
     }
-    // varKey={key}
-    // varValue={value || { payload: '', variableType: 'string' }}
-    // varType={value.variableType || 'string'}
 
     if (listName === 'Global') {
       return (

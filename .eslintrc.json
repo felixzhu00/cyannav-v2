@@ -19,7 +19,8 @@
     "@typescript-eslint/naming-convention": "off",
     "no-console": ["error", { "allow": ["warn", "error"] }],
     "react-hooks/exhaustive-deps": "off",
-    "react/require-default-props": "off"
+    "react/require-default-props": "off",
+    "@typescript-eslint/no-use-before-define": "off"
   },
   "ignorePatterns": ["components/ui/"]
 }

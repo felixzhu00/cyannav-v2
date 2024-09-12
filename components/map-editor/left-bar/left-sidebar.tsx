@@ -9,23 +9,17 @@ export default function LeftSidebar() {
 
   if (!map.geojson) return <div>GeoJSON not found</div>
 
-  const filterName = map.geojson?.features.map((feature) => [
-    feature.properties?._self.name.payload,
-    feature.properties?._id,
-    feature?.properties,
-  ])
-
   return (
     <div className="h-full max-h-[calc(100vh-74px)] w-full overflow-y-auto bg-zinc-900 pt-8">
       {/* Feature List */}
       <div className="w-full">
         <ul className="w-full">
-          {filterName?.map((tuple) => (
+          {map.geojson?.features?.map((feature) => (
             <LeftSidebarItem
-              key={tuple[0] + tuple[1]}
-              name={tuple[0]}
-              id={tuple[1]}
-              properties={tuple[2]}
+              key={feature.properties?.id.toString()}
+              name={feature.properties?.name.payload}
+              id={feature.properties?.id}
+              properties={feature?.properties || {}}
             />
           ))}
         </ul>

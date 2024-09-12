@@ -7,8 +7,11 @@ import {
   Geometry,
   GeometryCollection,
   GeoJSON,
+  Feature,
+  GeoJsonProperties,
 } from 'geojson'
 import {
+  CustomFeature,
   CustomFeatureCollection,
   IMapDocument,
 } from '@/core/_entities/types/map.types'
@@ -21,6 +24,10 @@ import { toast } from '@/components/ui/use-toast'
 // eslint-disable-next-line import/prefer-default-export
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+export const strToLowerAndDash = (str: string) => {
+  str.toLowerCase().replace(/\s+/g, '-')
 }
 
 export function encodeGeo(geojsonData: CustomFeatureCollection) {
@@ -196,7 +203,7 @@ export function editFeatureSelf(
 ) {
   // Find the feature by its ID
   const featureIndex = currentGeo.features.findIndex(
-    (feature) => feature?.properties?._id === featureId
+    (feature) => feature?.properties?.id === featureId
   )
   // Feature not found in geojson
   if (featureIndex === -1) {
@@ -209,7 +216,7 @@ export function editFeatureSelf(
   // See if properties exisit on currentGeo (Should exisit if properly imported)
   if (!currentFeature.properties) return currentGeo
 
-  const currentSelf = currentFeature.properties._self
+  const currentSelf = currentFeature.properties
 
   if (action === 'addOrUpdate') {
     if (value !== undefined) {
@@ -217,12 +224,12 @@ export function editFeatureSelf(
       currentSelf[key] = value
     }
   } else if (action === 'remove') {
-    // Remove the key from _self
+    // Remove the key from
     delete currentSelf[key]
   }
 
-  // Update the feature with the modified _self
-  currentFeature.properties._self = currentSelf
+  // Update the feature with the modified
+  currentFeature.properties = currentSelf
 
   // Replace the modified feature in the geojson features array
   const updatedFeatures = [...currentGeo.features]
@@ -245,7 +252,7 @@ export function editAllFeatureSelf(
   // Iterate over each feature in geojson.features and update _self
   const updatedFeatures = currentGeo.features.map((feature) => {
     if (!feature.properties) return currentGeo
-    const currentSelf = feature.properties._self
+    const currentSelf = feature.properties
 
     if (action === 'addOrUpdate') {
       if (value !== undefined) {
@@ -270,6 +277,28 @@ export function editAllFeatureSelf(
   }
 
   return newGeo as CustomFeatureCollection
+}
+
+export function updateFeature(
+  oldGeo: CustomFeatureCollection,
+  newFeature: CustomFeature
+): CustomFeatureCollection {
+  // Filter out the feature with the matching ID from the oldGeo features
+  const filteredFeatures = oldGeo.features.filter(
+    (feature) => feature.id !== newFeature.id
+  )
+
+  // Append the newFeature to the filtered list
+  const updatedFeatures = [...filteredFeatures, newFeature]
+
+  // Return the new GeoJSON object with the updated features
+  const newGeo = {
+    ...oldGeo,
+    features: updatedFeatures,
+  }
+  console.log(newGeo)
+
+  return newGeo
 }
 
 export function handleDBError(error: any): APIResponse {
@@ -370,7 +399,13 @@ export async function editMapGeo(
   if (editFunction === 'editAllFeatureSelf') {
     newGeo = editAllFeatureSelf(mapGeo, key, value, updateOption)
   }
+  return updateGeoJSONAPI(newGeo, mapId)
+}
 
+export async function updateGeoJSONAPI(
+  newGeo: CustomFeatureCollection,
+  mapId: string
+) {
   try {
     // Encode geoJSON
     const encodedGeoJSON = encodeGeo(newGeo)

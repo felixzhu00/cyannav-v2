@@ -1,10 +1,12 @@
 import {
+  CustomFeature,
   CustomFeatureCollection,
   IMap,
   MapAtom,
 } from '@/core/_entities/types/map.types'
 import { atom } from 'jotai'
 import maplibregl from 'maplibre-gl'
+import { updateFeature, updateGeoJSONAPI } from './utils'
 
 // Constants for Default Jotai Atom Value
 const EMPTY_GEO: CustomFeatureCollection = {
@@ -31,6 +33,7 @@ const EMPTY_MAP_DATA: MapAtom = {
 export const selectedEditOptionAtom = atom('')
 export const currLayerAtom = atom('')
 export const mapLibreAtom = atom<maplibregl.Map | null>(null)
+export const mapDrawAtom = atom<any | null>(null)
 export const mapAtom = atom(EMPTY_MAP_DATA)
 
 // mapAtom setter for any field change
@@ -42,6 +45,30 @@ export const setMapFieldAtom = atom(
       ...currentMap,
       [field]: value,
     })
+  }
+)
+
+// mapAtom setter for any field change
+export const updateMapByNewFeatureAtom = atom(
+  null,
+  async (get, set, feature: CustomFeature) => {
+    const currentMap = get(mapAtom)
+
+    console.log(feature)
+
+    const newGeo = updateFeature(currentMap.geojson, feature)
+
+    const newMap = {
+      ...currentMap,
+      geojson: newGeo,
+    }
+
+    set(mapAtom,newMap)
+
+    // console.log()
+    await updateGeoJSONAPI(newGeo, currentMap._id)
+
+    //   console.log(currentMap.geojson)
   }
 )
 
@@ -58,7 +85,7 @@ export const setCurrLayerSelectAtom = atom(
     if (!sources) return
 
     mapRef.querySourceFeatures('geojson-data').forEach((feature) => {
-      const id = feature.properties._id as string // Ensure id is string
+      const id = feature.id as string // Ensure id is string
       mapRef.setFeatureState(
         { source: 'geojson-data', id },
         { selected: id === featureId }
@@ -75,19 +102,11 @@ export const setToggleFeatureStateAtom = atom(
   (get, set, featureId: string, stateKey: string, stateValue) => {
     const mapRef = get(mapLibreAtom)
     if (!mapRef) return
-    const sources = mapRef.getSource('geojson-data')
-    if (!sources) return
 
-    const feature = mapRef
-      .querySourceFeatures('geojson-data')
-      .find((f) => f.properties._id === featureId)
-
-    if (feature) {
-      // Set the new state
-      mapRef.setFeatureState(
-        { source: 'geojson-data', id: featureId },
-        { [stateKey.substring(1)]: stateValue }
-      )
-    }
+    // Set the new feature state
+    mapRef.setFeatureState(
+      { source: featureId, id: featureId },
+      { [stateKey]: stateValue }
+    )
   }
 )

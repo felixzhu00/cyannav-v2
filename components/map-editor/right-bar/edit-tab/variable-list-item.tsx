@@ -83,7 +83,8 @@ export default function VariableListItem({
             ...propValue,
             payload: varType === 'number' ? parseFloat(value) : value,
           },
-          byFeature
+          byFeature,
+          currLayerId
         )
       }
     }

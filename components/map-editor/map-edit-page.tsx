@@ -1,7 +1,12 @@
 'use client'
 
 import { useHydrateAtoms } from 'jotai/utils'
-import { currLayerAtom, mapAtom } from '@/lib/jotai'
+import {
+  currLayerAtom,
+  mapAtom,
+  setMapFieldAtom,
+  updateMapByNewFeatureAtom,
+} from '@/lib/jotai'
 import LeftSidebar from '@/components/map-editor/left-bar/left-sidebar'
 import RightBar from '@/components/map-editor/right-bar/right-bar'
 
@@ -15,27 +20,70 @@ import { decodeGeo } from '@/lib/utils'
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import { useMapLibre } from '@/lib/hooks/useMapLibre'
 import { useSetAtom } from 'jotai'
-import { applyClick, applyHover, renderFill } from '@/lib/map-render'
+import { renderMap } from '@/lib/map-render'
+import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson'
 
 export default function MapEditPage({ initialMap }: { initialMap: any }) {
+  const decodedGeoJSON = decodeGeo(
+    initialMap.geojson
+  ) as CustomFeatureCollection
+
+  const filteredFeatures = decodedGeoJSON.features.filter(
+    (feature) => feature.properties?.name.payload === 'Canada'
+  )
+
+  // Create a new GeoJSON with the filtered feature
+  const newGeojson: FeatureCollection<Geometry, GeoJsonProperties> = {
+    type: 'FeatureCollection',
+    features: filteredFeatures,
+  }
+
   // Decode the initial map data
   const decodedMap = {
     ...initialMap,
-    geojson: decodeGeo(initialMap.geojson) as CustomFeatureCollection,
+    geojson: newGeojson,
   }
 
+  console.log(newGeojson)
+
   const setCurrLayer = useSetAtom(currLayerAtom)
+  const updateMapByNewFeature = useSetAtom(updateMapByNewFeatureAtom)
+  useHydrateAtoms([[mapAtom, decodedMap]])
 
   // Hydrate Jotai map atom
-  useHydrateAtoms([[mapAtom, decodedMap]])
 
   // Use the custom useMapLibre hook
   const { mapContainer } = useMapLibre({
+    mapGeo: decodedMap,
     styleUrl: 'https://demotiles.maplibre.org/style.json',
-    onMapLoad: (mapRef) => {
-      renderFill(mapRef, decodedMap.geojson) // Render layers with fill style
-      applyHover(mapRef) // Apply hover event listener
-      applyClick(mapRef, setCurrLayer) // Apply click event listener
+    onMapLoad: (mapRef, drawRef, sourceRef) => {
+      renderMap(mapRef, sourceRef, drawRef, setCurrLayer, decodedMap.geojson) // Render layers with fill style
+
+      // Listen for when the feature goes inactive and remove it from draw
+      const handleSelectionChange = (event: any) => {
+        const selectedFeatures = event.features
+
+        if (selectedFeatures.length === 0) {
+          // Get the Feature Collection that is going to be deleted
+          const deletedCollection = drawRef.getAll()
+
+          // Remove feature from draw
+          drawRef.deleteAll()
+
+          // Add Feature back to maplibre
+          renderMap(mapRef, sourceRef, drawRef, setCurrLayer, deletedCollection)
+
+          // Update backend of the change feature
+          updateMapByNewFeature(deletedCollection.features[0])
+          // const newGeo = updateFeature()
+        }
+      }
+      mapRef.on('draw.selectionchange', handleSelectionChange)
+
+      // applyHover(mapRef) // Apply hover event listener
+      // applyClick(mapRef, drawRef, setCurrLayer, map.geojson) // Apply click event listener
+      // applyEditMode(mapRef, drawRef, setCurrLayer, map.geojson) // Apply edit mode event listener
+      // renderFillV2(drawRef, mapRef, decodedMap.geojson)
     },
   })
 

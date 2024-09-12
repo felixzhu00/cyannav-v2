@@ -12,10 +12,7 @@ const findFeatureById = (
 ) => {
   if (!id || !mapGeojson || !mapGeojson.features) return null
 
-  return (
-    mapGeojson.features.find((feature) => feature?.properties?._id === id) ||
-    null
-  )
+  return mapGeojson.features.find((feature) => feature?.id === id) || null
 }
 
 export default function EditTab() {
@@ -27,7 +24,7 @@ export default function EditTab() {
 
   const selectedFeature = findFeatureById(currLayer, map.geojson)
 
-  const localItems = selectedFeature?.properties?._self
+  const localItems = selectedFeature?.properties as { [key: string]: any }
   const gobalItems = (map.geojson as CustomFeatureCollection)._shared
 
   if (!selectedFeature)

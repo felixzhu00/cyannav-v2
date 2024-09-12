@@ -129,23 +129,33 @@ const mongoDB = 'mongodb://localhost:27017/cyan' // replace with db of your choi
 // Use during import new map
 export function convertToCustomFeatureCollection(geojson) {
   if (geojson.type === 'FeatureCollection') {
-    const postGeo = geojson.features.map((feature, index) => ({
-      ...feature,
-      properties: {
-        ...feature.properties,
-        _id: nanoid(),
-        _self: {
-          name: feature.properties.name || `Feature${index}`,
-          _visible: true,
-          _lock: false,
+    const postGeo = geojson.features.map((feature, index) => {
+      const tempId = nanoid() // Declare tempId inside the map function
+      return {
+        ...feature,
+        id: tempId, // Set the feature's id to the generated tempId
+        properties: {
+          id: tempId, // Also include the tempId in the properties
+          name: {
+            payload: feature.properties?.name || `Feature${index}`,
+            variableType: 'string',
+          },
+          visible: true,
+          lock: false,
+          ...Object.fromEntries(
+            Object.entries(feature.properties || {}).map(([key, value]) => [
+              `_+${key}`, // Prefix existing property keys with "_"
+              value,
+            ])
+          ),
         },
-      },
-    }))
+      }
+    })
 
     const finalGeo = {
       type: 'FeatureCollection',
       features: postGeo,
-      _shared: new Map(),
+      _shared: {mode: "none"},
     }
 
     return finalGeo

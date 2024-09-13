@@ -21,30 +21,29 @@ import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import { useMapLibre } from '@/lib/hooks/useMapLibre'
 import { useSetAtom } from 'jotai'
 import { renderMap } from '@/lib/map-render'
-import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson'
 
 export default function MapEditPage({ initialMap }: { initialMap: any }) {
   const decodedGeoJSON = decodeGeo(
     initialMap.geojson
   ) as CustomFeatureCollection
 
-  const filteredFeatures = decodedGeoJSON.features.filter(
-    (feature) => feature.properties?.name.payload === 'Canada'
-  )
+  // const filteredFeatures = decodedGeoJSON.features.filter(
+  //   (feature) => feature.properties?.name.payload === 'Canada'
+  // )
 
   // Create a new GeoJSON with the filtered feature
-  const newGeojson: FeatureCollection<Geometry, GeoJsonProperties> = {
-    type: 'FeatureCollection',
-    features: filteredFeatures,
-  }
+  // const newGeojson: FeatureCollection<Geometry, GeoJsonProperties> = {
+  //   type: 'FeatureCollection',
+  //   features: filteredFeatures,
+  // }
 
   // Decode the initial map data
   const decodedMap = {
     ...initialMap,
-    geojson: newGeojson,
+    geojson: decodedGeoJSON,
   }
 
-  console.log(newGeojson)
+  console.log(decodedGeoJSON)
 
   const setCurrLayer = useSetAtom(currLayerAtom)
   const updateMapByNewFeature = useSetAtom(updateMapByNewFeatureAtom)

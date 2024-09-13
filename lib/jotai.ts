@@ -54,8 +54,6 @@ export const updateMapByNewFeatureAtom = atom(
   async (get, set, feature: CustomFeature) => {
     const currentMap = get(mapAtom)
 
-    console.log(feature)
-
     const newGeo = updateFeature(currentMap.geojson, feature)
 
     const newMap = {
@@ -63,12 +61,9 @@ export const updateMapByNewFeatureAtom = atom(
       geojson: newGeo,
     }
 
-    set(mapAtom,newMap)
+    set(mapAtom, newMap)
 
-    // console.log()
     await updateGeoJSONAPI(newGeo, currentMap._id)
-
-    //   console.log(currentMap.geojson)
   }
 )
 
@@ -76,24 +71,24 @@ export const updateMapByNewFeatureAtom = atom(
 export const setCurrLayerSelectAtom = atom(
   null,
   (get, set, featureId: string) => {
+    // Set Jotai Atom
+    set(currLayerAtom, featureId)
+
     // change "click" styling in map render
     const mapRef = get(mapLibreAtom)
 
     if (!mapRef) return
     // Reset previous selection
-    const sources = mapRef.getSource('geojson-data')
+    const sources = mapRef.getSource(featureId)
     if (!sources) return
 
-    mapRef.querySourceFeatures('geojson-data').forEach((feature) => {
+    mapRef.querySourceFeatures(featureId).forEach((feature) => {
       const id = feature.id as string // Ensure id is string
       mapRef.setFeatureState(
-        { source: 'geojson-data', id },
+        { source: featureId, id },
         { selected: id === featureId }
       )
     })
-
-    // set jotai atom
-    set(currLayerAtom, featureId)
   }
 )
 

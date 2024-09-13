@@ -1,11 +1,11 @@
 import React from 'react'
 import LeftSidebarItem from './left-sidebar-item'
-import { useAtom } from 'jotai'
+import { useAtomValue } from 'jotai'
 import { mapAtom } from '@/lib/jotai'
 // Temp const var to populate
 
 export default function LeftSidebar() {
-  const [map] = useAtom(mapAtom)
+  const map = useAtomValue(mapAtom)
 
   if (!map.geojson) return <div>GeoJSON not found</div>
 
@@ -17,8 +17,6 @@ export default function LeftSidebar() {
           {map.geojson?.features?.map((feature) => (
             <LeftSidebarItem
               key={feature.properties?.id.toString()}
-              name={feature.properties?.name.payload}
-              id={feature.properties?.id}
               properties={feature?.properties || {}}
             />
           ))}

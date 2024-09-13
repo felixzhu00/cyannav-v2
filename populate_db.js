@@ -7,7 +7,7 @@ import geobuf from 'geobuf'
 import { nanoid } from 'nanoid'
 import Pbf from 'pbf'
 
-import geojsonData from './public/america.geo.json' assert { type: 'json' }
+import geojsonData from './public/aus_state.geo.json' assert { type: 'json' }
 
 import mongoose from 'mongoose'
 const { Schema } = mongoose
@@ -136,18 +136,23 @@ export function convertToCustomFeatureCollection(geojson) {
         id: tempId, // Set the feature's id to the generated tempId
         properties: {
           id: tempId, // Also include the tempId in the properties
-          name: {
-            payload: feature.properties?.name || `Feature${index}`,
-            variableType: 'string',
+          meta: {
+            name: {
+              payload: feature.properties?.name || `Feature${index}`,
+              variableType: 'string',
+            },
+            visible: {
+              payload: true,
+              variableType: 'boolean',
+            },
+            lock: {
+              payload: false,
+              variableType: 'boolean',
+            },
           },
-          visible: true,
-          lock: false,
-          ...Object.fromEntries(
-            Object.entries(feature.properties || {}).map(([key, value]) => [
-              `_+${key}`, // Prefix existing property keys with "_"
-              value,
-            ])
-          ),
+          old: {
+            ...feature.properties,
+          },
         },
       }
     })
@@ -155,7 +160,7 @@ export function convertToCustomFeatureCollection(geojson) {
     const finalGeo = {
       type: 'FeatureCollection',
       features: postGeo,
-      _shared: {mode: "none"},
+      _shared: { mode: 'none' },
     }
 
     return finalGeo

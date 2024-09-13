@@ -1,8 +1,5 @@
 /* eslint-disable no-param-reassign */
-import {
-  CustomFeature,
-  CustomFeatureCollection,
-} from '@/core/_entities/types/map.types'
+import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import maplibregl from 'maplibre-gl'
 import { findMinMax } from './utils'
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
@@ -13,9 +10,25 @@ function addFeatureSourceAndLayer(
   sourceRef: { [key: string]: string[] },
   feature: Feature<Geometry, GeoJsonProperties>
 ) {
+  // ID of source and layer
   const featureId = feature.id as string
-  const selfObject = JSON.parse(feature.properties?.visible || '{}')
-  const visible = selfObject === true // Assuming 'visible' is a boolean property
+
+  // Check properties.visible
+  const visible = feature.properties?.visible || true
+
+  // fill: Fill color from {payload: color, variableType: 'color'}
+  const fillColor =
+    feature.properties?.render?.fill?.color?.payload || '#000000'
+
+  // fill: Opacity color from {payload: number, variableType: 'number'}
+  const fillOpacity = feature.properties?.render?.fill?.opacity?.payload || 0.4
+
+  // line: Line color from {payload: color, variableType: 'color'}
+  const lineColor =
+    feature.properties?.render?.line?.color?.payload || '#FFFFFF'
+
+  // line: Line width from {payload: number, variableType: 'number'}
+  const lineWidth = feature.properties?.render?.line?.width?.payload || 1
 
   if (!mapRef) return
   // Add a source for the feature
@@ -44,7 +57,7 @@ function addFeatureSourceAndLayer(
           '#407a4f', // Color for selected features
           ['boolean', ['feature-state', 'hover'], false],
           '#40587a', // Color for hovered features
-          '#000000', // Default color
+          fillColor, // Default color
         ],
         'rgba(0,0,0,0)', // Transparent color for hidden features
       ],
@@ -57,7 +70,7 @@ function addFeatureSourceAndLayer(
           1, // Opacity for selected features
           ['boolean', ['feature-state', 'hover'], false],
           1, // Opacity for hovered features
-          0.4, // Default opacity
+          fillOpacity, // Default opacity
         ],
         0, // Fully transparent for hidden features
       ],
@@ -74,13 +87,13 @@ function addFeatureSourceAndLayer(
       'line-color': [
         'case',
         ['boolean', ['feature-state', 'visible'], visible],
-        '#FFFFFF', // Color for visible features
+        lineColor, // Color for visible features
         'rgba(0,0,0,0)', // Transparent color for hidden features
       ],
       'line-width': [
         'case',
         ['boolean', ['feature-state', 'visible'], visible],
-        1, // Width for visible features
+        lineWidth, // Width for visible features
         0, // Width for hidden features
       ],
     },
@@ -241,7 +254,7 @@ export function renderMap(
 export function editLayerStyleGlobal(
   mapRef: maplibregl.Map | null,
   value: { [key: string]: any }, // index 0,1,2 is usual not for data
-  featureId:string,
+  featureId: string,
   byFeature?: string
 ) {
   // Check if map is valid

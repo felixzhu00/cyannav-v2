@@ -29,10 +29,12 @@ export default function VariableList({
   currLayerId: string
   localItems: { [key: string]: any }
 }) {
+  // State of current mode
   const [selectMode, setSelectMode] = useState<
     'choropleth' | 'heatmap' | 'none'
   >(mapGeo._shared?.mode || 'none')
 
+  // Default map mode values base on selected mode
   const mapModes = {
     choropleth: {
       'Border Color': {
@@ -80,9 +82,12 @@ export default function VariableList({
     none: {},
   }
 
+  // Handler that update Backend base on mode change
   const handleChangeMode = async (
     newMode: 'none' | 'choropleth' | 'heatmap'
   ) => {
+    // TODO: Optimisic Update: revert if promise failed
+
     // create default option for map mode if map mode does not exist
     if (!list[newMode]) {
       // add default option into _shared
@@ -109,9 +114,11 @@ export default function VariableList({
       'addOrUpdate',
       'editGeoShared'
     )
+
     setSelectMode(newMode) // Set the new mode
   }
 
+  // Fallback display if "list" is empty or missing
   if (!list) {
     return (
       <span className="mr-5 text-center text-sm text-gray-500">
@@ -120,10 +127,13 @@ export default function VariableList({
     )
   }
 
+  // Filter out variable user should not be able to edit
   const privateVariablesLocal = ['id', 'visible', 'lock']
   const privateVariablesGlobal = ['mode']
 
+  // Render logic for empty, local and global
   const renderList = () => {
+    // Empty Logic
     if (Object.keys(list).length === 0) {
       return (
         <div className="mr-5 py-2 text-center text-sm text-gray-500">
@@ -186,11 +196,11 @@ export default function VariableList({
                       variableType: 'string' | 'number' | 'color' | 'select'
                     },
                   ][]
-                ).map(([key, value]) => {
+                ).map(([key, value], index) => {
                   if (!privateVariablesGlobal.includes(key)) {
                     return (
                       <VariableListItem
-                        key={nanoid()}
+                        key={value.payload + index.toString()}
                         inputObject={{ [key]: value }}
                         listName={listName}
                         mapGeo={mapGeo}

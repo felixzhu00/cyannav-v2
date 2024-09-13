@@ -36,6 +36,7 @@ export default function VariableListItem({
   selectOptions?: string[]
   byFeature?: string
 }) {
+  // Jotai
   const setMapField = useSetAtom(setMapFieldAtom)
   const mapLibre = useAtomValue(mapLibreAtom)
 

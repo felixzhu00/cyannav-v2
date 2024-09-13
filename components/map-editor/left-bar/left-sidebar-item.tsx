@@ -13,24 +13,22 @@ import { cn, decodeGeo, editFeatureSelf, encodeGeo } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
 
 type LeftSidebarItemProps = {
-  name: string
-  id: string
   properties: { [key: string]: any }
 }
 
-export default function LeftSidebarItem({
-  name,
-  id,
-  properties,
-}: LeftSidebarItemProps) {
+export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
+  // Jotai Global State
   const currLayer = useAtomValue(currLayerAtom)
   const map = useAtomValue(mapAtom)
   const setMapField = useSetAtom(setMapFieldAtom)
-
   const setCurrLayerStyle = useSetAtom(setCurrLayerSelectAtom)
   const setToggleFeatureState = useSetAtom(setToggleFeatureStateAtom)
 
-  // console.log("rerender", properties)
+  // Render Data
+  const { id } = properties
+  const name = properties.meta.name.payload
+  const visible = properties.meta.visible.payload
+  const lock = properties.meta.lock.payload
 
   const handleLayerChange = () => {
     if (currLayer !== id) {
@@ -111,10 +109,7 @@ export default function LeftSidebarItem({
           }}
         >
           <Lock
-            className={cn(
-              'h-4 w-4',
-              properties.lock === false ? 'text-gray-500' : ''
-            )}
+            className={cn('h-4 w-4', lock === false ? 'text-gray-500' : '')}
           />
         </Button>
         <Button
@@ -126,10 +121,7 @@ export default function LeftSidebarItem({
           }}
         >
           <Eye
-            className={cn(
-              'h-4 w-4',
-              properties.visible === false ? 'text-gray-500' : ''
-            )}
+            className={cn('h-4 w-4', visible === false ? 'text-gray-500' : '')}
           />
         </Button>
       </div>

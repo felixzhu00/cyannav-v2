@@ -116,13 +116,12 @@ export const useMapLibre = ({
     }
 
     return () => {
+      setMapDraw(null)
+      draw.current = null
+
       map.current?.remove()
       setMapLibre(null)
       map.current = null
-
-      draw.current?.remove()
-      setMapDraw(null)
-      draw.current = null
     }
   }, [initializeMap, setMapLibre])
 

@@ -288,15 +288,36 @@ export function updateFeature(
     (feature) => feature.id !== newFeature.id
   )
 
-  // Append the newFeature to the filtered list
-  const updatedFeatures = [...filteredFeatures, newFeature]
+  let updatedFeatures
+
+  if (filteredFeatures.length !== oldGeo.features.length) {
+    // Append the newFeature to the filtered list
+    updatedFeatures = [...filteredFeatures, newFeature]
+  } else {
+    // If feature does does not exist before
+    const newFeaturePopulated = {
+      ...newFeature,
+      properties: {
+        ...newFeature.properties,
+        meta: {
+          ...newFeature.properties?.meta,
+          // Replace exisitng name if new
+          name: {
+            payload: `Feature${filteredFeatures.length}`,
+            variableType: 'string',
+          },
+        },
+      },
+    }
+    // Append the newFeature to the filtered list
+    updatedFeatures = [...filteredFeatures, newFeaturePopulated]
+  }
 
   // Return the new GeoJSON object with the updated features
   const newGeo = {
     ...oldGeo,
     features: updatedFeatures,
   }
-  console.log(newGeo)
 
   return newGeo
 }

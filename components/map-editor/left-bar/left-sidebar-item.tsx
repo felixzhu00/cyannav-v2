@@ -26,9 +26,9 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
 
   // Render Data
   const { id } = properties
-  const name = properties.meta.name.payload
-  const visible = properties.meta.visible.payload
-  const lock = properties.meta.lock.payload
+  const name = properties.meta?.name.payload || ""
+  const visible = properties.meta?.visible.payload || true
+  const lock = properties.meta?.lock.payload || true 
 
   const handleLayerChange = () => {
     if (currLayer !== id) {

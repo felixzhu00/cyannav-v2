@@ -21,21 +21,12 @@ import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import { useMapLibre } from '@/lib/hooks/useMapLibre'
 import { useSetAtom } from 'jotai'
 import { renderMap } from '@/lib/map-render'
+import * as MapboxDrawGeodesic from 'mapbox-gl-draw-geodesic'
 
 export default function MapEditPage({ initialMap }: { initialMap: any }) {
   const decodedGeoJSON = decodeGeo(
     initialMap.geojson
   ) as CustomFeatureCollection
-
-  // const filteredFeatures = decodedGeoJSON.features.filter(
-  //   (feature) => feature.properties?.name.payload === 'Canada'
-  // )
-
-  // Create a new GeoJSON with the filtered feature
-  // const newGeojson: FeatureCollection<Geometry, GeoJsonProperties> = {
-  //   type: 'FeatureCollection',
-  //   features: filteredFeatures,
-  // }
 
   // Decode the initial map data
   const decodedMap = {
@@ -53,13 +44,13 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
 
   // Use the custom useMapLibre hook
   const { mapContainer } = useMapLibre({
-    mapGeo: decodedMap,
     styleUrl: 'https://demotiles.maplibre.org/style.json',
     onMapLoad: (mapRef, drawRef, sourceRef) => {
       renderMap(mapRef, sourceRef, drawRef, setCurrLayer, decodedMap.geojson) // Render layers with fill style
 
       // Listen for when the feature goes inactive and remove it from draw
       const handleSelectionChange = (event: any) => {
+        console.log('das', event)
         const selectedFeatures = event.features
 
         if (selectedFeatures.length === 0) {
@@ -77,7 +68,120 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
           // const newGeo = updateFeature()
         }
       }
+
+      // Handles adding feature to atom upon creation
+      const handleCreate = (event) => {
+        // Special manual fire case
+
+        console.log('created', event)
+
+        const currentCollection = drawRef.getAll()
+        const createdFeature = currentCollection.features[0]
+        const currentMode = drawRef.getMode()
+
+        // Initialize default value for Polygon, Rectangle, Circle, Point, Line, Spine
+        const newFeaturePopulated = {
+          ...createdFeature,
+          properties: {
+            ...createdFeature.properties,
+            id: createdFeature.id,
+            meta: {
+              ...createdFeature.properties?.meta,
+              name: {
+                payload: `Feature${currentCollection.length}`,
+                variableType: 'string',
+              },
+              visible: {
+                payload: true,
+                variableType: 'boolean',
+              },
+              lock: {
+                payload: false,
+                variableType: 'boolean',
+              },
+              draw: {
+                payload: currentMode,
+                variableType: 'string',
+              },
+            },
+            // Ensure render is initialized as an empty object if it doesn't exist
+            render: {
+              ...(createdFeature.properties?.render || {}),
+            },
+          },
+        }
+
+        // If a Circle is created
+        if (createdFeature.properties.circleRadius) {
+          const geojson = event.features[0] // created Circle
+          const center = MapboxDrawGeodesic.getCircleCenter(geojson)
+          const radius = MapboxDrawGeodesic.getCircleRadius(geojson)
+
+          // Convert radius from kilometers to meters
+          const radiusInMeters = radius * 1000
+
+          const radiusInDegreesLng =
+            ((radiusInMeters / 6378137) * (180 / Math.PI)) /
+            Math.cos((center[1] * Math.PI) / 180)
+
+          // Create a new point for the circumference
+          const circumferencePoint: [number, number] = [
+            center[0] + radiusInDegreesLng, // Longitude shift
+            center[1], // Latitude remains the same
+          ]
+
+          // Project both the center and circumference point into pixel coordinates
+          const centerPixel = mapRef.project(center)
+          const circumferencePixel = mapRef.project(circumferencePoint)
+
+          // Calculate the distance in pixels
+          const radiusInPixels = Math.sqrt(
+            (circumferencePixel.x - centerPixel.x) ** 2 +
+              (circumferencePixel.y - centerPixel.y) ** 2
+          )
+
+          // Update geometry
+          newFeaturePopulated.geometry = {
+            type: 'Point',
+            coordinates: center,
+          }
+
+          // Update radius
+          newFeaturePopulated.properties.render.radius = {
+            payload: radiusInPixels,
+            variableType: 'number',
+          }
+        }
+
+        const newCollection: CustomFeatureCollection = {
+          type: 'FeatureCollection',
+          features: [newFeaturePopulated],
+          _shared: { mode: 'none' },
+        }
+
+        // Remove collection
+        drawRef.deleteAll()
+
+        // Add Feature back to maplibre
+        renderMap(mapRef, sourceRef, drawRef, setCurrLayer, newCollection)
+
+        // Update atom collection
+        updateMapByNewFeature(newFeaturePopulated)
+
+        // Change to select
+        drawRef.changeMode('simple_select')
+        // Update React State
+      }
+
+      // const handleChangeMode = (event: any) => {
+      //   console.log(drawRef.getMode())
+      // }
+
+      mapRef.on('draw.create', handleCreate)
+
       mapRef.on('draw.selectionchange', handleSelectionChange)
+
+      // mapRef.on('draw.modechange', handleChangeMode)
 
       // applyHover(mapRef) // Apply hover event listener
       // applyClick(mapRef, drawRef, setCurrLayer, map.geojson) // Apply click event listener

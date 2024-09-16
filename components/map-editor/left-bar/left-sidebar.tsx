@@ -2,6 +2,7 @@ import React from 'react'
 import LeftSidebarItem from './left-sidebar-item'
 import { useAtomValue } from 'jotai'
 import { mapAtom } from '@/lib/jotai'
+import { nanoid } from 'nanoid'
 // Temp const var to populate
 
 export default function LeftSidebar() {
@@ -16,7 +17,8 @@ export default function LeftSidebar() {
         <ul className="w-full">
           {map.geojson?.features?.map((feature) => (
             <LeftSidebarItem
-              key={feature.properties?.id.toString()}
+              // key={feature.properties?.id.toString()}
+              key={nanoid()}
               properties={feature?.properties || {}}
             />
           ))}

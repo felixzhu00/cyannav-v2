@@ -130,7 +130,7 @@ const mongoDB = 'mongodb://localhost:27017/cyan' // replace with db of your choi
 export function convertToCustomFeatureCollection(geojson) {
   if (geojson.type === 'FeatureCollection') {
     const postGeo = geojson.features.map((feature, index) => {
-      const tempId = nanoid() // Declare tempId inside the map function
+      const tempId = nanoid(32) // Declare tempId inside the map function
       return {
         ...feature,
         id: tempId, // Set the feature's id to the generated tempId
@@ -148,6 +148,10 @@ export function convertToCustomFeatureCollection(geojson) {
             lock: {
               payload: false,
               variableType: 'boolean',
+            },
+            draw: {
+              payload: 'feature',
+              variableType: 'string',
             },
           },
           old: {

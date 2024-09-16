@@ -3,6 +3,13 @@ import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import maplibregl from 'maplibre-gl'
 import { findMinMax } from './utils'
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
+import {
+  addCircleFillLayer,
+  addImageLayer,
+  addInfillLayer,
+  addTextLayer,
+  addUnfillLayer,
+} from './render/manage-layers'
 
 // Adds source, fill, outline layer to maplibre mapRef for ONE feature
 function addFeatureSourceAndLayer(
@@ -10,94 +17,32 @@ function addFeatureSourceAndLayer(
   sourceRef: { [key: string]: string[] },
   feature: Feature<Geometry, GeoJsonProperties>
 ) {
+  if (!mapRef) return
+
+  const featureType = feature.properties?.meta.draw.payload || ''
+
+  const infill = ['feature', 'draw_rectangle', 'draw_polygon']
+
+  const unfill = ['draw_line_string', 'draw_bezier_curve']
+
+  if (infill.includes(featureType)) {
+    addInfillLayer(mapRef, feature)
+  }
+  if (unfill.includes(featureType)) {
+    addUnfillLayer(mapRef, feature)
+  }
+  if (featureType === 'draw_circle') {
+    addCircleFillLayer(mapRef, feature)
+  }
+  if (featureType === 'marker') {
+    addImageLayer(mapRef, feature)
+  }
+  if (featureType === 'text') {
+    addTextLayer(mapRef, feature)
+  }
+
   // ID of source and layer
   const featureId = feature.id as string
-
-  // Check properties.visible
-  const visible = feature.properties?.visible || true
-
-  // fill: Fill color from {payload: color, variableType: 'color'}
-  const fillColor =
-    feature.properties?.render?.fill?.color?.payload || '#000000'
-
-  // fill: Opacity color from {payload: number, variableType: 'number'}
-  const fillOpacity = feature.properties?.render?.fill?.opacity?.payload || 0.4
-
-  // line: Line color from {payload: color, variableType: 'color'}
-  const lineColor =
-    feature.properties?.render?.line?.color?.payload || '#FFFFFF'
-
-  // line: Line width from {payload: number, variableType: 'number'}
-  const lineWidth = feature.properties?.render?.line?.width?.payload || 1
-
-  if (!mapRef) return
-  // Add a source for the feature
-  mapRef.addSource(featureId, {
-    type: 'geojson',
-    data: {
-      type: 'FeatureCollection',
-      features: [feature],
-    },
-    promoteId: 'id',
-  })
-
-  // Add a fill layer for the feature
-  mapRef.addLayer({
-    id: `${featureId}-fill`,
-    type: 'fill',
-    source: featureId,
-    layout: {},
-    paint: {
-      'fill-color': [
-        'case',
-        ['boolean', ['feature-state', 'visible'], visible],
-        [
-          'case',
-          ['boolean', ['feature-state', 'selected'], false],
-          '#407a4f', // Color for selected features
-          ['boolean', ['feature-state', 'hover'], false],
-          '#40587a', // Color for hovered features
-          fillColor, // Default color
-        ],
-        'rgba(0,0,0,0)', // Transparent color for hidden features
-      ],
-      'fill-opacity': [
-        'case',
-        ['boolean', ['feature-state', 'visible'], visible],
-        [
-          'case',
-          ['boolean', ['feature-state', 'selected'], false],
-          1, // Opacity for selected features
-          ['boolean', ['feature-state', 'hover'], false],
-          1, // Opacity for hovered features
-          fillOpacity, // Default opacity
-        ],
-        0, // Fully transparent for hidden features
-      ],
-    },
-  })
-
-  // Add an outline layer for the feature
-  mapRef.addLayer({
-    id: `${featureId}-outline`,
-    type: 'line',
-    source: featureId,
-    layout: {},
-    paint: {
-      'line-color': [
-        'case',
-        ['boolean', ['feature-state', 'visible'], visible],
-        lineColor, // Color for visible features
-        'rgba(0,0,0,0)', // Transparent color for hidden features
-      ],
-      'line-width': [
-        'case',
-        ['boolean', ['feature-state', 'visible'], visible],
-        lineWidth, // Width for visible features
-        0, // Width for hidden features
-      ],
-    },
-  })
 
   // Add source to sourceMap
   sourceRef[featureId] = [`${featureId}-fill`, `${featureId}-outline`]
@@ -223,18 +168,19 @@ export function applyClick(
 
     if (drawRef.getMode() === 'simple_select') {
       const source = mapRef.getSource(sourceId) as maplibregl.GeoJSONSource
-
       if (source) {
         const sourceData = await source.getData() // Get the source data
         removeSourceAndLayers(mapRef, sourceRef, sourceId)
         // Add feature to draw object
         drawRef.add(sourceData)
+        e.preventDefault()
 
         // Programmically change edit this new draw object
-        drawRef.changeMode('simple_select', { featureIds: [featureId] })
+        drawRef.changeMode('simple_select', { featureIds: [sourceId] })
       }
     }
   })
+  console.log('aasdaaaaas')
 }
 
 export function renderMap(
@@ -246,8 +192,12 @@ export function renderMap(
 ) {
   // Iterate over features and add individual sources and layers
   mapGeo.features.forEach((feature) => {
-    addFeatureSourceAndLayer(mapRef, sourceRef, feature)
-    applyClick(mapRef, drawRef, sourceRef, setCurrLayer, feature.id as string)
+    try {
+      addFeatureSourceAndLayer(mapRef, sourceRef, feature)
+      // applyClick(mapRef, drawRef, sourceRef, setCurrLayer, feature.id as string)
+    } catch (error) {
+      console.error('Error adding feature or applying click:', error)
+    }
   })
 }
 

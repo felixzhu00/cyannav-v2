@@ -34,6 +34,8 @@ export const selectedEditOptionAtom = atom('')
 export const currLayerAtom = atom('')
 export const mapLibreAtom = atom<maplibregl.Map | null>(null)
 export const mapDrawAtom = atom<any | null>(null)
+export const mapSourceAtom = atom<any | null>(null)
+
 export const mapAtom = atom(EMPTY_MAP_DATA)
 
 // mapAtom setter for any field change

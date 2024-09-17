@@ -276,6 +276,7 @@ export default function EditToolbar({ className }: { className: string }) {
         }
         if (nonDraw.includes(currentDraw)) {
           mapRef.on('click', handleMapClick)
+          drawRef.changeMode('no_op')
         } else {
           drawRef.changeMode(currentDraw)
         }

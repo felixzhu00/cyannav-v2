@@ -112,3 +112,38 @@ export const drawToLayerType = {
   draw_line_string: 'line',
   draw_bezier_curve: 'line',
 }
+
+// draw no that does nothing
+export const NoOpMode = {
+  onSetup() {
+    return {} // Empty state since there's no setup needed
+  },
+
+  onClick() {
+    // Prevent any drawing or interaction when clicking
+    return false
+  },
+
+  onDrag() {
+    // Disable dragging
+    return false
+  },
+
+  onMouseMove() {
+    // Prevent hover effects
+    return false
+  },
+
+  onStop() {
+    return {} // Cleanup if needed
+  },
+
+  toDisplayFeatures(state, geojson, display) {
+    // Do nothing, do not display any features
+  },
+
+  onKeyUp() {
+    // Handle escape key to possibly exit the mode if needed
+    return false
+  },
+}

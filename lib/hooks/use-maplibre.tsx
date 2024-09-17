@@ -12,6 +12,7 @@ import {
 import DrawRectangle from 'mapbox-gl-draw-rectangle-mode'
 import * as MapboxDrawGeodesic from 'mapbox-gl-draw-geodesic'
 import PaintMode from 'mapbox-gl-draw-paint-mode'
+import { NoOpMode } from '../maplibre-actions/map-var-const'
 
 interface UseMapLibreProps {
   styleUrl: string
@@ -75,6 +76,7 @@ export const useMapLibre = ({
           draw_bezier_curve: DrawBezierCurve,
           draw_rectangle: DrawRectangle,
           draw_paint_mode: PaintMode,
+          no_op: NoOpMode,
         },
       })
 

@@ -78,20 +78,20 @@ export const setCurrLayerSelectAtom = atom(
     set(currLayerAtom, featureId)
 
     // change "click" styling in map render
-    const mapRef = get(mapLibreAtom)
+    // const mapRef = get(mapLibreAtom)
 
-    if (!mapRef) return
-    // Reset previous selection
-    const sources = mapRef.getSource(featureId)
-    if (!sources) return
+    // if (!mapRef) return
+    // // Reset previous selection
+    // const sources = mapRef.getSource(featureId)
+    // if (!sources) return
 
-    mapRef.querySourceFeatures(featureId).forEach((feature) => {
-      const id = feature.id as string // Ensure id is string
-      mapRef.setFeatureState(
-        { source: featureId, id },
-        { selected: id === featureId }
-      )
-    })
+    // mapRef.querySourceFeatures(featureId).forEach((feature) => {
+    //   const id = feature.id as string // Ensure id is string
+    //   mapRef.setFeatureState(
+    //     { source: featureId, id },
+    //     { selected: id === featureId }
+    //   )
+    // })
   }
 )
 

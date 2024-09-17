@@ -1,25 +1,39 @@
 /* eslint-disable no-param-reassign */
+import { CustomFeature } from '@/core/_entities/types/map.types'
 import { unrenderFeatureLayer } from './map-render-layers'
+import { drawToLayerType, infill } from './map-var-const'
 
 export function applyClick(
   mapRef: maplibregl.Map | null,
   drawRef: any,
   sourceRef: { [key: string]: string[] },
   setCurrLayer: (update: (prevLayerId: string) => string) => void,
-  sourceId: string
+  feature: CustomFeature
 ) {
   if (!mapRef) return
 
+  // Extract feature properties
+  const featureId = feature.id
+  const featureType = feature.properties?.render.draw
+    .payload as keyof typeof drawToLayerType
+
+  let layerId = featureId
+
+  // Assign on click for different layers dependning on featureType
+  if (!infill.includes(featureType)) {
+    layerId = `${featureId}-${drawToLayerType[featureType]}`
+  } else {
+    layerId = `${featureId}-fill`
+  }
+
   // Add the click event listener
-  mapRef.on('click', `${sourceId}-fill`, async (e) => {
+  mapRef.on('click', `${layerId}`, async (e) => {
     if (!mapRef) return
     const features = mapRef.queryRenderedFeatures(e.point, {
-      layers: [`${sourceId}-fill`],
+      layers: [`${layerId}`],
     })
 
     if (!features || !features.length) return
-
-    const featureId = features[0].id as string
 
     setCurrLayer((prevLayerId) => {
       if (!mapRef) return ''
@@ -30,17 +44,11 @@ export function applyClick(
     })
 
     if (drawRef.getMode() === 'simple_select') {
-      const source = mapRef.getSource(sourceId) as maplibregl.GeoJSONSource
+      const source = mapRef.getSource(featureId) as maplibregl.GeoJSONSource
       if (source) {
         const sourceData = await source.getData() // Get the source data
 
-        // Check if draw type is text or marker
-
-        // const sourceType = sourceData.features[0].properties.meta.draw.payload
-        // if (sourceType !== 'text' && sourceType !== 'marker') {
-        // }
-
-        unrenderFeatureLayer(mapRef, sourceRef, sourceId)
+        unrenderFeatureLayer(mapRef, sourceRef, featureId)
 
         drawRef.add(sourceData)
 
@@ -48,7 +56,7 @@ export function applyClick(
         e.preventDefault()
 
         // Programmically change edit this new draw object
-        drawRef.changeMode('simple_select', { featureIds: [sourceId] })
+        drawRef.changeMode('simple_select', { featureIds: [featureId] })
       }
     }
   })

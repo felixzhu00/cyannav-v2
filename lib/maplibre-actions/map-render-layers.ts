@@ -86,7 +86,7 @@ export function renderCollection(
   mapGeo.features.forEach((feature) => {
     try {
       renderFeatureLayer(mapRef, sourceRef, feature)
-      applyClick(mapRef, drawRef, sourceRef, setCurrLayer, feature.id as string)
+      applyClick(mapRef, drawRef, sourceRef, setCurrLayer, feature)
     } catch (error) {
       console.error(error)
     }

@@ -191,9 +191,10 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
         // This code allow continues drawing
         setTimeout(() => {
           drawRef.changeMode(currentMode)
+          console.log(drawRef.getMode(), "5")
         }, 0)
       }
-
+      console.log(drawRef.getMode(), "4")
       mapRef.on('draw.create', handleCreate)
 
       mapRef.on('draw.selectionchange', handleSelectionChange)

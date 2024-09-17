@@ -12,7 +12,10 @@ import {
 } from '@/components/ui/resizable'
 import MenuBar from './title-bar/menubar'
 import { decodeGeo } from '@/lib/utils'
-import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
+import {
+  CustomFeature,
+  CustomFeatureCollection,
+} from '@/core/_entities/types/map.types'
 import { useMapLibre } from '@/lib/hooks/use-maplibre'
 import { useSetAtom } from 'jotai'
 import * as MapboxDrawGeodesic from 'mapbox-gl-draw-geodesic'
@@ -157,9 +160,13 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
           }
         }
 
+        const newFeatureAfterDefault = populateDefault(
+          newFeaturePopulated
+        ) as CustomFeature
+
         const newCollection: CustomFeatureCollection = {
           type: 'FeatureCollection',
-          features: [populateDefault(newFeaturePopulated)],
+          features: [newFeatureAfterDefault],
           _shared: { mode: 'none' },
         }
 
@@ -178,8 +185,13 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
         updateMapByNewFeature(newFeatureAfterDefault)
 
         // Change to select
-        drawRef.changeMode('simple_select')
+        // drawRef.changeMode(currentMode)
         // Update React State
+
+        // This code allow continues drawing
+        setTimeout(() => {
+          drawRef.changeMode(currentMode)
+        }, 0)
       }
 
       mapRef.on('draw.create', handleCreate)

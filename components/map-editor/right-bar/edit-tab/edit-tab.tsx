@@ -1,6 +1,5 @@
 import CollapsibleVariables from './collapsible-variables'
 import Variablebar from './variable-toolbar'
-import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import { useAtom, useAtomValue } from 'jotai'
 import { currLayerAtom, mapAtom } from '@/lib/jotai'
 import VariableList from './variable-list'
@@ -17,7 +16,7 @@ export default function EditTab() {
 
   // Object of local and global sections to be rendered
   const localItems = selectedFeature?.properties as { [key: string]: any }
-  const gobalItems = (map.geojson as CustomFeatureCollection)._shared
+  // const gobalItems = (map.geojson as CustomFeatureCollection)._shared
 
   // If no layer is currently selected
   if (!selectedFeature)
@@ -44,7 +43,7 @@ export default function EditTab() {
       </CollapsibleVariables>
 
       {/* Collapsible for _Share/Global */}
-      <CollapsibleVariables header="Global Variables">
+      {/* <CollapsibleVariables header="Global Variables">
         <VariableList
           list={gobalItems}
           currLayerId={currLayer}
@@ -53,7 +52,7 @@ export default function EditTab() {
           listName="Global"
           localItems={localItems}
         />
-      </CollapsibleVariables>
+      </CollapsibleVariables> */}
     </div>
   )
 }

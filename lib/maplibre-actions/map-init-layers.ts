@@ -1,5 +1,7 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import MapPin from '@/public/map-pin.svg'
+import temp from '@/public/logo-text-black.png'
+
 import {
   populateCircle,
   populateIcon,
@@ -134,13 +136,13 @@ export function initializeIconLayer(
   addSource(mapRef, featureId, populatedIcon)
 
   // Add SVG
-  loadSVGAsImage(mapRef, featureId, MapPin)
+  loadSVGAsImage(mapRef, 'Pin', MapPin)
 
   addIconLayer(
     mapRef,
     featureId,
     visible,
-    featureId,
+    'Pin',
     iconSize,
     iconAllowOverlap,
     iconOpacity,
@@ -400,8 +402,11 @@ export function addIconLayer(
 
 // Function to add the SVG as an image to the map
 function loadSVGAsImage(map: maplibregl.Map, iconId: string, svgIcon: any) {
+  // Check if image is already added
+
   const img = new Image()
   img.onload = () => {
+    if (map.hasImage(iconId)) return
     map.addImage(iconId, img)
   }
   img.src = svgIcon.src

@@ -27,7 +27,7 @@ import {
   Download,
   RectangleHorizontal,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import SelectMenuBar from './select-menu-bar'
 import { nanoid } from 'nanoid'
 import {
@@ -111,11 +111,14 @@ const menu = [
 
 export default function EditToolbar({ className }: { className: string }) {
   // TODO add tooltip for each menuCol
+  // Jotai
   const drawRef = useAtomValue(mapDrawAtom)
   const mapRef = useAtomValue(mapLibreAtom)
   const sourceRef = useAtomValue(mapSourceAtom)
-
   const mapData = useAtomValue(mapAtom)
+
+  const transientDrawMode = useRef('simple_select')
+
   const mapGeo = mapData.geojson
 
   // Download canvas
@@ -201,7 +204,7 @@ export default function EditToolbar({ className }: { className: string }) {
     // Destructure draw string
     const currentMode = current.draw
 
-    drawRef.changeMode('simple_select')
+    // drawRef.changeMode('simple_select')
     if (!mapRef) return
     const coordinates = e.lngLat.toArray() // Get clicked location
     const newID = nanoid(32) // Unique ID for the marker
@@ -246,8 +249,6 @@ export default function EditToolbar({ className }: { className: string }) {
     // Add Feature back to maplibre
     renderCollection(mapRef, sourceRef, drawRef, setCurrLayer, newCollection)
     updateMapByNewFeature(initFeature)
-
-    mapRef.off('click', handleMapClick)
   }
 
   useEffect(() => {
@@ -266,6 +267,13 @@ export default function EditToolbar({ className }: { className: string }) {
 
       // Check if element has a valid currentDraw
       if (currentDraw) {
+        if (
+          transientDrawMode.current !== currentDraw &&
+          nonDraw.includes(transientDrawMode.current)
+        ) {
+          transientDrawMode.current = currentDraw
+          mapRef.off('click', handleMapClick)
+        }
         if (nonDraw.includes(currentDraw)) {
           mapRef.on('click', handleMapClick)
         } else {

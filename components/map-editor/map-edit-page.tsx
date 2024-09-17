@@ -1,12 +1,7 @@
 'use client'
 
 import { useHydrateAtoms } from 'jotai/utils'
-import {
-  currLayerAtom,
-  mapAtom,
-  setMapFieldAtom,
-  updateMapByNewFeatureAtom,
-} from '@/lib/jotai'
+import { currLayerAtom, mapAtom, updateMapByNewFeatureAtom } from '@/lib/jotai'
 import LeftSidebar from '@/components/map-editor/left-bar/left-sidebar'
 import RightBar from '@/components/map-editor/right-bar/right-bar'
 
@@ -18,16 +13,16 @@ import {
 import MenuBar from './title-bar/menubar'
 import { decodeGeo } from '@/lib/utils'
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
-import { useMapLibre } from '@/lib/hooks/useMapLibre'
+import { useMapLibre } from '@/lib/hooks/use-maplibre'
 import { useSetAtom } from 'jotai'
-import { renderMap } from '@/lib/map-render'
 import * as MapboxDrawGeodesic from 'mapbox-gl-draw-geodesic'
+import { renderCollection } from '@/lib/maplibre-actions/map-render-layers'
+import { populateDefault } from '@/lib/maplibre-actions/map-utils'
 
 export default function MapEditPage({ initialMap }: { initialMap: any }) {
   const decodedGeoJSON = decodeGeo(
     initialMap.geojson
   ) as CustomFeatureCollection
-
   // Decode the initial map data
   const decodedMap = {
     ...initialMap,
@@ -35,24 +30,26 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
   }
 
   console.log(decodedGeoJSON)
-
   const setCurrLayer = useSetAtom(currLayerAtom)
   const updateMapByNewFeature = useSetAtom(updateMapByNewFeatureAtom)
-  useHydrateAtoms([[mapAtom, decodedMap]])
 
-  // Hydrate Jotai map atom
+  useHydrateAtoms([[mapAtom, decodedMap]]) // Hydrate Jotai map atom
 
   // Use the custom useMapLibre hook
   const { mapContainer } = useMapLibre({
     styleUrl: 'https://demotiles.maplibre.org/style.json',
     onMapLoad: (mapRef, drawRef, sourceRef) => {
-      renderMap(mapRef, sourceRef, drawRef, setCurrLayer, decodedMap.geojson) // Render layers with fill style
+      renderCollection(
+        mapRef,
+        sourceRef,
+        drawRef,
+        setCurrLayer,
+        decodedMap.geojson
+      ) // Render layers with fill style
 
       // Listen for when the feature goes inactive and remove it from draw
       const handleSelectionChange = (event: any) => {
-        console.log('das', event)
         const selectedFeatures = event.features
-
         if (selectedFeatures.length === 0) {
           // Get the Feature Collection that is going to be deleted
           const deletedCollection = drawRef.getAll()
@@ -61,7 +58,13 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
           drawRef.deleteAll()
 
           // Add Feature back to maplibre
-          renderMap(mapRef, sourceRef, drawRef, setCurrLayer, deletedCollection)
+          renderCollection(
+            mapRef,
+            sourceRef,
+            drawRef,
+            setCurrLayer,
+            deletedCollection
+          )
 
           // Update backend of the change feature
           updateMapByNewFeature(deletedCollection.features[0])
@@ -70,11 +73,7 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
       }
 
       // Handles adding feature to atom upon creation
-      const handleCreate = (event) => {
-        // Special manual fire case
-
-        console.log('created', event)
-
+      const handleCreate = (event: any) => {
         const currentCollection = drawRef.getAll()
         const createdFeature = currentCollection.features[0]
         const currentMode = drawRef.getMode()
@@ -85,10 +84,11 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
           properties: {
             ...createdFeature.properties,
             id: createdFeature.id,
-            meta: {
-              ...createdFeature.properties?.meta,
+            // Ensure render is initialized as an empty object if it doesn't exist
+            render: {
+              ...(createdFeature.properties?.render || {}),
               name: {
-                payload: `Feature${currentCollection.length}`,
+                payload: `New Feature`,
                 variableType: 'string',
               },
               visible: {
@@ -104,11 +104,15 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
                 variableType: 'string',
               },
             },
-            // Ensure render is initialized as an empty object if it doesn't exist
-            render: {
-              ...(createdFeature.properties?.render || {}),
-            },
           },
+        }
+
+        // If a Point
+        if (currentMode === 'draw_point') {
+          newFeaturePopulated.properties.render.radius = {
+            payload: 10,
+            variableType: 'number',
+          }
         }
 
         // If a Circle is created
@@ -155,7 +159,7 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
 
         const newCollection: CustomFeatureCollection = {
           type: 'FeatureCollection',
-          features: [newFeaturePopulated],
+          features: [populateDefault(newFeaturePopulated)],
           _shared: { mode: 'none' },
         }
 
@@ -163,30 +167,24 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
         drawRef.deleteAll()
 
         // Add Feature back to maplibre
-        renderMap(mapRef, sourceRef, drawRef, setCurrLayer, newCollection)
-
+        renderCollection(
+          mapRef,
+          sourceRef,
+          drawRef,
+          setCurrLayer,
+          newCollection
+        )
         // Update atom collection
-        updateMapByNewFeature(newFeaturePopulated)
+        updateMapByNewFeature(newFeatureAfterDefault)
 
         // Change to select
         drawRef.changeMode('simple_select')
         // Update React State
       }
 
-      // const handleChangeMode = (event: any) => {
-      //   console.log(drawRef.getMode())
-      // }
-
       mapRef.on('draw.create', handleCreate)
 
       mapRef.on('draw.selectionchange', handleSelectionChange)
-
-      // mapRef.on('draw.modechange', handleChangeMode)
-
-      // applyHover(mapRef) // Apply hover event listener
-      // applyClick(mapRef, drawRef, setCurrLayer, map.geojson) // Apply click event listener
-      // applyEditMode(mapRef, drawRef, setCurrLayer, map.geojson) // Apply edit mode event listener
-      // renderFillV2(drawRef, mapRef, decodedMap.geojson)
     },
   })
 

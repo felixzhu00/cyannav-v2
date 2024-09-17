@@ -21,6 +21,7 @@ import { IUserDocument } from '@/core/_entities/types/user.types'
 import { IMessageDocument } from '@/core/_entities/types/messages.types'
 import { Types } from 'mongoose'
 import { toast } from '@/components/ui/use-toast'
+import { populateDefault } from './maplibre-actions/map-utils'
 // eslint-disable-next-line import/prefer-default-export
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -41,9 +42,20 @@ export function decodeGeo(geojsonBuffer: { type: string; data: number[] }) {
   const buffer = Buffer.from(new Uint8Array(geojsonBuffer.data))
 
   // Decode the Buffer using geobuf
-  const geo = geobuf.decode(new Pbf(buffer))
+  const geo = geobuf.decode(new Pbf(buffer)) as CustomFeatureCollection
 
-  return geo as FeatureCollection
+  // Populate default in case the geojson from db does not have render properties
+  const defaultFeatureList = geo.features.map((feature) =>
+    populateDefault(feature)
+  )
+
+  // Replace features
+  const defaultGeoCollection = {
+    ...geo,
+    features: defaultFeatureList,
+  }
+
+  return defaultGeoCollection
 }
 
 // Use during import new map
@@ -214,9 +226,9 @@ export function editFeatureSelf(
   const currentFeature = { ...currentGeo.features[featureIndex] }
 
   // See if properties exisit on currentGeo (Should exisit if properly imported)
-  if (!currentFeature.properties) return currentGeo
+  if (!currentFeature.properties?.render) return currentGeo
 
-  const currentSelf = currentFeature.properties
+  const currentSelf = currentFeature.properties.render
 
   if (action === 'addOrUpdate') {
     if (value !== undefined) {
@@ -229,7 +241,7 @@ export function editFeatureSelf(
   }
 
   // Update the feature with the modified
-  currentFeature.properties = currentSelf
+  currentFeature.properties.render = currentSelf
 
   // Replace the modified feature in the geojson features array
   const updatedFeatures = [...currentGeo.features]
@@ -299,8 +311,8 @@ export function updateFeature(
       ...newFeature,
       properties: {
         ...newFeature.properties,
-        meta: {
-          ...newFeature.properties?.meta,
+        render: {
+          ...newFeature.properties?.render,
           // Replace exisitng name if new
           name: {
             payload: `Feature${filteredFeatures.length}`,
@@ -485,3 +497,9 @@ export function findMinMax(
 }
 
 export const isValidHex = (str: string) => /^#([0-9A-Fa-f]{3}){1,2}$/.test(str)
+
+export const propNameToString = (str: string) =>
+  str
+    .split('-') // Split the string by dashes
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each part
+    .join(' ') // Join them back with spaces}

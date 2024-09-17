@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react'
+import React, { Dispatch, SetStateAction, useRef, useState } from 'react'
 import {
   MenubarMenu,
   MenubarTrigger,
@@ -11,6 +11,7 @@ import { ChevronDown } from 'lucide-react'
 interface MenuItem {
   label: string
   icon: React.ReactNode
+  onClick: () => void
 }
 
 interface SelectMenuBarProps {
@@ -24,6 +25,7 @@ interface SelectMenuBarProps {
   menuColIndex: number
   isActive: boolean
   isFile?: boolean
+  mapRef?: maplibregl.Map | null
 }
 
 export default function SelectMenuBar({
@@ -32,6 +34,7 @@ export default function SelectMenuBar({
   menuColIndex,
   isActive,
   isFile = false,
+  mapRef = null,
 }: SelectMenuBarProps) {
   // TODO use onFocus and onBlur to optimize react rendering(prevent render)
   const [currSelectedIndex, setCurrSelectedIndex] = useState(0)
@@ -63,31 +66,35 @@ export default function SelectMenuBar({
           }}
         >
           {currMenuItem.icon}
-          <ChevronDown className="h-3 w-3" />
+          {items.length > 1 && <ChevronDown className="h-3 w-3" />}
         </MenubarTrigger>
 
         {/* TODO spline is different from everything else */}
-        <MenubarContent className="mt-3.5">
-          {/* Map over the items to render the list of menu items */}
-          {items.map((item, index) =>
-            index === currSelectedIndex ? null : (
-              <React.Fragment key={item.label + index.toString()}>
-                <MenubarItem
-                  onClick={() => {
-                    // Set the selected menu item on click and run the provided onClick
-                    handleChangeMode(index) // Preventing default if you are chooseing Content
-                    if (!isFile) setCurrSelectedIndex(index)
-                  }}
-                  className="flex-row gap-2"
-                >
-                  {item.icon} {item.label}
-                </MenubarItem>
-                {/* Add a separator if it's not the last item */}
-                {index < items.length - 1 && <MenubarSeparator />}
-              </React.Fragment>
-            )
-          )}
-        </MenubarContent>
+        {items.length > 1 && (
+          <MenubarContent className="mt-3.5">
+            {/* Map over the items to render the list of menu items */}
+            {items.map((item, index) =>
+              index === currSelectedIndex ? null : (
+                <React.Fragment key={item.label + index.toString()}>
+                  <MenubarItem
+                    onClick={() => {
+                      if (item.onClick) item.onClick()
+                      // Set the selected menu item on click and run the provided onClick
+                      handleChangeMode(index) // Preventing default if you are chooseing Content
+                      if (!isFile) setCurrSelectedIndex(index)
+                    }}
+                    className="flex-row gap-2"
+                  >
+                    {item.icon} {item.label}
+                  </MenubarItem>
+
+                  {/* Add a separator if it's not the last item */}
+                  {index < items.length - 1 && <MenubarSeparator />}
+                </React.Fragment>
+              )
+            )}
+          </MenubarContent>
+        )}
       </MenubarMenu>
     </div>
   )

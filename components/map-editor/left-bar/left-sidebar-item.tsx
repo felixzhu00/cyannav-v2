@@ -20,15 +20,17 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
   // Jotai Global State
   const currLayer = useAtomValue(currLayerAtom)
   const map = useAtomValue(mapAtom)
+
   const setMapField = useSetAtom(setMapFieldAtom)
   const setCurrLayerStyle = useSetAtom(setCurrLayerSelectAtom)
   const setToggleFeatureState = useSetAtom(setToggleFeatureStateAtom)
 
   // Render Data
   const { id } = properties
-  const name = properties.meta?.name.payload || ""
-  const visible = properties.meta?.visible.payload || true
-  const lock = properties.meta?.lock.payload || true 
+  const name = properties.render?.name.payload || ''
+  const visible = properties.render?.visible.payload
+  const lock = properties.render?.lock.payload
+  const draw = properties.render?.draw.payload
 
   const handleLayerChange = () => {
     if (currLayer !== id) {
@@ -37,19 +39,24 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
       setCurrLayerStyle('')
     }
   }
-
+  // console.log("renderadas")
   const handleToggleProperty = async (property: string) => {
     // init newGeo with a not null value
     // console.log("asdasd",properties[property] === undefined)
     const changeValue =
-      properties[property] === undefined ? false : !properties[property]
+      properties.render[property].payload === undefined
+        ? false
+        : !properties.render[property].payload
 
     // console.log(changeValue)
     const newGeo = editFeatureSelf(
       map.geojson,
       id,
       property,
-      changeValue,
+      {
+        ...properties.render?.visible,
+        payload: changeValue,
+      },
       'addOrUpdate'
     )
 
@@ -79,7 +86,7 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
         const decodedGeo = decodeGeo(result.payload.geojson)
 
         setMapField({ field: 'geojson', value: decodedGeo }) // Update the global title state
-        setToggleFeatureState(id, property, changeValue)
+        setToggleFeatureState(id, property, changeValue, draw)
       }
     } catch (error) {
       toast({

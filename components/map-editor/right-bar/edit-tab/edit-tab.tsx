@@ -1,30 +1,22 @@
 import CollapsibleVariables from './collapsible-variables'
 import Variablebar from './variable-toolbar'
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
-import { useAtomValue } from 'jotai'
+import { useAtom, useAtomValue } from 'jotai'
 import { currLayerAtom, mapAtom } from '@/lib/jotai'
 import VariableList from './variable-list'
-
-// Function to find the feature with the matching ID
-const findFeatureById = (
-  id: string | null,
-  mapGeojson: CustomFeatureCollection
-) => {
-  if (!id || !mapGeojson || !mapGeojson.features) return null
-
-  return mapGeojson.features.find((feature) => feature?.id === id) || null
-}
 
 export default function EditTab() {
   // Jotai
   const currLayer = useAtomValue(currLayerAtom)
-  const map = useAtomValue(mapAtom)
+  const [map] = useAtom(mapAtom)
 
   // Get the currently selected layer
-  const selectedFeature = findFeatureById(currLayer, map.geojson)
+  const selectedFeature = map.geojson.features.find(
+    (feature) => feature?.id === currLayer
+  )
 
   // Object of local and global sections to be rendered
-  const localItems = selectedFeature?.properties?.meta as { [key: string]: any }
+  const localItems = selectedFeature?.properties as { [key: string]: any }
   const gobalItems = (map.geojson as CustomFeatureCollection)._shared
 
   // If no layer is currently selected
@@ -34,7 +26,6 @@ export default function EditTab() {
         Select A Layer From The Left To Edit
       </div>
     )
-
   return (
     <div className="space-y-3">
       <Variablebar />

@@ -7,6 +7,7 @@ import {
 import { atom } from 'jotai'
 import maplibregl from 'maplibre-gl'
 import { updateFeature, updateGeoJSONAPI } from './utils'
+import { toggleFeatureVisibility } from './maplibre-actions/map-utils'
 
 // Constants for Default Jotai Atom Value
 const EMPTY_GEO: CustomFeatureCollection = {
@@ -96,14 +97,20 @@ export const setCurrLayerSelectAtom = atom(
 
 export const setToggleFeatureStateAtom = atom(
   null,
-  (get, set, featureId: string, stateKey: string, stateValue) => {
+  (
+    get,
+    set,
+    featureId: string,
+    stateKey: string,
+    stateValue: boolean,
+    featureType: any
+  ) => {
     const mapRef = get(mapLibreAtom)
     if (!mapRef) return
 
     // Set the new feature state
-    mapRef.setFeatureState(
-      { source: featureId, id: featureId },
-      { [stateKey]: stateValue }
-    )
+    if (stateKey === 'visible') {
+      toggleFeatureVisibility(mapRef, featureId, stateValue, featureType)
+    }
   }
 )

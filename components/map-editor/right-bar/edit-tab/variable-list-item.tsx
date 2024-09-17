@@ -1,4 +1,9 @@
-import { decodeGeo, editMapGeo, isValidHex } from '@/lib/utils'
+import {
+  decodeGeo,
+  editMapGeo,
+  isValidHex,
+  propNameToString,
+} from '@/lib/utils'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { mapLibreAtom, setMapFieldAtom } from '@/lib/jotai'
 import { Label } from '@/components/ui/label'
@@ -15,7 +20,7 @@ import {
   SelectGroup,
   SelectItem,
 } from '@/components/ui/select'
-import { editLayerStyleGlobal } from '@/lib/map-render'
+import { editLayerStyle } from '@/lib/maplibre-actions/map-utils'
 
 export default function VariableListItem({
   inputObject,
@@ -24,6 +29,7 @@ export default function VariableListItem({
   mapId,
   currLayerId,
   hasTrash,
+  draw,
   selectOptions = [],
   byFeature = '',
 }: {
@@ -33,9 +39,11 @@ export default function VariableListItem({
   mapId: string
   currLayerId: string
   hasTrash: boolean
+  draw: string
   selectOptions?: string[]
   byFeature?: string
 }) {
+  // TODO add Toast when input not valid onBlur
   // Jotai
   const setMapField = useSetAtom(setMapFieldAtom)
   const mapLibre = useAtomValue(mapLibreAtom)
@@ -48,13 +56,18 @@ export default function VariableListItem({
       ? propValue.payload.toString()
       : propValue.toString()
   const varType = propValue.variableType || 'string'
-
   // React Hooks
-  const [inputValue, setInputValue] = useState<string>(varValue)
-  const transientName = useRef('')
+  const [inputValue, setInputValue] = useState<string | number | boolean>(
+    varValue
+  )
+  const transientName = useRef<string | number | boolean>('')
 
+  // console.log(inputObject)
+  // console.log(varKey, varValue, varType)
+
+  // console.log(mapGeo.features.find((feature) => feature.id === currLayerId))
   // Updates Jotai Atom and Backend
-  const updateVariable = async (payload: string) => {
+  const updateVariable = async (payload: string | number | boolean) => {
     const result = await editMapGeo(
       mapGeo,
       mapId,
@@ -72,23 +85,20 @@ export default function VariableListItem({
   }
 
   // Updates MapLibre ref
-  const handleInputChange = (value: string) => {
+  const handleInputChange = (value: string | number | boolean) => {
     setInputValue(value)
-    if (listName === 'Global') {
-      if (
-        varType === 'color' ? value.length === 7 && isValidHex(value) : true
-      ) {
-        editLayerStyleGlobal(
-          mapLibre,
-          {
-            ...propValue,
-            payload: varType === 'number' ? parseFloat(value) : value,
-          },
-          byFeature,
-          currLayerId
-        )
-      }
-    }
+    // Ignore maplibre style change if is name
+    if (varKey === 'name') return
+
+    // Check if valid color
+    if (
+      varType === 'color' &&
+      ((value as string).length !== 7 || !isValidHex(value as string))
+    )
+      return
+
+    // Change the style of shape
+    editLayerStyle(mapLibre, varKey, value, currLayerId, draw)
   }
 
   const handleBlur = () => {
@@ -97,14 +107,16 @@ export default function VariableListItem({
       // Update the transient name value
       transientName.current = inputValue
 
-      // Do other on blur analytics stuff
-      let validValue =
-        varType === 'number' ? parseFloat(inputValue) : inputValue
+      // // Parse if is number
+      let validValue = inputValue
+      //   varType === 'number' ? parseFloat(inputValue) : inputValue
 
+      // Impute number if invalid
       if (Number.isNaN(validValue)) {
         validValue = propValue.payload
       }
 
+      // Impute number if out of range
       if (varType === 'number') {
         validValue = Math.max(
           propValue?.range[0],
@@ -112,14 +124,20 @@ export default function VariableListItem({
         )
       }
 
-      if (varType === 'color' && inputValue.length !== 7) {
+      // Impute color if invalid
+      if (varType === 'color' && (inputValue as string).length !== 7) {
         validValue = propValue.payload
       }
 
+      // Make the change if input is invalid
       if (validValue !== inputValue) {
-        handleInputChange(validValue.toString())
+        handleInputChange(
+          varType === 'number' ? validValue : validValue.toString()
+        )
       }
-      updateVariable(validValue.toString())
+
+      // Update backend
+      updateVariable(validValue)
     }
   }
 
@@ -134,7 +152,7 @@ export default function VariableListItem({
           placeholder={varKey}
           className="flex-1"
           onChange={(e) => handleInputChange(e.target.value)}
-          value={inputValue}
+          value={inputValue as string}
           onBlur={handleBlur} // Blur handling
         />
       )
@@ -146,9 +164,9 @@ export default function VariableListItem({
           id="value"
           placeholder="111111"
           className="text-sm"
-          step={propValue?.range[2] || '1'}
-          value={inputValue}
-          onChange={(e) => handleInputChange(e.target.value)}
+          step={propValue?.step || '1'}
+          value={inputValue as number}
+          onChange={(e) => handleInputChange(parseFloat(e.target.value))}
           onBlur={handleBlur} // Blur handling
         />
       )
@@ -160,13 +178,13 @@ export default function VariableListItem({
             id="value"
             placeholder="#FFFFFF"
             className="text-sm"
-            value={inputValue}
+            value={inputValue as string}
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={handleBlur} // Blur handling
           />
           <ColorPicker
             className="aspect-square"
-            value={inputValue}
+            value={inputValue as string}
             onChange={handleInputChange}
             setIsBlurred={handleBlur}
           />
@@ -175,7 +193,7 @@ export default function VariableListItem({
     }
     if (varType === 'select' && selectOptions) {
       return (
-        <Select value={inputValue} onValueChange={setInputValue}>
+        <Select value={inputValue as string} onValueChange={setInputValue}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -197,7 +215,7 @@ export default function VariableListItem({
   return (
     <div className="flex w-full flex-col items-start gap-1.5 pt-2">
       <Label className="px-1" htmlFor={varKey}>
-        {varKey}
+        {propNameToString(varKey)}
       </Label>
       <div className="flex w-full flex-row items-center">
         {renderInput()}

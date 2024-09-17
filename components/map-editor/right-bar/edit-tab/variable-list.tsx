@@ -128,7 +128,7 @@ export default function VariableList({
   }
 
   // Filter out variable user should not be able to edit
-  const privateVariablesLocal = ['id', 'visible', 'lock']
+  const privateVariablesLocal = ['id', 'visible', 'lock', 'draw']
   const privateVariablesGlobal = ['mode']
 
   // Render logic for empty, local and global
@@ -145,16 +145,17 @@ export default function VariableList({
     if (listName === 'Local') {
       return (
         <>
-          {Object.entries(list).map(([key, value], index) => {
-            if (!privateVariablesLocal.includes(key) && !key.startsWith('_+')) {
+          {Object.entries(list.render).map(([key, value], index) => {
+            if (!privateVariablesLocal.includes(key)) {
               return (
                 <VariableListItem
-                  key={value.payload + index.toString()}
+                  key={nanoid() + index.toString()}
                   inputObject={{ [key]: value }}
                   listName={listName}
                   mapGeo={mapGeo}
                   mapId={mapId}
                   currLayerId={currLayerId}
+                  draw={list.render.draw.payload}
                   hasTrash={key !== 'name'}
                 />
               )
@@ -207,6 +208,7 @@ export default function VariableList({
                         mapId={mapId}
                         currLayerId={currLayerId}
                         hasTrash={false}
+                        draw={list.render.draw.payload}
                       />
                     )
                   }

@@ -42,7 +42,6 @@ const ColorPicker = forwardRef<
     const handleColorChange = (newColor: string) => {
       setInternalValue(newColor) // Update internal state
       onChange(newColor) // Call parent's onChange to sync with parent component
-      console.log('trigger')
     }
 
     // Handle popover open/close and blur state

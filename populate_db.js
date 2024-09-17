@@ -136,7 +136,7 @@ export function convertToCustomFeatureCollection(geojson) {
         id: tempId, // Set the feature's id to the generated tempId
         properties: {
           id: tempId, // Also include the tempId in the properties
-          meta: {
+          render: {
             name: {
               payload: feature.properties?.name || `Feature${index}`,
               variableType: 'string',

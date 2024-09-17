@@ -1,5 +1,6 @@
 import {
   currLayerAtom,
+  mapAtom,
   mapDrawAtom,
   mapLibreAtom,
   mapSourceAtom,
@@ -28,19 +29,12 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import SelectMenuBar from './select-menu-bar'
-import {
-  addImageLayer,
-  addTextLayer,
-  createMarkerLayer,
-  createSource,
-} from '@/lib/render/manage-layers'
 import { nanoid } from 'nanoid'
-import { Feature } from 'geojson'
-import { renderMap } from '@/lib/map-render'
 import {
   CustomFeature,
   CustomFeatureCollection,
 } from '@/core/_entities/types/map.types'
+import { renderCollection } from '@/lib/maplibre-actions/map-render-layers'
 
 const menu = [
   [
@@ -115,36 +109,81 @@ const menu = [
   ],
 ]
 
-const file = [
-  // Trigger Icon Only
-  {
-    label: 'Trigger',
-    icon: <File className="h-5 w-5" />,
-    draw: undefined,
-  },
-  // Dropdown Options
-  {
-    label: 'Export',
-    icon: <Download className="h-5 w-5" />,
-    draw: undefined,
-  },
-  {
-    label: 'Fork',
-    icon: <GitFork className="h-5 w-5" />,
-    draw: undefined,
-  },
-  {
-    label: 'Download PNG',
-    icon: <ImageIcon className="h-5 w-5" />,
-    draw: undefined,
-  },
-]
-
 export default function EditToolbar({ className }: { className: string }) {
   // TODO add tooltip for each menuCol
   const drawRef = useAtomValue(mapDrawAtom)
   const mapRef = useAtomValue(mapLibreAtom)
   const sourceRef = useAtomValue(mapSourceAtom)
+
+  const mapData = useAtomValue(mapAtom)
+  const mapGeo = mapData.geojson
+
+  // Download canvas
+  const handlePNG = () => {
+    if (mapRef) {
+      const imgData = mapRef.getCanvas().toDataURL('image/png')
+
+      // Programmatically create a download link and trigger the download
+      const link = document.createElement('a')
+      link.href = imgData
+      link.download = `${mapData.title}.png`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link) // Clean up the link
+    }
+  }
+
+  // Download NavJson
+  const handleExport = () => {
+    // Convert the object to a JSON string
+    const jsonString = JSON.stringify(mapGeo, null, 2)
+
+    // Create a Blob from the JSON string
+    const blob = new Blob([jsonString], { type: 'application/json' })
+
+    // Create a URL for the Blob
+    const url = URL.createObjectURL(blob)
+
+    // Create a temporary anchor element
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${mapData.title}.navjson`
+
+    // Programmatically trigger the download
+    link.click()
+
+    // Clean up the URL object
+    URL.revokeObjectURL(url)
+  }
+
+  const file = [
+    // Trigger Icon Only
+    {
+      label: 'Trigger',
+      icon: <File className="h-5 w-5" />,
+      draw: undefined,
+      onClick: () => {},
+    },
+    // Dropdown Options
+    {
+      label: 'Export',
+      icon: <Download className="h-5 w-5" />,
+      draw: undefined,
+      onClick: handleExport,
+    },
+    {
+      label: 'Fork',
+      icon: <GitFork className="h-5 w-5" />,
+      draw: undefined,
+      onClick: () => {},
+    },
+    {
+      label: 'Download PNG',
+      icon: <ImageIcon className="h-5 w-5" />,
+      draw: undefined,
+      onClick: handlePNG,
+    },
+  ]
 
   const setCurrLayer = useSetAtom(currLayerAtom)
   const updateMapByNewFeature = useSetAtom(updateMapByNewFeatureAtom)
@@ -177,7 +216,7 @@ export default function EditToolbar({ className }: { className: string }) {
       id: newID,
       properties: {
         id: newID,
-        meta: {
+        render: {
           name: {
             payload: `${currentMode}${newID.substring(0, 2)}`,
             variableType: 'string',
@@ -195,7 +234,6 @@ export default function EditToolbar({ className }: { className: string }) {
             variableType: 'string',
           },
         },
-        render: {},
       },
     }
 
@@ -206,7 +244,7 @@ export default function EditToolbar({ className }: { className: string }) {
     }
 
     // Add Feature back to maplibre
-    renderMap(mapRef, sourceRef, drawRef, setCurrLayer, newCollection)
+    renderCollection(mapRef, sourceRef, drawRef, setCurrLayer, newCollection)
     updateMapByNewFeature(initFeature)
 
     mapRef.off('click', handleMapClick)
@@ -252,6 +290,7 @@ export default function EditToolbar({ className }: { className: string }) {
           menuColIndex={-1} // Dummy prop
           isActive={false}
           isFile
+          mapRef={mapRef}
         />
         {/* Menu Columns */}
         {menu.map((menuCol, index) => (

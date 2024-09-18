@@ -1,7 +1,15 @@
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import maplibregl from 'maplibre-gl'
 import { findMinMax } from '../utils'
-import { drawToLayerType, infill, layerMap, unfill } from './map-var-const'
+import {
+  drawToLayerType,
+  infill,
+  layerMap,
+  mapPin,
+  unfill,
+} from './map-var-const'
+
+import MapPin from '@/public/map-pin.svg'
 
 import {
   populateCircle,
@@ -58,13 +66,19 @@ export function editLayerStyle(
     ) {
       mapRef.setLayoutProperty(layerId, key, value)
     } else {
-      mapRef.setPaintProperty(layerId, key, value)
+      if (
+        key in layerMap[featureType] &&
+        layerMap[featureType][key] === 'change-icon-color'
+      ) {
+        updateIconColor(mapRef, featureId, mapPin, value as string)
+      } else {
+        mapRef.setPaintProperty(layerId, key, value)
+      }
     }
   } else {
     if (!mapRef) return
 
     const layerId = `${featureId}-${key.split('-')[0]}` // append correct layer type to featureId
-    console.log(layerId, key, value)
     mapRef.setPaintProperty(layerId, key, value)
   }
 }
@@ -147,4 +161,36 @@ export function toggleFeatureVisibility(
     mapRef.setLayoutProperty(`${featureId}-fill`, 'visibility', visibility)
     mapRef.setLayoutProperty(`${featureId}-line`, 'visibility', visibility)
   }
+}
+
+// Replace the icon with a new color
+export function updateIconColor(
+  mapRef: maplibregl.Map,
+  featureId: string,
+  svgIcon: string,
+  color: string
+) {
+  const layerId = `${featureId}-icon`
+  const iconId = `${featureId}-Pin` // Use featureId to ensure unique icon ID
+
+  // Modify the SVG color by replacing the "fill" attribute
+  const coloredSVG = svgIcon.replace(/fill="[^"]*"/g, `fill="${color}"`)
+
+  // Convert the modified SVG to a base64 data URL
+  const img = new Image()
+  img.onload = () => {
+    // Check if the image already exists and remove it before adding the new one
+    if (mapRef.hasImage(iconId)) {
+      mapRef.removeImage(iconId)
+    }
+    // Add the updated image
+    mapRef.addImage(iconId, img)
+
+    // Update the icon image in the layer
+    mapRef.setLayoutProperty(layerId, 'icon-image', iconId)
+  }
+
+  // Set the modified SVG as the image source
+  const svgUrl = `data:image/svg+xml;base64,${btoa(coloredSVG)}`
+  img.src = svgUrl
 }

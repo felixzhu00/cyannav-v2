@@ -81,6 +81,8 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
         const createdFeature = currentCollection.features[0]
         const currentMode = drawRef.getMode()
 
+        console.log(currentCollection)
+
         // Initialize default value for Polygon, Rectangle, Circle, Point, Line, Spine
         const newFeaturePopulated = {
           ...createdFeature,

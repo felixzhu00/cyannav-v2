@@ -1,5 +1,8 @@
 /* eslint-disable no-param-reassign */
-import { CustomFeature } from '@/core/_entities/types/map.types'
+import {
+  CustomFeature,
+  CustomFeatureCollection,
+} from '@/core/_entities/types/map.types'
 import { unrenderFeatureLayer } from './map-render-layers'
 import { drawToLayerType, infill } from './map-var-const'
 
@@ -46,7 +49,7 @@ export function applyClick(
     if (drawRef.getMode() === 'simple_select') {
       const source = mapRef.getSource(featureId) as maplibregl.GeoJSONSource
       if (source) {
-        const sourceData = await source.getData() // Get the source data
+        const sourceData = (await source.getData()) as CustomFeatureCollection // Get the source data
 
         unrenderFeatureLayer(mapRef, sourceRef, featureId)
 

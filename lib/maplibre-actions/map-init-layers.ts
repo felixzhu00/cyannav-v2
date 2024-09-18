@@ -1,5 +1,4 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
-import MapPin from '@/public/map-pin.svg'
 
 import {
   populateCircle,
@@ -8,6 +7,7 @@ import {
   populateText,
   populateUnfill,
 } from './map-populate-default'
+import { mapPin } from './map-var-const'
 
 // GeoFeature, Rectangle, Polygon
 export function initializeInfillLayer(
@@ -128,25 +128,28 @@ export function initializeIconLayer(
   const iconSize = newRenderValues['icon-size']?.payload
   const iconAllowOverlap = newRenderValues['icon-allow-overlap']?.payload
   const iconOpacity = newRenderValues['icon-opacity']?.payload
-  const iconHaloColor = newRenderValues['icon-halo-color']?.payload
-  const iconHalowWidth = newRenderValues['icon-halo-width']?.payload
+  const iconColor = newRenderValues['icon-color']?.payload
+
+  // const iconHaloColor = newRenderValues['icon-halo-color']?.payload
+  // const iconHalowWidth = newRenderValues['icon-halo-width']?.payload
 
   // Add point feature as a source to mapRef
   addSource(mapRef, featureId, populatedIcon)
 
   // Add SVG
-  loadSVGAsImage(mapRef, 'Pin', MapPin)
+  loadSVGAsImage(mapRef, `${featureId}-Pin`, mapPin, iconColor)
 
   addIconLayer(
     mapRef,
     featureId,
     visible,
-    'Pin',
+    `${featureId}-Pin`,
     iconSize,
     iconAllowOverlap,
     iconOpacity,
-    iconHaloColor,
-    iconHalowWidth
+    // iconHaloColor,
+    // iconHalowWidth,
+    iconColor
   )
 }
 
@@ -164,8 +167,6 @@ export function initializeTextLayer(
 
   // Retreive the render values from newFeature
   const newRenderValues = populatedText.properties?.render
-
-  console.log(populatedText)
 
   // Extract render value
   const visible = populatedText.properties?.render?.visible.payload
@@ -380,8 +381,9 @@ export function addIconLayer(
   iconSize: number,
   iconAllowOverlap: boolean,
   iconOpacity: number,
-  iconHaloColor: string,
-  iconHalowWidth: number
+  // iconHaloColor: string,
+  // iconHalowWidth: number,
+  iconColor: string
 ) {
   mapRef.addLayer({
     id: `${featureId}-icon`,
@@ -395,14 +397,20 @@ export function addIconLayer(
     },
     paint: {
       'icon-opacity': iconOpacity,
-      'icon-halo-color': iconHaloColor,
-      'icon-halo-width': iconHalowWidth,
+      // 'icon-halo-color': iconHaloColor,
+      // 'icon-halo-width': iconHalowWidth,
+      'icon-color': iconColor,
     },
   })
 }
 
 // Function to add the SVG as an image to the map
-function loadSVGAsImage(map: maplibregl.Map, iconId: string, svgIcon: any) {
+function loadSVGAsImage(
+  map: maplibregl.Map,
+  iconId: string,
+  svgIcon: any,
+  color: string
+) {
   // Check if image is already added
 
   const img = new Image()
@@ -410,5 +418,10 @@ function loadSVGAsImage(map: maplibregl.Map, iconId: string, svgIcon: any) {
     if (map.hasImage(iconId)) return
     map.addImage(iconId, img)
   }
-  img.src = svgIcon.src
+
+  // Modify the SVG color by replacing the "fill" attribute
+  const coloredSVG = svgIcon.replace(/fill="[^"]*"/g, `fill="${color}"`)
+
+  const svgUrl = `data:image/svg+xml;base64,${btoa(coloredSVG)}`
+  img.src = svgUrl
 }

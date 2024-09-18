@@ -22,7 +22,7 @@ export function populateInfill(feature: Feature<Geometry, GeoJsonProperties>) {
           ? featureRenderValues['fill-opacity']
           : {
               ...fraction,
-              payload: 0.6,
+              payload: 0.9,
               variableType: 'number',
             },
         'line-color': featureRenderValues['line-color']
@@ -97,7 +97,7 @@ export function populateCircle(feature: Feature<Geometry, GeoJsonProperties>) {
           ? featureRenderValues['circle-opacity']
           : {
               ...fraction,
-              payload: 0.6,
+              payload: 0.9,
               variableType: 'number',
             },
         'circle-stroke-color': featureRenderValues['circle-stroke-color']
@@ -151,18 +151,26 @@ export function populateIcon(feature: Feature<Geometry, GeoJsonProperties>) {
               payload: 1.0,
               variableType: 'number',
             },
-        'icon-halo-color': featureRenderValues['icon-halo-color']
-          ? featureRenderValues['icon-halo-color']
-          : {
-              payload: '#000000',
-              variableType: 'color',
-            },
-        'icon-halo-width': featureRenderValues['icon-halo-width']
-          ? featureRenderValues['icon-halo-width']
+        // 'icon-halo-color': featureRenderValues['icon-halo-color']
+        //   ? featureRenderValues['icon-halo-color']
+        //   : {
+        //       payload: '#000000',
+        //       variableType: 'color',
+        //     },
+        // 'icon-halo-width': featureRenderValues['icon-halo-width']
+        //   ? featureRenderValues['icon-halo-width']
+        //   : {
+        //       ...width,
+        //       payload: 2,
+        //       variableType: 'number',
+        //     },
+
+        'icon-color': featureRenderValues['icon-color']
+          ? featureRenderValues['icon-color']
           : {
               ...width,
-              payload: 2,
-              variableType: 'number',
+              payload: '#000000',
+              variableType: 'color',
             },
       },
     },
@@ -173,7 +181,6 @@ export function populateIcon(feature: Feature<Geometry, GeoJsonProperties>) {
 export function populateText(feature: Feature<Geometry, GeoJsonProperties>) {
   // Retreive the render values
   const featureRenderValues = feature.properties?.render || {}
-
 
   // Impute null values / create default render
   const populatedText: Feature = {

@@ -165,9 +165,11 @@ export function initializeTextLayer(
   // Retreive the render values from newFeature
   const newRenderValues = populatedText.properties?.render
 
+  console.log(populatedText)
+
   // Extract render value
   const visible = populatedText.properties?.render?.visible.payload
-  const textInput = newRenderValues['text-input']?.payload
+  const textField = newRenderValues['text-field']?.payload
   const textSize = newRenderValues['text-size']?.payload
   const textFont = newRenderValues['text-font']?.payload
   const textAnchor = newRenderValues['text-anchor']?.payload
@@ -184,7 +186,7 @@ export function initializeTextLayer(
     mapRef,
     featureId,
     visible,
-    textInput,
+    textField,
     textSize,
     textFont,
     textAnchor,
@@ -328,7 +330,7 @@ export function addTextLayer(
   mapRef: maplibregl.Map,
   featureId: string,
   visible: boolean, // in render
-  textInput: string,
+  textField: string,
   textSize: number,
   textFont: string,
   textAnchor:
@@ -353,7 +355,7 @@ export function addTextLayer(
     source: featureId,
     layout: {
       visibility: visible ? 'visible' : 'none',
-      'text-field': textInput, // Fetches the text from the properties
+      'text-field': textField, // Fetches the text from the properties
       'text-size': textSize,
       // 'text-font': [textFont],
       'text-offset': [0, 0.6],

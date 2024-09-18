@@ -62,7 +62,9 @@ export function editLayerStyle(
     }
   } else {
     if (!mapRef) return
+
     const layerId = `${featureId}-${key.split('-')[0]}` // append correct layer type to featureId
+    console.log(layerId, key, value)
     mapRef.setPaintProperty(layerId, key, value)
   }
 }

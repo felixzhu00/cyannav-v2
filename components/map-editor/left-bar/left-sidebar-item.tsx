@@ -32,6 +32,8 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
   const lock = properties.render?.lock.payload
   const draw = properties.render?.draw.payload
 
+  console.log(name, draw)
+
   const handleLayerChange = () => {
     if (currLayer !== id) {
       setCurrLayerStyle(id)

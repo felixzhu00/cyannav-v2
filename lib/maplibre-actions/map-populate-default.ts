@@ -15,27 +15,27 @@ export function populateInfill(feature: Feature<Geometry, GeoJsonProperties>) {
         'fill-color': featureRenderValues['fill-color']
           ? featureRenderValues['fill-color']
           : {
-              payload: '#000000',
+              payload: '#FFFFFF',
               variableType: 'color',
             },
         'fill-opacity': featureRenderValues['fill-opacity']
           ? featureRenderValues['fill-opacity']
           : {
               ...fraction,
-              payload: 0.4,
+              payload: 0.6,
               variableType: 'number',
             },
         'line-color': featureRenderValues['line-color']
           ? featureRenderValues['line-color']
           : {
-              payload: '#FFFFFF',
+              payload: '#000000',
               variableType: 'color',
             },
         'line-width': featureRenderValues['line-width']
           ? featureRenderValues['line-width']
           : {
               ...width,
-              payload: 1,
+              payload: 3,
               variableType: 'number',
             },
       },
@@ -59,14 +59,14 @@ export function populateUnfill(feature: Feature<Geometry, GeoJsonProperties>) {
         'line-color': featureRenderValues['line-color']
           ? featureRenderValues['line-color']
           : {
-              payload: '#FFFFFF',
+              payload: '#000000',
               variableType: 'color',
             },
         'line-width': featureRenderValues['line-width']
           ? featureRenderValues['line-width']
           : {
               ...width,
-              payload: 1,
+              payload: 3,
               variableType: 'number',
             },
       },
@@ -90,27 +90,27 @@ export function populateCircle(feature: Feature<Geometry, GeoJsonProperties>) {
         'circle-color': featureRenderValues['circle-color']
           ? featureRenderValues['circle-color']
           : {
-              payload: '#000000',
+              payload: '#FFFFFF',
               variableType: 'color',
             },
         'circle-opacity': featureRenderValues['circle-opacity']
           ? featureRenderValues['circle-opacity']
           : {
               ...fraction,
-              payload: 0.4,
+              payload: 0.6,
               variableType: 'number',
             },
         'circle-stroke-color': featureRenderValues['circle-stroke-color']
           ? featureRenderValues['circle-stroke-color']
           : {
-              payload: '#FFFFFF',
+              payload: '#000000',
               variableType: 'color',
             },
         'circle-stroke-width': featureRenderValues['circle-stroke-width']
           ? featureRenderValues['circle-stroke-width']
           : {
               ...width,
-              payload: 1,
+              payload: 3,
               variableType: 'number',
             },
       },
@@ -174,6 +174,7 @@ export function populateText(feature: Feature<Geometry, GeoJsonProperties>) {
   // Retreive the render values
   const featureRenderValues = feature.properties?.render || {}
 
+
   // Impute null values / create default render
   const populatedText: Feature = {
     ...feature,
@@ -181,8 +182,8 @@ export function populateText(feature: Feature<Geometry, GeoJsonProperties>) {
       ...feature.properties,
       render: {
         ...featureRenderValues,
-        'text-input': featureRenderValues['text-input']
-          ? featureRenderValues['text-input']
+        'text-field': featureRenderValues['text-field']
+          ? featureRenderValues['text-field']
           : {
               payload: 'text placeholder',
               variableType: 'string',
@@ -241,6 +242,7 @@ export function populateText(feature: Feature<Geometry, GeoJsonProperties>) {
     },
   }
 
+  console.log(populatedText)
   return populatedText
 }
 

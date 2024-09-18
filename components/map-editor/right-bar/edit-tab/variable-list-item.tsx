@@ -82,6 +82,7 @@ export default function VariableListItem({
     if (result.payload) {
       const decodedGeo = decodeGeo(result.payload.geojson)
       setMapField({ field: 'geojson', value: decodedGeo })
+      console.log('joati set1')
     }
   }
 
@@ -97,9 +98,10 @@ export default function VariableListItem({
       ((value as string).length !== 7 || !isValidHex(value as string))
     )
       return
-      console.log("id",currLayerId, draw)
+    // console.log('id', currLayerId, draw)
 
     // Change the style of shape
+    console.log(varKey, 'asdas', value, 'asdasd', currLayerId, 'asdas', draw)
     editLayerStyle(mapLibre, varKey, value, currLayerId, draw)
   }
 
@@ -214,7 +216,7 @@ export default function VariableListItem({
 
     if (varType === 'boolean') {
       return (
-        <div className="flex items-center space-x-2 flex-grow justify-start ml-2">
+        <div className="ml-2 flex flex-grow items-center justify-start space-x-2">
           <Label htmlFor="off-mode">Off</Label>
           <Switch
             checked={inputValue as boolean}

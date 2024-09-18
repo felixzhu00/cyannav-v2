@@ -35,6 +35,7 @@ import {
   CustomFeatureCollection,
 } from '@/core/_entities/types/map.types'
 import { renderCollection } from '@/lib/maplibre-actions/map-render-layers'
+import { populateDefault } from '@/lib/maplibre-actions/map-utils'
 
 const menu = [
   [
@@ -96,11 +97,11 @@ const menu = [
       icon: <MapPin className="h-5 w-5" />,
       draw: 'marker', // TODO
     },
-    {
-      label: 'Custom Marker',
-      icon: <MapPinPlus className="h-5 w-5" />,
-      draw: 'custom_marker', // TODO
-    },
+    // {
+    //   label: 'Custom Marker',
+    //   icon: <MapPinPlus className="h-5 w-5" />,
+    //   draw: 'custom_marker', // TODO
+    // },
     {
       label: 'Point',
       icon: <Dot className="h-5 w-5" />,
@@ -240,15 +241,17 @@ export default function EditToolbar({ className }: { className: string }) {
       },
     }
 
+    const newFeatureAfterDefault = populateDefault(initFeature) as CustomFeature
+
     const newCollection: CustomFeatureCollection = {
       type: 'FeatureCollection',
-      features: [initFeature],
+      features: [newFeatureAfterDefault],
       _shared: { mode: 'none' },
     }
 
     // Add Feature back to maplibre
     renderCollection(mapRef, sourceRef, drawRef, setCurrLayer, newCollection)
-    updateMapByNewFeature(initFeature)
+    updateMapByNewFeature(newFeatureAfterDefault)
   }
 
   useEffect(() => {

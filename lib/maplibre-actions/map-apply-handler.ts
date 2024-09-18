@@ -48,8 +48,12 @@ export function applyClick(
 
     if (drawRef.getMode() === 'simple_select') {
       const source = mapRef.getSource(featureId) as maplibregl.GeoJSONSource
+
       if (source) {
         const sourceData = (await source.getData()) as CustomFeatureCollection // Get the source data
+
+        // If Lock then you should not be able to move it
+        if (sourceData.features[0].properties?.render.lock.payload) return
 
         unrenderFeatureLayer(mapRef, sourceRef, featureId)
 

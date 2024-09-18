@@ -1,5 +1,6 @@
 import {
   decodeGeo,
+  editFeatureSelf,
   editMapGeo,
   isValidHex,
   propNameToString,
@@ -10,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import TrashDialog from './trash-dialog'
 import { useRef, useState } from 'react'
-import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
+import { CustomFeature, CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import { ColorPicker } from '@/components/ui/color-picker'
 import {
   Select,
@@ -20,7 +21,10 @@ import {
   SelectGroup,
   SelectItem,
 } from '@/components/ui/select'
-import { editLayerStyle } from '@/lib/maplibre-actions/map-utils'
+import {
+  editLayerStyle,
+  updateSourceById,
+} from '@/lib/maplibre-actions/map-utils'
 import { Switch } from '@/components/ui/switch'
 
 export default function VariableListItem({
@@ -98,11 +102,32 @@ export default function VariableListItem({
       ((value as string).length !== 7 || !isValidHex(value as string))
     )
       return
-    // console.log('id', currLayerId, draw)
 
     // Change the style of shape
-    console.log(varKey, 'asdas', value, 'asdasd', currLayerId, 'asdas', draw)
     editLayerStyle(mapLibre, varKey, value, currLayerId, draw)
+
+    // Get the feature of with currLayerId
+    const feature = mapGeo.features.find(
+      (feature) => feature.id === currLayerId
+    ) as CustomFeature
+
+    // Convert feature into Feature collection
+    const newCollection: CustomFeatureCollection = {
+      type: 'FeatureCollection',
+      features: [feature],
+      _shared: { mode: 'none' },
+    }
+    // Get a updateGeo
+    const newGeo = editFeatureSelf(
+      newCollection,
+      currLayerId,
+      varKey,
+      { ...propValue, payload: value },
+      'addOrUpdate'
+    )
+
+    // Update the source of the shape
+    updateSourceById(mapLibre, currLayerId, newGeo)
   }
 
   const handleBlur = () => {

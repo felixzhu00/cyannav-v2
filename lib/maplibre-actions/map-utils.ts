@@ -194,3 +194,24 @@ export function updateIconColor(
   const svgUrl = `data:image/svg+xml;base64,${btoa(coloredSVG)}`
   img.src = svgUrl
 }
+
+export function updateSourceById(
+  mapRef: maplibregl.Map | null,
+  id: string,
+  newGeo: CustomFeatureCollection
+) {
+
+  console.log(newGeo)
+  // Check if the map reference and the source exist
+  if (!mapRef) return
+
+  // Check if the source exists in the map by id
+  const source = mapRef.getSource(id)
+  if (!source) return
+
+  // Check if the source is of type 'geojson'
+  if ((source as maplibregl.GeoJSONSource).setData) {
+    // Update the source with the new GeoJSON data
+    (source as maplibregl.GeoJSONSource).setData(newGeo)
+  }
+}

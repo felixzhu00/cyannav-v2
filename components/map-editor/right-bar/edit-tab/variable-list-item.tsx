@@ -21,6 +21,7 @@ import {
   SelectItem,
 } from '@/components/ui/select'
 import { editLayerStyle } from '@/lib/maplibre-actions/map-utils'
+import { Switch } from '@/components/ui/switch'
 
 export default function VariableListItem({
   inputObject,
@@ -96,6 +97,7 @@ export default function VariableListItem({
       ((value as string).length !== 7 || !isValidHex(value as string))
     )
       return
+      console.log("id",currLayerId, draw)
 
     // Change the style of shape
     editLayerStyle(mapLibre, varKey, value, currLayerId, draw)
@@ -209,6 +211,19 @@ export default function VariableListItem({
         </Select>
       )
     }
+
+    if (varType === 'boolean') {
+      return (
+        <div className="flex items-center space-x-2 flex-grow justify-start ml-2">
+          <Label htmlFor="off-mode">Off</Label>
+          <Switch
+            checked={inputValue as boolean}
+            onCheckedChange={handleInputChange}
+          />
+          <Label htmlFor="on-mode">On</Label>
+        </div>
+      )
+    }
     return <div>Invalid Variable Type {varType}</div>
   }
 
@@ -217,7 +232,7 @@ export default function VariableListItem({
       <Label className="px-1" htmlFor={varKey}>
         {propNameToString(varKey)}
       </Label>
-      <div className="flex w-full flex-row items-center">
+      <div className="flex w-full flex-row items-center justify-between">
         {renderInput()}
         {hasTrash && (
           <TrashDialog variableName={varKey} collapsibleName={listName} />

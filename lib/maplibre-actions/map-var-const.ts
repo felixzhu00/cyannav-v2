@@ -138,7 +138,8 @@ export const NoOpMode = {
     return {} // Cleanup if needed
   },
 
-  toDisplayFeatures(state, geojson, display) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  toDisplayFeatures(_state: any, _geojson: any, _display: any) {
     // Do nothing, do not display any features
   },
 

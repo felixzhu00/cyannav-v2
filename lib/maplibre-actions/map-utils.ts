@@ -50,7 +50,7 @@ export function editLayerStyle(
 ) {
   if (featureType === 'marker' || featureType === 'text') {
     if (!mapRef) return
-    const layerId = featureId + key.split('-')[0] // append correct layer type to featureId
+    const layerId = `${featureId}-${key.split('-')[0]}` // append correct layer type to featureId
 
     if (
       key in layerMap[featureType] &&

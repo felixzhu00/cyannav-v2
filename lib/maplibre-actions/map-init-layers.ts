@@ -1,6 +1,5 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
 import MapPin from '@/public/map-pin.svg'
-import temp from '@/public/logo-text-black.png'
 
 import {
   populateCircle,

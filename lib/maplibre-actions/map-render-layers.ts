@@ -14,7 +14,6 @@ import { infill, unfill } from './map-var-const'
 // Adds source, fill, outline layer to maplibre mapRef for ONE shape
 export function renderFeatureLayer(
   mapRef: maplibregl.Map | null,
-  sourceRef: { [key: string]: string[] },
   feature: Feature<Geometry, GeoJsonProperties>
 ) {
   if (!mapRef) return
@@ -38,20 +37,10 @@ export function renderFeatureLayer(
   if (featureType === 'text') {
     initializeTextLayer(mapRef, feature)
   }
-
-  // ID of source and layer
-  const featureId = feature.id as string
-
-  // eslint-disable-next-line no-param-reassign
-  sourceRef[featureId] = [`${featureId}-fill`, `${featureId}-outline`] // Add source to sourceRef as future reference
 }
 
 // Removes source, fill, outline layer to maplibre mapRef for ONE shape
-export function unrenderFeatureLayer(
-  mapRef: maplibregl.Map,
-  sourceRef: { [key: string]: string[] },
-  sourceId: string
-) {
+export function unrenderFeatureLayer(mapRef: maplibregl.Map, sourceId: string) {
   // Check if the source exists
   if (!mapRef.getSource(sourceId)) return
 
@@ -70,14 +59,13 @@ export function unrenderFeatureLayer(
   // Remove the source
   mapRef.removeSource(sourceId)
 
-  // eslint-disable-next-line no-param-reassign
-  delete sourceRef[sourceId] // Pop source from sourceRef object
+  // // eslint-disable-next-line no-param-reassign
+  // delete sourceRef[sourceId] // Pop source from sourceRef object
 }
 
 // Main function that renders a GeoJSON collection
 export function renderCollection(
   mapRef: maplibregl.Map | null,
-  sourceRef: { [key: string]: string[] },
   drawRef: any,
   setCurrLayer: (update: (prevLayerId: string) => string) => void,
   mapGeo: CustomFeatureCollection
@@ -85,8 +73,8 @@ export function renderCollection(
   // Iterate over mapGeo features and add individual sources and layers
   mapGeo.features.forEach((feature) => {
     try {
-      renderFeatureLayer(mapRef, sourceRef, feature)
-      applyClick(mapRef, drawRef, sourceRef, setCurrLayer, feature)
+      renderFeatureLayer(mapRef, feature)
+      applyClick(mapRef, drawRef, setCurrLayer, feature)
     } catch (error) {
       console.error(error)
     }

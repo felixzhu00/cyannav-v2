@@ -1,5 +1,6 @@
 import {
   currLayerAtom,
+  currSelectedModeAtom,
   mapAtom,
   mapDrawAtom,
   mapLibreAtom,
@@ -8,7 +9,7 @@ import {
 } from '@/lib/jotai'
 import { Menubar } from '@/components/ui/menubar'
 import { cn } from '@/lib/utils'
-import { useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import {
   MousePointer,
   Circle,
@@ -115,8 +116,8 @@ export default function EditToolbar({ className }: { className: string }) {
   // Jotai
   const drawRef = useAtomValue(mapDrawAtom)
   const mapRef = useAtomValue(mapLibreAtom)
-  const sourceRef = useAtomValue(mapSourceAtom)
   const mapData = useAtomValue(mapAtom)
+  const [currSelectedMode, setCurrSelectedMode] = useAtom(currSelectedModeAtom)
 
   const transientDrawMode = useRef('simple_select')
 
@@ -192,11 +193,6 @@ export default function EditToolbar({ className }: { className: string }) {
   const setCurrLayer = useSetAtom(currLayerAtom)
   const updateMapByNewFeature = useSetAtom(updateMapByNewFeatureAtom)
 
-  const [currSelectedMode, setCurrSelectedMode] = useState({
-    menuColIndex: 0, // Row of "menu" matrix
-    menuItemIndex: 0, // Col of "menu" matrix
-  }) // postion in "menu" matrix, default to cursor
-
   // Handle the map click event
   const handleMapClick = (e: maplibregl.MapMouseEvent) => {
     const current =
@@ -250,7 +246,7 @@ export default function EditToolbar({ className }: { className: string }) {
     }
 
     // Add Feature back to maplibre
-    renderCollection(mapRef, sourceRef, drawRef, setCurrLayer, newCollection)
+    renderCollection(mapRef, drawRef, setCurrLayer, newCollection)
     updateMapByNewFeature(newFeatureAfterDefault)
   }
 

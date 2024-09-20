@@ -41,14 +41,8 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
   // Use the custom useMapLibre hook
   const { mapContainer } = useMapLibre({
     styleUrl: 'https://demotiles.maplibre.org/style.json',
-    onMapLoad: (mapRef, drawRef, sourceRef) => {
-      renderCollection(
-        mapRef,
-        sourceRef,
-        drawRef,
-        setCurrLayer,
-        decodedMap.geojson
-      ) // Render layers with fill style
+    onMapLoad: (mapRef, drawRef) => {
+      renderCollection(mapRef, drawRef, setCurrLayer, decodedMap.geojson) // Render layers with fill style
 
       // Listen for when the feature goes inactive and remove it from draw
       const handleSelectionChange = (event: any) => {
@@ -61,13 +55,7 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
           drawRef.deleteAll()
 
           // Add Feature back to maplibre
-          renderCollection(
-            mapRef,
-            sourceRef,
-            drawRef,
-            setCurrLayer,
-            deletedCollection
-          )
+          renderCollection(mapRef, drawRef, setCurrLayer, deletedCollection)
 
           // Update backend of the change feature
           updateMapByNewFeature(deletedCollection.features[0])
@@ -80,8 +68,6 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
         const currentCollection = drawRef.getAll()
         const createdFeature = currentCollection.features[0]
         const currentMode = drawRef.getMode()
-
-        console.log(currentCollection)
 
         // Initialize default value for Polygon, Rectangle, Circle, Point, Line, Spine
         const newFeaturePopulated = {
@@ -176,13 +162,7 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
         drawRef.deleteAll()
 
         // Add Feature back to maplibre
-        renderCollection(
-          mapRef,
-          sourceRef,
-          drawRef,
-          setCurrLayer,
-          newCollection
-        )
+        renderCollection(mapRef, drawRef, setCurrLayer, newCollection)
         // Update atom collection
         updateMapByNewFeature(newFeatureAfterDefault)
 

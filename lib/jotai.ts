@@ -37,6 +37,11 @@ export const mapLibreAtom = atom<maplibregl.Map | null>(null)
 export const mapDrawAtom = atom<any | null>(null)
 export const mapSourceAtom = atom<any | null>(null)
 
+export const currSelectedModeAtom = atom({
+  menuColIndex: 0, // Row of "menu" matrix
+  menuItemIndex: 0, // Col of "menu" matrix
+})
+
 export const mapAtom = atom(EMPTY_MAP_DATA)
 
 // mapAtom setter for any field change

@@ -4,13 +4,19 @@ import { Button } from '@/components/ui/button'
 import { useAtomValue, useSetAtom } from 'jotai'
 import {
   currLayerAtom,
+  currSelectedModeAtom,
   mapAtom,
+  mapDrawAtom,
+  mapLibreAtom,
+  mapSourceAtom,
   setCurrLayerSelectAtom,
   setMapFieldAtom,
   setToggleFeatureStateAtom,
 } from '@/lib/jotai'
 import { cn, decodeGeo, editFeatureSelf, encodeGeo } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
+import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
+import { unrenderFeatureLayer } from '@/lib/maplibre-actions/map-render-layers'
 
 type LeftSidebarItemProps = {
   properties: { [key: string]: any }
@@ -20,10 +26,14 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
   // Jotai Global State
   const currLayer = useAtomValue(currLayerAtom)
   const map = useAtomValue(mapAtom)
+  const mapRef = useAtomValue(mapLibreAtom)
+  const drawRef = useAtomValue(mapDrawAtom)
+  const sourceRef = useAtomValue(mapSourceAtom)
 
   const setMapField = useSetAtom(setMapFieldAtom)
   const setCurrLayerStyle = useSetAtom(setCurrLayerSelectAtom)
   const setToggleFeatureState = useSetAtom(setToggleFeatureStateAtom)
+  const setCurrSelectedMode = useSetAtom(currSelectedModeAtom)
 
   // Render Data
   const { id } = properties
@@ -32,13 +42,32 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
   const lock = properties.render?.lock.payload
   const draw = properties.render?.draw.payload
 
-  const handleLayerChange = () => {
+  const handleLayerChange = async () => {
     if (currLayer !== id) {
+      // Change Tool Bar selected option
+      setCurrSelectedMode({
+        menuColIndex: 0,
+        menuItemIndex: 0,
+      })
+      // Change Edit bar to current layer
       setCurrLayerStyle(id)
+
+      // TODO Remove past layer from draw and render to maplibre, update feature source if needed
+      // TODO Add the Layer to Draw to be moved and edited
     } else {
+      // remove current Edit bar layer
       setCurrLayerStyle('')
+      // Remove the layer from draw and render to maplibre, update feature source if needed
     }
   }
+
+  // Unmount Draw Collection(getAll(), deleteAll())
+  // Update MapLibre Collection(renderCollection)
+  // Update Atom(updateMapByNewFeature)
+
+  // Add To Draw Collection
+  // Simple Select it
+
   // console.log("renderadas")
   const handleToggleProperty = async (property: string) => {
     // init newGeo with a not null value

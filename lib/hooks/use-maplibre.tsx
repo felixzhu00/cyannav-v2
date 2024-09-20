@@ -17,11 +17,7 @@ import { NoOpMode } from '../maplibre-actions/map-var-const'
 interface UseMapLibreProps {
   styleUrl: string
   initialZoom?: number
-  onMapLoad?: (
-    map: maplibregl.Map,
-    draw: MapboxDraw,
-    source: { [key: string]: string[] }
-  ) => void
+  onMapLoad?: (map: maplibregl.Map, draw: MapboxDraw) => void
 }
 
 export const useMapLibre = ({
@@ -32,12 +28,9 @@ export const useMapLibre = ({
   // Jotai Setter
   const setMapLibre = useSetAtom(mapLibreAtom) // Set MapLibre Map Object to Ref
   const setMapDraw = useSetAtom(mapDrawAtom) // Set draw to Ref
-  const setMapSource = useSetAtom(mapSourceAtom) // Set source to Ref
-
   // Hook Ref to be exported
   const mapContainer = useRef<HTMLDivElement | null>(null)
   const map = useRef<maplibregl.Map | null>(null)
-  const source = useRef({})
   const draw = useRef<MapboxDraw | null>(null)
 
   // Init maplibre canvas
@@ -88,14 +81,13 @@ export const useMapLibre = ({
       // Update jotai reference
       setMapDraw(draw.current)
       setMapLibre(map.current)
-      setMapSource(source.current)
 
       // Do remainder onload procedure
       if (onMapLoad && map.current) {
-        onMapLoad(map.current, draw.current, source.current) // Pass the map
+        onMapLoad(map.current, draw.current) // Pass the map
       }
     })
-  }, [styleUrl, initialZoom, onMapLoad, setMapLibre, setMapDraw, setMapSource])
+  }, [styleUrl, initialZoom, onMapLoad, setMapLibre, setMapDraw])
 
   // Component onmount and unmount logic
   useEffect(() => {
@@ -120,6 +112,5 @@ export const useMapLibre = ({
     mapContainer,
     map,
     draw,
-    source,
   }
 }

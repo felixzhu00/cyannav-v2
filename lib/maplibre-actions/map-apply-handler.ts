@@ -9,7 +9,6 @@ import { drawToLayerType, infill } from './map-var-const'
 export function applyClick(
   mapRef: maplibregl.Map | null,
   drawRef: any,
-  sourceRef: { [key: string]: string[] },
   setCurrLayer: (update: (prevLayerId: string) => string) => void,
   feature: CustomFeature
 ) {
@@ -55,7 +54,7 @@ export function applyClick(
         // If Lock then you should not be able to move it
         if (sourceData.features[0].properties?.render.lock.payload) return
 
-        unrenderFeatureLayer(mapRef, sourceRef, featureId)
+        unrenderFeatureLayer(mapRef, featureId)
 
         drawRef.add(sourceData)
 

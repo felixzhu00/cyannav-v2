@@ -8,9 +8,6 @@ import {
   mapPin,
   unfill,
 } from './map-var-const'
-
-import MapPin from '@/public/map-pin.svg'
-
 import {
   populateCircle,
   populateIcon,
@@ -200,7 +197,6 @@ export function updateSourceById(
   id: string,
   newGeo: CustomFeatureCollection
 ) {
-
   console.log(newGeo)
   // Check if the map reference and the source exist
   if (!mapRef) return
@@ -212,6 +208,16 @@ export function updateSourceById(
   // Check if the source is of type 'geojson'
   if ((source as maplibregl.GeoJSONSource).setData) {
     // Update the source with the new GeoJSON data
-    (source as maplibregl.GeoJSONSource).setData(newGeo)
+    ;(source as maplibregl.GeoJSONSource).setData(newGeo)
   }
 }
+
+// Unmount Draw Collection(getAll(), deleteAll())
+// Update MapLibre Collection(renderCollection)
+// Update Atom(updateMapByNewFeature)
+
+// Add To Draw Collection
+// Simple Select it
+
+
+

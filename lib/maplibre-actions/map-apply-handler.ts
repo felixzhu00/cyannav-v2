@@ -184,15 +184,15 @@ export const handleSelectionChange = (
     // Remove feature from draw
     drawRef.deleteAll()
 
-    const deletedFeatureId = deletedCollection.features[0].id
+    // const deletedFeatureId = deletedCollection.features[0].id
 
-    setCurrLayer((prevLayerId) => {
-      if (!mapRef) return ''
-      if (prevLayerId === deletedFeatureId) {
-        return '' // Deselect if already selected
-      }
-      return deletedFeatureId // Select new feature
-    })
+    // setCurrLayer((prevLayerId) => {
+    //   if (!mapRef) return ''
+    //   if (prevLayerId === deletedFeatureId) {
+    //     return '' // Deselect if already selected
+    //   }
+    //   return deletedFeatureId // Select new feature
+    // })
 
     // Add Feature back to maplibre
     renderCollection(mapRef, drawRef, setCurrLayer, deletedCollection)

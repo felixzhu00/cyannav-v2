@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import {
   MenubarMenu,
   MenubarTrigger,
@@ -7,40 +7,40 @@ import {
   MenubarSeparator,
 } from '@/components/ui/menubar'
 import { ChevronDown } from 'lucide-react'
+import { currSelectedModeAtom } from '@/lib/jotai'
+import { useAtom } from 'jotai'
 
 interface MenuItem {
   label: string
   icon: React.ReactNode
-  onClick: () => void
 }
 
 interface SelectMenuBarProps {
   items: MenuItem[]
-  setCurrSelectedMode: Dispatch<
-    SetStateAction<{
-      menuColIndex: number
-      menuItemIndex: number
-    }>
-  >
   menuColIndex: number
   isActive: boolean
   isFile?: boolean
-  mapRef?: maplibregl.Map | null
 }
 
 export default function SelectMenuBar({
   items,
-  setCurrSelectedMode,
   menuColIndex,
   isActive,
   isFile = false,
-  mapRef = null,
 }: SelectMenuBarProps) {
   // TODO use onFocus and onBlur to optimize react rendering(prevent render)
-  const [currSelectedIndex, setCurrSelectedIndex] = useState(0)
+  const [currSelectedMode, setCurrSelectedMode] = useAtom(currSelectedModeAtom)
+
+  // Using state instead of ref for better reactivity
+  const currSelectedIndex = useRef(0)
+
+  // Logic used to keep either the past menuItem or currently active one
+  if (currSelectedMode.menuColIndex === menuColIndex) {
+    currSelectedIndex.current = currSelectedMode.menuItemIndex
+  }
 
   // The current menu item displayed as the trigger
-  const currMenuItem = items[currSelectedIndex]
+  const currMenuItem = items[currSelectedIndex.current]
 
   const triggerStyle = () =>
     `flex flex-row items-center aspect-square h-full justify-center ${
@@ -62,7 +62,7 @@ export default function SelectMenuBar({
         {/* Render the currently selected menu item as the trigger */}
         <MenubarTrigger
           onClick={() => {
-            if (!isActive) handleChangeMode(currSelectedIndex)
+            if (!isActive) handleChangeMode(currSelectedIndex.current)
           }}
         >
           {currMenuItem.icon}
@@ -74,14 +74,13 @@ export default function SelectMenuBar({
           <MenubarContent className="mt-3.5">
             {/* Map over the items to render the list of menu items */}
             {items.map((item, index) =>
-              index === currSelectedIndex ? null : (
+              index === currSelectedIndex.current ? null : (
                 <React.Fragment key={item.label + index.toString()}>
                   <MenubarItem
                     onClick={() => {
                       if (item.onClick) item.onClick()
                       // Set the selected menu item on click and run the provided onClick
-                      handleChangeMode(index) // Preventing default if you are chooseing Content
-                      if (!isFile) setCurrSelectedIndex(index)
+                      if (!isFile) handleChangeMode(index) // Preventing default if you are chooseing Content
                     }}
                     className="flex-row gap-2"
                   >

@@ -42,8 +42,8 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
         menuColIndex: 0,
         menuItemIndex: 0,
       })
-      if (drawRef.getMode() !== 'simple_select') {
-        drawRef.changeMode('simple_select')
+      if (drawRef.getMode() !== 'select') {
+        drawRef.changeMode('select')
       }
 
       // Change Edit bar to current layer

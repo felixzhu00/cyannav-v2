@@ -27,8 +27,9 @@ import {
   GitFork,
   Download,
   RectangleHorizontal,
+  Move,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import SelectMenuBar from './select-menu-bar'
 import { nanoid } from 'nanoid'
 import {
@@ -43,7 +44,12 @@ const menu = [
     {
       label: 'Cursor',
       icon: <MousePointer className="h-5 w-5" />,
-      draw: 'simple_select',
+      draw: 'select',
+    },
+    {
+      label: 'Move',
+      icon: <Move className="h-5 w-5" />,
+      draw: 'simple_select', // TODO
     },
     // {
     //   label: 'Measure',
@@ -117,9 +123,9 @@ export default function EditToolbar({ className }: { className: string }) {
   const drawRef = useAtomValue(mapDrawAtom)
   const mapRef = useAtomValue(mapLibreAtom)
   const mapData = useAtomValue(mapAtom)
-  const [currSelectedMode, setCurrSelectedMode] = useAtom(currSelectedModeAtom)
+  const currSelectedMode = useAtomValue(currSelectedModeAtom)
 
-  const transientDrawMode = useRef('simple_select')
+  const transientDrawMode = useRef('select')
 
   const mapGeo = mapData.geojson
 
@@ -294,18 +300,15 @@ export default function EditToolbar({ className }: { className: string }) {
         {/* File Option : using SelectMenuBar just for identical styling */}
         <SelectMenuBar
           items={file}
-          setCurrSelectedMode={() => {}} // Dummy prop
           menuColIndex={-1} // Dummy prop
           isActive={false}
           isFile
-          mapRef={mapRef}
         />
         {/* Menu Columns */}
         {menu.map((menuCol, index) => (
           <SelectMenuBar
             key={menuCol[0].label}
             items={menuCol}
-            setCurrSelectedMode={setCurrSelectedMode}
             menuColIndex={index}
             isActive={currSelectedMode.menuColIndex === index}
           />

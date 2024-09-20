@@ -47,6 +47,19 @@ export function applyClick(
       return featureId // Select new feature
     })
 
+    if (drawRef.getAll().features.length > 0) {
+      drawRef.changeMode('simple_select', {
+        featureIds: [],
+      })
+      handleSelectionChange(
+        { features: [] }, // Simulate empty selected features
+        mapRef,
+        drawRef,
+        setCurrLayer
+      )
+    }
+
+    if (drawRef.getMode() === 'select') return
     // Add to Draw
     handleAddToDraw(e, mapRef, drawRef, featureId)
   })
@@ -183,16 +196,6 @@ export const handleSelectionChange = (
 
     // Remove feature from draw
     drawRef.deleteAll()
-
-    // const deletedFeatureId = deletedCollection.features[0].id
-
-    // setCurrLayer((prevLayerId) => {
-    //   if (!mapRef) return ''
-    //   if (prevLayerId === deletedFeatureId) {
-    //     return '' // Deselect if already selected
-    //   }
-    //   return deletedFeatureId // Select new feature
-    // })
 
     // Add Feature back to maplibre
     renderCollection(mapRef, drawRef, setCurrLayer, deletedCollection)

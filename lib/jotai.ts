@@ -75,31 +75,6 @@ export const updateMapByNewFeatureAtom = atom(
   }
 )
 
-// currLayer setter && maplibre select layer
-export const setCurrLayerSelectAtom = atom(
-  null,
-  (get, set, featureId: string) => {
-    // Set Jotai Atom
-    set(currLayerAtom, featureId)
-
-    // change "click" styling in map render
-    // const mapRef = get(mapLibreAtom)
-
-    // if (!mapRef) return
-    // // Reset previous selection
-    // const sources = mapRef.getSource(featureId)
-    // if (!sources) return
-
-    // mapRef.querySourceFeatures(featureId).forEach((feature) => {
-    //   const id = feature.id as string // Ensure id is string
-    //   mapRef.setFeatureState(
-    //     { source: featureId, id },
-    //     { selected: id === featureId }
-    //   )
-    // })
-  }
-)
-
 export const setToggleFeatureStateAtom = atom(
   null,
   (

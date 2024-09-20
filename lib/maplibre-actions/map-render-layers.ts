@@ -58,12 +58,9 @@ export function unrenderFeatureLayer(mapRef: maplibregl.Map, sourceId: string) {
 
   // Remove the source
   mapRef.removeSource(sourceId)
-
-  // // eslint-disable-next-line no-param-reassign
-  // delete sourceRef[sourceId] // Pop source from sourceRef object
 }
 
-// Main function that renders a GeoJSON collection
+// Main function that renders a GeoJSON collectionD
 export function renderCollection(
   mapRef: maplibregl.Map | null,
   drawRef: any,

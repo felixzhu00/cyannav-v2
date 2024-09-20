@@ -12,11 +12,16 @@ import {
   setCurrLayerSelectAtom,
   setMapFieldAtom,
   setToggleFeatureStateAtom,
+  updateMapByNewFeatureAtom,
 } from '@/lib/jotai'
 import { cn, decodeGeo, editFeatureSelf, encodeGeo } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 import { unrenderFeatureLayer } from '@/lib/maplibre-actions/map-render-layers'
+import {
+  handleAddToDraw,
+  handleSelectionChange,
+} from '@/lib/maplibre-actions/map-apply-handler'
 
 type LeftSidebarItemProps = {
   properties: { [key: string]: any }
@@ -28,12 +33,12 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
   const map = useAtomValue(mapAtom)
   const mapRef = useAtomValue(mapLibreAtom)
   const drawRef = useAtomValue(mapDrawAtom)
-  const sourceRef = useAtomValue(mapSourceAtom)
 
   const setMapField = useSetAtom(setMapFieldAtom)
-  const setCurrLayerStyle = useSetAtom(setCurrLayerSelectAtom)
+  const setCurrLayerStyle = useSetAtom(currLayerAtom)
   const setToggleFeatureState = useSetAtom(setToggleFeatureStateAtom)
   const setCurrSelectedMode = useSetAtom(currSelectedModeAtom)
+  const updateMapByNewFeature = useSetAtom(updateMapByNewFeatureAtom)
 
   // Render Data
   const { id } = properties
@@ -52,21 +57,57 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
       // Change Edit bar to current layer
       setCurrLayerStyle(id)
 
-      // TODO Remove past layer from draw and render to maplibre, update feature source if needed
-      // TODO Add the Layer to Draw to be moved and edited
+      // Return if MapLibre/Draw has not loaded yet
+      if (!mapRef || !drawRef) return
+
+      // If you have a layer selected, changing layer will run this
+      // if (drawRef.getAll().features.length > 0) {
+      //   // Manually trigger handleSelectionChange as if unselect happened
+
+      // }
+
+      if (drawRef.getAll().features.length > 0) {
+        // Unselect previous features programmatically
+        drawRef.changeMode('simple_select', {
+          featureIds: [],
+        })
+
+        if (!mapRef) return
+        // Manually trigger handleSelectionChange as if unselect happened
+        handleSelectionChange(
+          { features: [] }, // Simulate empty selected features
+          mapRef,
+          drawRef,
+          setCurrLayerStyle
+        )
+      }
+      // Add current ID layer to Draw
+      setTimeout(() => {
+        handleAddToDraw(undefined, mapRef, drawRef, id)
+      }, 0)
     } else {
       // remove current Edit bar layer
       setCurrLayerStyle('')
       // Remove the layer from draw and render to maplibre, update feature source if needed
+      // If you have a layer selected, changing layer will run this
+      if (drawRef.getAll().features.length > 0) {
+        // Unselect previous features programmatically
+        drawRef.changeMode('simple_select', {
+          featureIds: [],
+        })
+
+        if (!mapRef) return
+        // Manually trigger handleSelectionChange as if unselect happened
+        handleSelectionChange(
+          { features: [] }, // Simulate empty selected features
+          mapRef,
+          drawRef,
+          setCurrLayerStyle,
+          updateMapByNewFeature
+        )
+      }
     }
   }
-
-  // Unmount Draw Collection(getAll(), deleteAll())
-  // Update MapLibre Collection(renderCollection)
-  // Update Atom(updateMapByNewFeature)
-
-  // Add To Draw Collection
-  // Simple Select it
 
   // console.log("renderadas")
   const handleToggleProperty = async (property: string) => {

@@ -11,7 +11,10 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import TrashDialog from './trash-dialog'
 import { useRef, useState } from 'react'
-import { CustomFeature, CustomFeatureCollection } from '@/core/_entities/types/map.types'
+import {
+  CustomFeature,
+  CustomFeatureCollection,
+} from '@/core/_entities/types/map.types'
 import { ColorPicker } from '@/components/ui/color-picker'
 import {
   Select,
@@ -86,7 +89,6 @@ export default function VariableListItem({
     if (result.payload) {
       const decodedGeo = decodeGeo(result.payload.geojson)
       setMapField({ field: 'geojson', value: decodedGeo })
-      console.log('joati set1')
     }
   }
 

@@ -16,6 +16,7 @@ import {
   populateUnfill,
 } from '@/lib/maplibre-actions/map-populate-default'
 import { Feature, GeoJsonProperties, Geometry } from 'geojson'
+import * as turf from '@turf/turf'
 
 // Controller for choosing which populate function
 export function populateDefault(
@@ -197,7 +198,6 @@ export function updateSourceById(
   id: string,
   newGeo: CustomFeatureCollection
 ) {
-  console.log(newGeo)
   // Check if the map reference and the source exist
   if (!mapRef) return
 
@@ -211,6 +211,26 @@ export function updateSourceById(
     ;(source as maplibregl.GeoJSONSource).setData(newGeo)
   }
 }
+// Function to add padding around the bounding box
+export function calculatePaddedBBox(
+  feature: Feature<Geometry, GeoJsonProperties>,
+  padding: number // Padding in degrees or percentage
+): [number, number, number, number] {
+  // Get the original bbox from Turf.js
+  const bbox = turf.bbox(feature) // [minX, minY, maxX, maxY]
+
+  // Deconstruct bbox into its components
+  const [minX, minY, maxX, maxY] = bbox
+
+  // Apply padding (in degrees)
+  const paddedMinX = minX - padding
+  const paddedMinY = minY - padding
+  const paddedMaxX = maxX + padding
+  const paddedMaxY = maxY + padding
+
+  // Return the padded bounding box
+  return [paddedMinX, paddedMinY, paddedMaxX, paddedMaxY]
+}
 
 // Unmount Draw Collection(getAll(), deleteAll())
 // Update MapLibre Collection(renderCollection)
@@ -218,6 +238,3 @@ export function updateSourceById(
 
 // Add To Draw Collection
 // Simple Select it
-
-
-

@@ -1,7 +1,12 @@
 import { useRef, useEffect, useCallback } from 'react'
 import maplibregl from 'maplibre-gl'
 import { useSetAtom } from 'jotai'
-import { mapDrawAtom, mapLibreAtom, mapSourceAtom } from '../jotai'
+import {
+  attachedHandlersAtom,
+  mapDrawAtom,
+  mapLibreAtom,
+  mapSourceAtom,
+} from '../jotai'
 import MapboxDraw from '@mapbox/mapbox-gl-draw'
 import {
   SimpleSelectModeBezierOverride,
@@ -17,7 +22,11 @@ import { NoOpMode, SelectMode } from '../maplibre-actions/map-var-const'
 interface UseMapLibreProps {
   styleUrl: string
   initialZoom?: number
-  onMapLoad?: (map: maplibregl.Map, draw: MapboxDraw) => void
+  onMapLoad?: (
+    map: maplibregl.Map,
+    draw: MapboxDraw,
+    handler: { [key: string]: (event: any) => void }
+  ) => void
 }
 
 export const useMapLibre = ({
@@ -28,10 +37,12 @@ export const useMapLibre = ({
   // Jotai Setter
   const setMapLibre = useSetAtom(mapLibreAtom) // Set MapLibre Map Object to Ref
   const setMapDraw = useSetAtom(mapDrawAtom) // Set draw to Ref
+  const setHandler = useSetAtom(attachedHandlersAtom)
   // Hook Ref to be exported
   const mapContainer = useRef<HTMLDivElement | null>(null)
   const map = useRef<maplibregl.Map | null>(null)
   const draw = useRef<MapboxDraw | null>(null)
+  const handler = useRef<{ [key: string]: (event: any) => void }>({})
 
   // Init maplibre canvas
   const initializeMap = useCallback(() => {
@@ -82,10 +93,11 @@ export const useMapLibre = ({
       // Update jotai reference
       setMapDraw(draw.current)
       setMapLibre(map.current)
+      setHandler(handler.current)
 
       // Do remainder onload procedure
       if (onMapLoad && map.current) {
-        onMapLoad(map.current, draw.current) // Pass the map
+        onMapLoad(map.current, draw.current, handler.current) // Pass the map
       }
     })
   }, [styleUrl, initialZoom, onMapLoad, setMapLibre, setMapDraw])
@@ -98,6 +110,10 @@ export const useMapLibre = ({
 
     // Clean up function
     return () => {
+      // Remove Handlers
+      setHandler({})
+      handler.current = {}
+
       // Remove Draw Plugin
       setMapDraw(null)
       draw.current = null
@@ -113,5 +129,6 @@ export const useMapLibre = ({
     mapContainer,
     map,
     draw,
+    handler,
   }
 }

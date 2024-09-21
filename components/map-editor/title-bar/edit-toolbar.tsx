@@ -1,4 +1,5 @@
 import {
+  attachedHandlersAtom,
   currLayerAtom,
   currSelectedModeAtom,
   mapAtom,
@@ -122,6 +123,7 @@ export default function EditToolbar({ className }: { className: string }) {
   // Jotai
   const drawRef = useAtomValue(mapDrawAtom)
   const mapRef = useAtomValue(mapLibreAtom)
+  const handlerRef = useAtomValue(attachedHandlersAtom)
   const mapData = useAtomValue(mapAtom)
   const currSelectedMode = useAtomValue(currSelectedModeAtom)
 
@@ -252,7 +254,7 @@ export default function EditToolbar({ className }: { className: string }) {
     }
 
     // Add Feature back to maplibre
-    renderCollection(mapRef, drawRef, setCurrLayer, newCollection)
+    renderCollection(mapRef, drawRef, handlerRef, setCurrLayer, newCollection)
     updateMapByNewFeature(newFeatureAfterDefault)
   }
 

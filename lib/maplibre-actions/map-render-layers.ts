@@ -40,7 +40,11 @@ export function renderFeatureLayer(
 }
 
 // Removes source, fill, outline layer to maplibre mapRef for ONE shape
-export function unrenderFeatureLayer(mapRef: maplibregl.Map, sourceId: string) {
+export function unrenderFeatureLayer(
+  mapRef: maplibregl.Map,
+  sourceId: string,
+  handlerRef: { [key: string]: (event: any) => void }
+) {
   // Check if the source exists
   if (!mapRef.getSource(sourceId)) return
 
@@ -50,7 +54,12 @@ export function unrenderFeatureLayer(mapRef: maplibregl.Map, sourceId: string) {
   // Loop through layers and remove the ones that reference the source
   if (layers) {
     layers.forEach((layer) => {
-      if ('source' in layer && layer.source === sourceId) {
+      if (
+        'source' in layer &&
+        (layer.source === sourceId || layer.source === `${sourceId}-bbox`)
+      ) {
+        if (handlerRef[layer.id])
+          mapRef.off('click', `${layer.id}`, handlerRef[layer.id])
         mapRef.removeLayer(layer.id)
       }
     })
@@ -58,12 +67,15 @@ export function unrenderFeatureLayer(mapRef: maplibregl.Map, sourceId: string) {
 
   // Remove the source
   mapRef.removeSource(sourceId)
+  // Remove Bounding Box source
+  mapRef.removeSource(`${sourceId}-bbox`)
 }
 
 // Main function that renders a GeoJSON collectionD
 export function renderCollection(
   mapRef: maplibregl.Map | null,
   drawRef: any,
+  handlerRef: { [key: string]: (event: any) => void },
   setCurrLayer: (update: (prevLayerId: string) => string) => void,
   mapGeo: CustomFeatureCollection
 ) {
@@ -71,7 +83,7 @@ export function renderCollection(
   mapGeo.features.forEach((feature) => {
     try {
       renderFeatureLayer(mapRef, feature)
-      applyClick(mapRef, drawRef, setCurrLayer, feature)
+      applyClick(mapRef, drawRef, setCurrLayer, feature, handlerRef)
     } catch (error) {
       console.error(error)
     }

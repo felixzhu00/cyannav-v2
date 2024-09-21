@@ -8,6 +8,7 @@ import {
   mapAtom,
   mapDrawAtom,
   setMapFieldAtom,
+  setSelectedLayerStyleAtom,
   setToggleFeatureStateAtom,
 } from '@/lib/jotai'
 import { cn, decodeGeo, editFeatureSelf, encodeGeo } from '@/lib/utils'
@@ -24,7 +25,7 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
   const drawRef = useAtomValue(mapDrawAtom)
 
   const setMapField = useSetAtom(setMapFieldAtom)
-  const setCurrLayerStyle = useSetAtom(currLayerAtom)
+  const setCurrLayerStyle = useSetAtom(setSelectedLayerStyleAtom)
   const setToggleFeatureState = useSetAtom(setToggleFeatureStateAtom)
   const setCurrSelectedMode = useSetAtom(currSelectedModeAtom)
 

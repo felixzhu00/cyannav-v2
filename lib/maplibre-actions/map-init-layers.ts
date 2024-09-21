@@ -8,6 +8,8 @@ import {
   populateUnfill,
 } from './map-populate-default'
 import { mapPin } from './map-var-const'
+import * as turf from '@turf/turf'
+import { calculatePaddedBBox } from './map-utils'
 
 // GeoFeature, Rectangle, Polygon
 export function initializeInfillLayer(
@@ -40,6 +42,9 @@ export function initializeInfillLayer(
 
   // Add Line
   addLineLayer(mapRef, featureId, visible, lineColor, lineWidth)
+
+  // Add Bounding Box
+  addBoundingBoxLayer(mapRef, featureId, feature)
 }
 
 // Lines and Splines
@@ -67,6 +72,9 @@ export function initializeUnfillLayer(
 
   // Add Line
   addLineLayer(mapRef, featureId, visible, lineColor, lineWidth)
+
+  // Add Bounding Box
+  addBoundingBoxLayer(mapRef, featureId, feature)
 }
 
 // Circle
@@ -106,6 +114,9 @@ export function initializeCircleFillLayer(
     circleStrokeWidth,
     circleRadius
   )
+
+  // Add Bounding Box
+  addBoundingBoxLayer(mapRef, featureId, feature, circleRadius)
 }
 
 // Marker/ Custom Marker
@@ -151,6 +162,9 @@ export function initializeIconLayer(
     // iconHalowWidth,
     iconColor
   )
+
+  // Add Bounding Box
+  addBoundingBoxLayer(mapRef, featureId, feature, iconSize + 4)
 }
 
 // Text
@@ -197,6 +211,9 @@ export function initializeTextLayer(
     textHaloColor,
     textHaloWidth
   )
+
+  // Add Bounding Box
+  addBoundingBoxLayer(mapRef, featureId, feature, textSize + 4)
 }
 
 // Primative function: add source to mapRef
@@ -400,6 +417,55 @@ export function addIconLayer(
       // 'icon-halo-color': iconHaloColor,
       // 'icon-halo-width': iconHalowWidth,
       'icon-color': iconColor,
+    },
+  })
+}
+
+// Function to add the bounding box as a polygon layer on MapLibre
+export function addBoundingBoxLayer(
+  mapRef: maplibregl.Map | null,
+  featureId: string,
+  feature: Feature<Geometry, GeoJsonProperties>,
+  padding: number = 2,
+  color: string = '#3b82f6', // Customize color for the bounding box
+  lineStyle: string = 'dashed' // Custom line style
+) {
+  if (!mapRef) return
+
+  console.log('boundingboxgenerated')
+  // 1. Calculate bounding box using Turf
+  const bbox = calculatePaddedBBox(feature, padding) // [minX, minY, maxX, maxY]
+
+  // 2. Create a bounding box polygon GeoJSON
+  const bboxPolygon = turf.bboxPolygon(bbox) // Returns a polygon GeoJSON feature
+  bboxPolygon.properties = { id: `${featureId}-bbox-polygon` } // Assign Id to polygon
+
+  // 3. Add a source for the bounding box polygon
+  mapRef.addSource(`${featureId}-bbox`, {
+    type: 'geojson',
+    data: bboxPolygon,
+    promoteId: 'id',
+  })
+
+  // 4. Add a polygon layer for the bounding box (visible only when selected)
+  mapRef.addLayer({
+    id: `${featureId}-bbox-layer`,
+    type: 'line', // Using 'line' for the dashed effect
+    source: `${featureId}-bbox`,
+    layout: {
+      'line-join': 'round',
+      'line-cap': 'round',
+    },
+    paint: {
+      'line-color': color,
+      'line-width': 2,
+      'line-dasharray': lineStyle === 'dashed' ? [2, 2] : [1, 0], // Dashed or solid
+      'line-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'selected'], false],
+        1, // Visible when selected
+        0, // Hidden when not selected
+      ],
     },
   })
 }

@@ -43,10 +43,17 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
   // Use the custom useMapLibre hook
   const { mapContainer } = useMapLibre({
     styleUrl: 'https://demotiles.maplibre.org/style.json',
-    onMapLoad: (mapRef, drawRef) => {
+    onMapLoad: (mapRef, drawRef, handler) => {
       // Ran when both MapRef and DrawRef has both loaded
       // Render the Initial Geojson File from server
-      renderCollection(mapRef, drawRef, setCurrLayer, decodedMap.geojson)
+
+      renderCollection(
+        mapRef,
+        drawRef,
+        handler,
+        setCurrLayer,
+        decodedMap.geojson
+      )
 
       // Initialize event listener for when a map-gl-draw create a shape
       mapRef.on('draw.create', (event) => {
@@ -54,6 +61,7 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
           event,
           mapRef,
           drawRef,
+          handler,
           setCurrLayer,
           updateMapByNewFeature
         )
@@ -65,6 +73,7 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
           event,
           mapRef,
           drawRef,
+          handler,
           setCurrLayer,
           updateMapByNewFeature
         )

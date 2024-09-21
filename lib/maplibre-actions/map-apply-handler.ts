@@ -12,7 +12,8 @@ export function applyClick(
   mapRef: maplibregl.Map | null,
   drawRef: any,
   setCurrLayer: (update: (prevLayerId: string) => string) => void,
-  feature: CustomFeature
+  feature: CustomFeature,
+  handlerRef: { [key: string]: (event: any) => void }
 ) {
   if (!mapRef) return
 
@@ -23,46 +24,106 @@ export function applyClick(
 
   let layerId = featureId
 
-  // Assign on click for different layers dependning on featureType
+  // Assign on click for different layers depending on featureType
   if (!infill.includes(featureType)) {
     layerId = `${featureId}-${drawToLayerType[featureType]}`
   } else {
     layerId = `${featureId}-fill`
   }
 
-  // Add the click event listener
-  mapRef.on('click', `${layerId}`, (e) => {
-    if (!mapRef) return
-    const features = mapRef.queryRenderedFeatures(e.point, {
-      layers: [`${layerId}`],
+  // Store the handler function in handlerRef without invoking it
+  handlerRef[layerId] = (event: any) => {
+    onClickHandler(
+      event,
+      mapRef,
+      drawRef,
+      handlerRef,
+      setCurrLayer,
+      layerId,
+      featureId
+    )
+  }
+
+  // Attach the handler to `mapRef` and store it in useRef
+  mapRef.on('click', `${layerId}`, handlerRef[layerId])
+}
+// Define a named event handler function
+export const onClickHandler = (
+  e: any,
+  mapRef: maplibregl.Map | null,
+  drawRef: any,
+  handlerRef: { [key: string]: (event: any) => void },
+  setCurrLayer: (update: (prevLayerId: string) => string) => void,
+  layerId: string,
+  featureId: string
+) => {
+  if (!mapRef) return
+  const features = mapRef.queryRenderedFeatures(e.point, {
+    layers: [`${layerId}`],
+  })
+
+  if (!features || !features.length) return
+
+  if (drawRef.getAll().features.length > 0) {
+    drawRef.changeMode('simple_select', {
+      featureIds: [],
     })
+    handleSelectionChange(
+      { features: [] }, // Simulate empty selected features
+      mapRef,
+      drawRef,
+      handlerRef,
+      setCurrLayer
+    )
+  }
 
-    if (!features || !features.length) return
-
+  if (drawRef.getMode() === 'select') {
     setCurrLayer((prevLayerId) => {
       if (!mapRef) return ''
+
       if (prevLayerId === featureId) {
+        mapRef.setFeatureState(
+          { source: `${featureId}-bbox`, id: `${featureId}-bbox-polygon` },
+          { selected: false }
+        )
         return '' // Deselect if already selected
       }
+      if (prevLayerId !== '') {
+        mapRef.setFeatureState(
+          {
+            source: `${prevLayerId}-bbox`,
+            id: `${prevLayerId}-bbox-polygon`,
+          },
+          { selected: false }
+        )
+      }
+      mapRef.setFeatureState(
+        { source: `${featureId}-bbox`, id: `${featureId}-bbox-polygon` },
+        { selected: true }
+      )
+
+      mapRef.moveLayer(`${featureId}-bbox-layer`)
       return featureId // Select new feature
     })
+  }
 
-    if (drawRef.getAll().features.length > 0) {
-      drawRef.changeMode('simple_select', {
-        featureIds: [],
-      })
-      handleSelectionChange(
-        { features: [] }, // Simulate empty selected features
-        mapRef,
-        drawRef,
-        setCurrLayer
-      )
-    }
+  if (drawRef.getMode() === 'simple_select') {
+    setCurrLayer((prevLayerId) => {
+      if (!mapRef) return ''
+      if (prevLayerId !== '') {
+        mapRef.setFeatureState(
+          {
+            source: `${prevLayerId}-bbox`,
+            id: `${prevLayerId}-bbox-polygon`,
+          },
+          { selected: false }
+        )
+      }
+      return '' // Deselect if already selected
+    })
 
-    if (drawRef.getMode() === 'select') return
-    // Add to Draw
-    handleAddToDraw(e, mapRef, drawRef, featureId)
-  })
+    handleAddToDraw(e, mapRef, drawRef, handlerRef, featureId)
+  }
 }
 
 // Handles adding feature to atom upon creation
@@ -70,6 +131,7 @@ export const handleCreate = (
   event: any,
   mapRef: maplibregl.Map,
   drawRef: any,
+  handlerRef: { [key: string]: (event: any) => void },
   setCurrLayer: (update: (prevLayerId: string) => string) => void,
   updateMapByNewFeature: (feature: CustomFeature) => void
 ) => {
@@ -170,7 +232,7 @@ export const handleCreate = (
   drawRef.deleteAll()
 
   // Add Feature back to maplibre
-  renderCollection(mapRef, drawRef, setCurrLayer, newCollection)
+  renderCollection(mapRef, drawRef, handlerRef, setCurrLayer, newCollection)
   // Update atom collection
   updateMapByNewFeature(newFeatureAfterDefault)
 
@@ -185,6 +247,7 @@ export const handleSelectionChange = (
   event: any | undefined,
   mapRef: maplibregl.Map,
   drawRef: any,
+  handlerRef: { [key: string]: (event: any) => void },
   setCurrLayer: (update: (prevLayerId: string) => string) => void,
   updateMapByNewFeature?: (feature: CustomFeature) => void
 ) => {
@@ -198,7 +261,13 @@ export const handleSelectionChange = (
     drawRef.deleteAll()
 
     // Add Feature back to maplibre
-    renderCollection(mapRef, drawRef, setCurrLayer, deletedCollection)
+    renderCollection(
+      mapRef,
+      drawRef,
+      handlerRef,
+      setCurrLayer,
+      deletedCollection
+    )
 
     // Update backend of the change feature
     if (updateMapByNewFeature)
@@ -212,6 +281,7 @@ export const handleAddToDraw = (
   e: any | undefined,
   mapRef: maplibregl.Map,
   drawRef: any,
+  handlerRef: { [key: string]: (event: any) => void },
   featureId: string
 ) => {
   if (drawRef.getMode() === 'simple_select') {
@@ -223,7 +293,7 @@ export const handleAddToDraw = (
       // If Lock then you should not be able to move it
       if (sourceData.features[0].properties?.render.lock.payload) return
 
-      unrenderFeatureLayer(mapRef, featureId)
+      unrenderFeatureLayer(mapRef, featureId, handlerRef)
 
       drawRef.add(sourceData)
 

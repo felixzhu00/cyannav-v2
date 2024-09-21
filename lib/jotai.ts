@@ -36,6 +36,7 @@ export const currLayerAtom = atom('')
 export const mapLibreAtom = atom<maplibregl.Map | null>(null)
 export const mapDrawAtom = atom<any | null>(null)
 export const mapSourceAtom = atom<any | null>(null)
+export const attachedHandlersAtom = atom<any | null>({})
 
 export const currSelectedModeAtom = atom({
   menuColIndex: 0, // Row of "menu" matrix
@@ -53,6 +54,47 @@ export const setMapFieldAtom = atom(
       ...currentMap,
       [field]: value,
     })
+  }
+)
+
+// mapAtom setter for selecting and deselecting layers
+export const setSelectedLayerStyleAtom = atom(
+  null,
+  (get, set, featureId: string) => {
+    const mapRef = get(mapLibreAtom) // Assuming mapAtom holds the reference to the map
+    const prevLayerId = get(currLayerAtom) // Adjust as needed to get the current layer ID
+
+    if (!mapRef) return // Exit if map reference is not available
+    if (prevLayerId === featureId) {
+      // Deselect if already selected
+      mapRef.setFeatureState(
+        { source: `${featureId}-bbox`, id: `${featureId}-bbox-polygon` },
+        { selected: false }
+      )
+      set(currLayerAtom, '') // Clear the current layer ID
+      return // Exit the function
+    }
+
+    // Deselect the previous layer
+    if (prevLayerId) {
+      mapRef.setFeatureState(
+        { source: `${prevLayerId}-bbox`, id: `${prevLayerId}-bbox-polygon` },
+        { selected: false }
+      )
+    }
+
+    if (featureId) {
+      // Select the new feature
+      mapRef.setFeatureState(
+        { source: `${featureId}-bbox`, id: `${featureId}-bbox-polygon` },
+        { selected: true }
+      )
+
+      // Move the selected layer to the front
+      mapRef.moveLayer(`${featureId}-bbox-layer`)
+    }
+    // Update the current layer ID
+    set(currLayerAtom, featureId)
   }
 )
 

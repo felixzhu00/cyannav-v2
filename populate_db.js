@@ -153,6 +153,10 @@ export function convertToCustomFeatureCollection(geojson) {
               payload: 'feature',
               variableType: 'string',
             },
+            trash: {
+              payload: false,
+              variableType: 'boolean',
+            },
           },
           old: {
             ...feature.properties,

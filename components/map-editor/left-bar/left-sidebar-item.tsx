@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { Eye, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAtomValue, useSetAtom } from 'jotai'
@@ -13,12 +13,15 @@ import {
 } from '@/lib/jotai'
 import { cn, decodeGeo, editFeatureSelf, encodeGeo } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
+import DeleteItemDialog from './delete-item-dialog'
 
 type LeftSidebarItemProps = {
   properties: { [key: string]: any }
 }
 
 export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
+  // React State
+
   // Jotai Global State
   const currLayer = useAtomValue(currLayerAtom)
   const map = useAtomValue(mapAtom)
@@ -35,6 +38,9 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
   const visible = properties.render?.visible.payload
   const lock = properties.render?.lock.payload
   const draw = properties.render?.draw.payload
+
+  // Trash Icon
+  const hasTrash = properties.render?.trash?.payload || false
 
   const handleLayerChange = async () => {
     if (currLayer !== id) {
@@ -112,41 +118,47 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
   }
 
   return (
-    <div
-      className={cn(
-        'flex w-full items-center justify-between rounded-md border border-transparent px-2 py-0.5 hover:border-blue-500',
-        currLayer === id && 'border-white-500'
-      )}
-      onClick={handleLayerChange}
-    >
-      <span className="ml-2 overflow-hidden text-ellipsis whitespace-nowrap text-white">
-        {name}
-      </span>
-      <div className="flex">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={(e) => {
-            e.stopPropagation()
-            handleToggleProperty('lock')
-          }}
-        >
-          <Lock
-            className={cn('h-4 w-4', lock === false ? 'text-gray-500' : '')}
-          />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={(e) => {
-            e.stopPropagation()
-            handleToggleProperty('visible')
-          }}
-        >
-          <Eye
-            className={cn('h-4 w-4', visible === false ? 'text-gray-500' : '')}
-          />
-        </Button>
+    <div className="flex flex-row items-center">
+      <DeleteItemDialog featureName={name} featureId={id} hasTrash={hasTrash} />
+      <div
+        className={cn(
+          'flex w-full items-center justify-between rounded-md border border-transparent px-2 py-0.5 hover:border-blue-500',
+          currLayer === id && 'border-white-500'
+        )}
+        onClick={handleLayerChange}
+      >
+        <span className="ml-2 overflow-hidden text-ellipsis whitespace-nowrap text-white">
+          {name}
+        </span>
+        <div className="flex">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleToggleProperty('lock')
+            }}
+          >
+            <Lock
+              className={cn('h-4 w-4', lock === false ? 'text-gray-500' : '')}
+            />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleToggleProperty('visible')
+            }}
+          >
+            <Eye
+              className={cn(
+                'h-4 w-4',
+                visible === false ? 'text-gray-500' : ''
+              )}
+            />
+          </Button>
+        </div>
       </div>
     </div>
   )

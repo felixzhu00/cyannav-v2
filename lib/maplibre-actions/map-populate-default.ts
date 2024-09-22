@@ -249,7 +249,6 @@ export function populateText(feature: Feature<Geometry, GeoJsonProperties>) {
     },
   }
 
-  console.log(populatedText)
   return populatedText
 }
 

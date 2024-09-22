@@ -164,6 +164,10 @@ export const handleCreate = (
           payload: currentMode,
           variableType: 'string',
         },
+        trash: {
+          payload: true,
+          variableType: 'boolean',
+        },
       },
     },
   }

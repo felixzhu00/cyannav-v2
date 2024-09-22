@@ -241,6 +241,10 @@ export default function EditToolbar({ className }: { className: string }) {
             payload: currentMode,
             variableType: 'string',
           },
+          trash: {
+            payload: true,
+            variableType: 'boolean',
+          },
         },
       },
     }

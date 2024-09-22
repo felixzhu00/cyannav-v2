@@ -34,6 +34,8 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
     geojson: decodedGeoJSON,
   }
 
+  console.log(decodedGeoJSON)
+
   // Jotai Setters
   const setCurrLayer = useSetAtom(currLayerAtom)
   const updateMapByNewFeature = useSetAtom(updateMapByNewFeatureAtom)

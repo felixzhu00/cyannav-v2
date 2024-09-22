@@ -432,7 +432,6 @@ export function addBoundingBoxLayer(
 ) {
   if (!mapRef) return
 
-  console.log('boundingboxgenerated')
   // 1. Calculate bounding box using Turf
   const bbox = calculatePaddedBBox(feature, padding) // [minX, minY, maxX, maxY]
 

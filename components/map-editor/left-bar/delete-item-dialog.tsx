@@ -11,16 +11,13 @@ import {
 import { toast } from '@/components/ui/use-toast'
 import {
   attachedHandlersAtom,
-  currLayerAtom,
   mapAtom,
   mapLibreAtom,
   setMapFieldAtom,
 } from '@/lib/jotai'
 import { unrenderFeatureLayer } from '@/lib/maplibre-actions/map-render-layers'
 import {
-  decodeGeo,
-  editFeatureSelf,
-  editGeoShared,
+  // decodeGeo,
   encodeGeo,
 } from '@/lib/utils'
 import { useAtomValue, useSetAtom } from 'jotai'
@@ -53,6 +50,9 @@ export default function DeleteItemDialog({
       features: filteredFeatures,
     }
 
+    // Optimistic Update
+    setMapField({ field: 'geojson', value: filteredGeoJSON }) // Update the global title state
+
     // Encode geoJSON
     const encodedGeoJSON = encodeGeo(filteredGeoJSON)
 
@@ -66,21 +66,24 @@ export default function DeleteItemDialog({
         body: JSON.stringify({ geojson: encodedGeoJSON }),
       })
 
-      const result = await response.json()
+      // const result = await response.json()
 
-      toast({
-        description: result.message,
-      })
+      // toast({
+      //   description: result.message,
+      // })
 
       if (response.ok) {
-        const decodedGeo = decodeGeo(result.payload.geojson)
-        setMapField({ field: 'geojson', value: decodedGeo }) // Update the global title state
+        // const decodedGeo = decodeGeo(result.payload.geojson)
+        // setMapField({ field: 'geojson', value: decodedGeo }) // Update the global title state
 
         // Remove from MapLibre
         if (!mapRef) return
         unrenderFeatureLayer(mapRef, featureId, handlerRef)
       }
     } catch (error) {
+      // Reverse Optimistic if Error
+      setMapField({ field: 'geojson', value: map.geojson })
+
       toast({
         description: 'An error occurred while updating the geojson',
       })

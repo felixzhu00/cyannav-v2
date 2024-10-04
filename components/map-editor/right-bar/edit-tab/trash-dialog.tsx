@@ -11,7 +11,7 @@ import {
 import { toast } from '@/components/ui/use-toast'
 import { currLayerAtom, mapAtom, setMapFieldAtom } from '@/lib/jotai'
 import {
-  decodeGeo,
+  // decodeGeo,
   editFeatureSelf,
   editGeoShared,
   encodeGeo,
@@ -46,6 +46,9 @@ export default function TrashDialog({
       newGeo = editGeoShared(map.geojson, variableName, '', 'remove')
     }
 
+    // Optimistic Update
+    setMapField({ field: 'geojson', value: newGeo })
+
     // Encode geoJSON
     const encodedGeoJSON = encodeGeo(newGeo)
 
@@ -59,17 +62,20 @@ export default function TrashDialog({
         body: JSON.stringify({ geojson: encodedGeoJSON }),
       })
 
-      const result = await response.json()
+      // const result = await response.json()
 
-      toast({
-        description: result.message,
-      })
+      // toast({
+      //   description: result.message,
+      // })
 
       if (response.ok) {
-        const decodedGeo = decodeGeo(result.payload.geojson)
-        setMapField({ field: 'geojson', value: decodedGeo }) // Update the global title state
+        // const decodedGeo = decodeGeo(result.payload.geojson)
+        // setMapField({ field: 'geojson', value: decodedGeo })
       }
     } catch (error) {
+      // Reverse Optimistic if Error
+      setMapField({ field: 'geojson', value: map.geojson })
+
       toast({
         description: 'An error occurred while updating the geojson',
       })

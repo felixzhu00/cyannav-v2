@@ -10,7 +10,9 @@ import {
   setSelectedLayerStyleAtom,
   setToggleFeatureStateAtom,
 } from '@/lib/jotai'
-import { cn, decodeGeo, editFeatureSelf, encodeGeo } from '@/lib/utils'
+import { cn, 
+  // decodeGeo,
+   editFeatureSelf, encodeGeo } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
 import DeleteItemDialog from './delete-item-dialog'
 
@@ -82,7 +84,8 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
     )
 
     // Optimisic update
-    // setMapField({ field: 'geojson', value: newGeo })
+    setMapField({ field: 'geojson', value: newGeo })
+    setToggleFeatureState(id, property, changeValue, draw)
 
     // Encode geoJSON
     const encodedGeoJSON = encodeGeo(newGeo)
@@ -97,19 +100,22 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
         body: JSON.stringify({ geojson: encodedGeoJSON }),
       })
 
-      const result = await response.json()
+      // const result = await response.json()
 
-      toast({
-        description: result.message,
-      })
+      // toast({
+      //   description: result.message,
+      // })
 
       if (response.ok) {
-        const decodedGeo = decodeGeo(result.payload.geojson)
-
-        setMapField({ field: 'geojson', value: decodedGeo }) // Update the global title state
-        setToggleFeatureState(id, property, changeValue, draw)
+        // const decodedGeo = decodeGeo(result.payload.geojson)
+        // // setMapField({ field: 'geojson', value: decodedGeo }) // Update the global title state
+        // setToggleFeatureState(id, property, changeValue, draw)
       }
     } catch (error) {
+      // Reverse Optimistic if Error
+      setMapField({ field: 'geojson', value: map.geojson })
+      setToggleFeatureState(id, property, changeValue, draw)
+
       toast({
         description: 'An error occurred while updating the geojson',
       })

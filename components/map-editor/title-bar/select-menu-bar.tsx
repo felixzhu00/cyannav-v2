@@ -62,7 +62,7 @@ export default function SelectMenuBar({
         {/* Render the currently selected menu item as the trigger */}
         <MenubarTrigger
           onClick={() => {
-            if (!isActive) handleChangeMode(currSelectedIndex.current)
+            if (!isActive && !isFile) handleChangeMode(currSelectedIndex.current)
           }}
         >
           {currMenuItem.icon}
@@ -78,7 +78,6 @@ export default function SelectMenuBar({
                 <React.Fragment key={item.label + index.toString()}>
                   <MenubarItem
                     onClick={() => {
-                      if (item.onClick) item.onClick()
                       // Set the selected menu item on click and run the provided onClick
                       if (!isFile) handleChangeMode(index) // Preventing default if you are chooseing Content
                     }}

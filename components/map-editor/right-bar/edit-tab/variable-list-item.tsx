@@ -39,7 +39,6 @@ export default function VariableListItem({
   hasTrash,
   draw,
   selectOptions = [],
-  byFeature = '',
 }: {
   inputObject: { [key: string]: any }
   listName: string
@@ -49,7 +48,6 @@ export default function VariableListItem({
   hasTrash: boolean
   draw: string
   selectOptions?: string[]
-  byFeature?: string
 }) {
   // TODO add Toast when input not valid onBlur
   // Jotai
@@ -73,6 +71,9 @@ export default function VariableListItem({
   // console.log(inputObject)
   // console.log(varKey, varValue, varType)
 
+  // Init: MapLibre get from geojson
+  // J
+
   // console.log(mapGeo.features.find((feature) => feature.id === currLayerId))
   // Updates Jotai Atom and Backend
   const updateVariable = async (payload: string | number | boolean) => {
@@ -95,9 +96,16 @@ export default function VariableListItem({
   // Updates MapLibre ref
   const handleInputChange = (value: string | number | boolean) => {
     setInputValue(value)
+
+    // If invalid value
+    if (!value && value !== 0) return
+    // Check if value in range
+    if (typeof value === 'number') {
+      if (value < propValue.range[0] || value > propValue.range[1]) return
+    }
+
     // Ignore maplibre style change if is name
     if (varKey === 'name') return
-
     // Check if valid color
     if (
       varType === 'color' &&
@@ -110,7 +118,7 @@ export default function VariableListItem({
 
     // Get the feature of with currLayerId
     const feature = mapGeo.features.find(
-      (feature) => feature.id === currLayerId
+      (oneFeature) => oneFeature.id === currLayerId
     ) as CustomFeature
 
     // Convert feature into Feature collection
@@ -183,7 +191,7 @@ export default function VariableListItem({
           placeholder={varKey}
           className="flex-1"
           onChange={(e) => handleInputChange(e.target.value)}
-          value={inputValue as string}
+          value={(inputValue as string) || ''}
           onBlur={handleBlur} // Blur handling
         />
       )
@@ -196,7 +204,7 @@ export default function VariableListItem({
           placeholder="111111"
           className="text-sm"
           step={propValue?.step || '1'}
-          value={inputValue as number}
+          value={(inputValue as number) || 0}
           onChange={(e) => handleInputChange(parseFloat(e.target.value))}
           onBlur={handleBlur} // Blur handling
         />
@@ -209,13 +217,13 @@ export default function VariableListItem({
             id="value"
             placeholder="#FFFFFF"
             className="text-sm"
-            value={inputValue as string}
+            value={(inputValue as string) || ''}
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={handleBlur} // Blur handling
           />
           <ColorPicker
             className="aspect-square"
-            value={inputValue as string}
+            value={(inputValue as string) || ''}
             onChange={handleInputChange}
             setIsBlurred={handleBlur}
           />
@@ -224,7 +232,10 @@ export default function VariableListItem({
     }
     if (varType === 'select' && selectOptions) {
       return (
-        <Select value={inputValue as string} onValueChange={setInputValue}>
+        <Select
+          value={(inputValue as string) || ''}
+          onValueChange={setInputValue}
+        >
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>

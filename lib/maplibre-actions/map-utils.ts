@@ -63,15 +63,13 @@ export function editLayerStyle(
       layerMap[featureType][key] === 'layout'
     ) {
       mapRef.setLayoutProperty(layerId, key, value)
+    } else if (
+      key in layerMap[featureType] &&
+      layerMap[featureType][key] === 'change-icon-color'
+    ) {
+      updateIconColor(mapRef, featureId, mapPin, value as string)
     } else {
-      if (
-        key in layerMap[featureType] &&
-        layerMap[featureType][key] === 'change-icon-color'
-      ) {
-        updateIconColor(mapRef, featureId, mapPin, value as string)
-      } else {
-        mapRef.setPaintProperty(layerId, key, value)
-      }
+      mapRef.setPaintProperty(layerId, key, value)
     }
   } else {
     if (!mapRef) return
@@ -149,8 +147,6 @@ export function toggleFeatureVisibility(
   if (!mapRef) return
 
   const visibility = visible ? 'visible' : 'none'
-
-  // console.log("asdas",featureId, "asd",featureType, drawToLayerType,infill.includes(featureType),visibility)
 
   if (!infill.includes(featureType)) {
     const layerId = `${featureId}-${drawToLayerType[featureType]}`

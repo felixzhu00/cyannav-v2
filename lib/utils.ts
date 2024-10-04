@@ -122,6 +122,7 @@ export function convertToCustomFeatureCollection(
               _lock: false,
             },
           },
+          id: ''
         },
       ],
       _shared: new Map<string, string | number>(),
@@ -143,6 +144,7 @@ export function convertToCustomFeatureCollection(
             lock: false,
           },
         },
+        id: ''
       },
     ],
     _shared: new Map<string, string | number>(),

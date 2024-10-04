@@ -1,4 +1,4 @@
-import { ChevronDown, CirclePlus, List } from 'lucide-react'
+import { ChevronDown, CirclePlus } from 'lucide-react'
 import { useState } from 'react'
 import {
   Popover,
@@ -58,12 +58,12 @@ export default function VariableToolBar() {
       {selectedOption && (
         <VariableDialog type={selectedOption} onClose={handleDialogClose} />
       )}
-      <Button
+      {/* <Button
         variant="secondary"
         className="flex flex-row items-center space-x-2 px-3"
       >
         <List className="h-5 w-5" />
-      </Button>
+      </Button> */}
     </div>
   )
 }

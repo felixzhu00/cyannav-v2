@@ -169,7 +169,7 @@ export function populateIcon(feature: Feature<Geometry, GeoJsonProperties>) {
           ? featureRenderValues['icon-color']
           : {
               ...width,
-              payload: '#000000',
+              payload: '#FFFFFF',
               variableType: 'color',
             },
       },

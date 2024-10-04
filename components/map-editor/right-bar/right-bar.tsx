@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import EditTab from './edit-tab/edit-tab'
-import CommentTab from './chat-tab/comment-tab'
+// import CommentTab from './chat-tab/comment-tab'
 
 export default function RightBar() {
   return (
@@ -12,9 +12,9 @@ export default function RightBar() {
         <TabsTrigger className="flex-1" value="edit">
           Edit
         </TabsTrigger>
-        <TabsTrigger className="flex-1" value="comment">
+        {/* <TabsTrigger className="flex-1" value="comment">
           Chat
-        </TabsTrigger>
+        </TabsTrigger> */}
       </TabsList>
       <TabsContent
         value="edit"
@@ -22,12 +22,13 @@ export default function RightBar() {
       >
         <EditTab />
       </TabsContent>
+{/* 
       <TabsContent
         value="comment"
         className="h-full max-h-[calc(100vh-122px)] overflow-y-auto"
       >
         <CommentTab />
-      </TabsContent>
+      </TabsContent> */}
     </Tabs>
   )
 }

@@ -128,7 +128,14 @@ export default function VariableList({
   }
 
   // Filter out variable user should not be able to edit
-  const privateVariablesLocal = ['id', 'visible', 'lock', 'draw']
+  const privateVariablesLocal = [
+    'id',
+    'visible',
+    'lock',
+    'draw',
+    'trash',
+    'radius',
+  ]
   const privateVariablesGlobal = ['mode']
 
   // Render logic for empty, local and global

@@ -67,20 +67,18 @@ export const setSelectedLayerStyleAtom = atom(
     const sourceId = `${featureId}-bbox`
     const featureIdToCheck = `${featureId}-bbox-polygon`
 
-    console.log('source', sourceId)
-
     if (!mapRef) return // Exit if map reference is not available
 
     // Error checking
     if (!mapRef.getSource(sourceId)) {
-      console.log('source does not exist: ', sourceId) // Keep this log because there might be a bug
+      // console.log('source does not exist: ', sourceId) // Keep this log because there might be a bug
     }
 
     const features = mapRef.querySourceFeatures(sourceId, {
       filter: ['==', ['id'], featureIdToCheck], // Check by feature ID
     })
     if (!features) {
-      console.log('layerId does not exist: ', featureIdToCheck) // Keep this log because there might be a bug
+      // console.log('layerId does not exist: ', featureIdToCheck) // Keep this log because there might be a bug
     }
 
     //

@@ -1,4 +1,3 @@
-import React, { useRef, useState } from 'react'
 import { Eye, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAtomValue, useSetAtom } from 'jotai'

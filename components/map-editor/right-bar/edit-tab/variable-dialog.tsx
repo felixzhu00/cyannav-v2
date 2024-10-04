@@ -31,7 +31,6 @@ import {
   SelectGroup,
   SelectItem,
 } from '@/components/ui/select'
-import NumberInput from '@/components/ui/number-input'
 
 export default function VariableDialog({
   type,
@@ -51,7 +50,6 @@ export default function VariableDialog({
 
   const map = useAtomValue(mapAtom)
 
-  console.log(selectedValue, variableName, variableType, variableValue)
   // Handle changes in input fields
   const handleVariableNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVariableName(e.target.value)

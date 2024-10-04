@@ -5,12 +5,11 @@ import {
   mapAtom,
   mapDrawAtom,
   mapLibreAtom,
-  mapSourceAtom,
   updateMapByNewFeatureAtom,
 } from '@/lib/jotai'
 import { Menubar } from '@/components/ui/menubar'
 import { cn } from '@/lib/utils'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import {
   MousePointer,
   Circle,
@@ -19,13 +18,9 @@ import {
   Type,
   MapPin,
   File,
-  Ruler,
-  Pencil,
   Pentagon,
   Dot,
   Image as ImageIcon,
-  MapPinPlus,
-  GitFork,
   Download,
   RectangleHorizontal,
   Move,
@@ -39,84 +34,29 @@ import {
 } from '@/core/_entities/types/map.types'
 import { renderCollection } from '@/lib/maplibre-actions/map-render-layers'
 import { populateDefault } from '@/lib/maplibre-actions/map-utils'
+import { menu } from '@/lib/maplibre-actions/map-var-const'
 
-const menu = [
-  [
-    {
-      label: 'Cursor',
-      icon: <MousePointer className="h-5 w-5" />,
-      draw: 'select',
-    },
-    {
-      label: 'Move',
-      icon: <Move className="h-5 w-5" />,
-      draw: 'simple_select', // TODO
-    },
-    // {
-    //   label: 'Measure',
-    //   icon: <Ruler className="h-5 w-5" />,
-    //   draw: undefined, // TODO
-    // },
-  ],
-  [
-    {
-      label: 'Text',
-      icon: <Type className="h-5 w-5" />,
-      draw: 'text', // TODO
-    },
-    // {
-    //   label: 'Draw',
-    //   icon: <Pencil className="h-5 w-5" />,
-    //   draw: undefined,
-    // },
-  ],
-  [
-    {
-      label: 'Line',
-      icon: <Minus className="-rotate-45 scale-x-125 scale-y-100 transform" />,
-      draw: 'draw_line_string',
-    },
-    {
-      label: 'Spline',
-      icon: <Spline className="h-5 w-5" />,
-      draw: 'draw_bezier_curve',
-    },
-  ],
-  [
-    {
-      label: 'Rectangle',
-      icon: <RectangleHorizontal className="h-5 w-5" />,
-      draw: 'draw_rectangle',
-    },
-    {
-      label: 'Circle',
-      icon: <Circle className="h-5 w-5" />,
-      draw: 'draw_circle',
-    },
-    {
-      label: 'Polygon',
-      icon: <Pentagon className="h-5 w-5" />,
-      draw: 'draw_polygon',
-    },
-  ],
-  [
-    {
-      label: 'Marker',
-      icon: <MapPin className="h-5 w-5" />,
-      draw: 'marker', // TODO
-    },
-    // {
-    //   label: 'Custom Marker',
-    //   icon: <MapPinPlus className="h-5 w-5" />,
-    //   draw: 'custom_marker', // TODO
-    // },
-    {
-      label: 'Point',
-      icon: <Dot className="h-5 w-5" />,
-      draw: 'draw_point',
-    },
-  ],
-]
+const icons = {
+  Cursor: <MousePointer className="h-5 w-5" />,
+  Move: <Move className="h-5 w-5" />,
+  Text: <Type className="h-5 w-5" />,
+  Line: <Minus className="-rotate-45 scale-x-125 scale-y-100 transform" />,
+  Spline: <Spline className="h-5 w-5" />,
+  Rectangle: <RectangleHorizontal className="h-5 w-5" />,
+  Circle: <Circle className="h-5 w-5" />,
+  Polygon: <Pentagon className="h-5 w-5" />,
+  Marker: <MapPin className="h-5 w-5" />,
+  Point: <Dot className="h-5 w-5" />,
+  // Add custom markers if needed
+  // CustomMarker: <MapPinPlus className="h-5 w-5" />,
+}
+
+const menuWithIcons = menu.map((group) =>
+  group.map((item) => ({
+    ...item,
+    icon: icons[item.label as keyof typeof icons], // Use type assertion
+  }))
+)
 
 export default function EditToolbar({ className }: { className: string }) {
   // TODO add tooltip for each menuCol
@@ -184,12 +124,12 @@ export default function EditToolbar({ className }: { className: string }) {
       draw: undefined,
       onClick: handleExport,
     },
-    {
-      label: 'Fork',
-      icon: <GitFork className="h-5 w-5" />,
-      draw: undefined,
-      onClick: () => {},
-    },
+    // {
+    //   label: 'Fork',
+    //   icon: <GitFork className="h-5 w-5" />,
+    //   draw: undefined,
+    //   onClick: () => {},
+    // },
     {
       label: 'Download PNG',
       icon: <ImageIcon className="h-5 w-5" />,
@@ -204,7 +144,9 @@ export default function EditToolbar({ className }: { className: string }) {
   // Handle the map click event
   const handleMapClick = (e: maplibregl.MapMouseEvent) => {
     const current =
-      menu[currSelectedMode.menuColIndex][currSelectedMode.menuItemIndex]
+      menuWithIcons[currSelectedMode.menuColIndex][
+        currSelectedMode.menuItemIndex
+      ]
 
     // Destructure draw string
     const currentMode = current.draw
@@ -267,7 +209,9 @@ export default function EditToolbar({ className }: { className: string }) {
     if (drawRef && mapRef) {
       // Get the current element from matrix
       const current =
-        menu[currSelectedMode.menuColIndex][currSelectedMode.menuItemIndex]
+        menuWithIcons[currSelectedMode.menuColIndex][
+          currSelectedMode.menuItemIndex
+        ]
 
       // Destructure draw string
       const currentDraw = current.draw
@@ -311,7 +255,7 @@ export default function EditToolbar({ className }: { className: string }) {
           isFile
         />
         {/* Menu Columns */}
-        {menu.map((menuCol, index) => (
+        {menuWithIcons.map((menuCol, index) => (
           <SelectMenuBar
             key={menuCol[0].label}
             items={menuCol}

@@ -21,6 +21,7 @@ import {
   handleCreate,
   handleSelectionChange,
 } from '@/lib/maplibre-actions/map-apply-handler'
+import DescriptionBox from './description-box'
 
 export default function MapEditPage({ initialMap }: { initialMap: any }) {
   // Decode the GeoJson from REST API
@@ -33,8 +34,6 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
     ...initialMap,
     geojson: decodedGeoJSON,
   }
-
-  console.log(decodedGeoJSON)
 
   // Jotai Setters
   const setCurrLayer = useSetAtom(currLayerAtom)
@@ -95,11 +94,12 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
 
           <ResizablePanel defaultSize={60}>
             <div
-              className="flex h-full max-h-[calc(100vh-74px)] flex-grow justify-center border-x-2 border-zinc-700"
+              className="relative flex h-full max-h-[calc(100vh-74px)] flex-grow justify-center border-x-2 border-zinc-700"
               ref={mapContainer}
               id="map-container"
             >
               {/* Your main content goes here */}
+              <DescriptionBox />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />

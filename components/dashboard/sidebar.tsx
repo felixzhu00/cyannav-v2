@@ -43,7 +43,7 @@ export default function DashboardSidebar({
   return (
     <div className="min-h-screen">
       <div className="z-40 mb-20 inline-block h-full max-w-xs bg-zinc-100">
-        <div className="h-full space-y-8 px-6 pt-12">
+        <div className="h-full space-y-8 px-12 pt-12">
           <div className="flex flex-col justify-center space-y-8">
             <Link
               href="/dashboard?view=recent-maps"

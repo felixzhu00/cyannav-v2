@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import Header from '@/components/landing/header'
-import Footer from '@/components/landing/footer'
+import Header from '@/components/header/header'
+import Footer from '@/components/footer/footer'
 import { Toaster } from '@/components/ui/toaster'
 import { headers } from 'next/headers'
 // import ThemeToggle from '@/components/theme-toggle';

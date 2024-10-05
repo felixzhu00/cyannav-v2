@@ -16,3 +16,12 @@ export interface IMessage {
   dateCreated?: Date
 }
 export interface IMessageDocument extends IMessage, Document {}
+
+export interface MessageFields{
+  _id: string
+  author: string
+  text: string
+  emojis?: IEmoji[]
+  replyTo?: Types.ObjectId // Array of Message references
+  dateCreated?: Date
+}

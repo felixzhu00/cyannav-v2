@@ -1,11 +1,9 @@
 'use client'
 
 import { useHydrateAtoms } from 'jotai/utils'
-import { mapAtom } from '@/lib/jotai'
-import Choropleth from '../templates/Choropleth'
+import { currLayerAtom, mapAtom, updateMapByNewFeatureAtom } from '@/lib/jotai'
 import LeftSidebar from '@/components/map-editor/left-bar/left-sidebar'
-import RightSideBar from '@/components/map-editor/right-bar/right-sidebar'
-import { MapSchemaDecodedType } from '@/lib/types'
+import RightBar from '@/components/map-editor/right-bar/right-bar'
 
 import {
   ResizableHandle,
@@ -13,17 +11,79 @@ import {
   ResizablePanelGroup,
 } from '@/components/ui/resizable'
 import MenuBar from './title-bar/menubar'
+import { decodeGeo } from '@/lib/utils'
+import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
+import { useMapLibre } from '@/lib/hooks/use-maplibre'
+import { useSetAtom } from 'jotai'
 
-export default function MapEditPage({
-  initialMap,
-}: {
-  initialMap: MapSchemaDecodedType
-}) {
-  useHydrateAtoms([[mapAtom, initialMap]])
+import { renderCollection } from '@/lib/maplibre-actions/map-render-layers'
+import {
+  handleCreate,
+  handleSelectionChange,
+} from '@/lib/maplibre-actions/map-apply-handler'
+import DescriptionBox from './description-box'
+
+export default function MapEditPage({ initialMap }: { initialMap: any }) {
+  // Decode the GeoJson from REST API
+  const decodedGeoJSON = decodeGeo(
+    initialMap.geojson
+  ) as CustomFeatureCollection
+
+  // Decode the initial map data
+  const decodedMap = {
+    ...initialMap,
+    geojson: decodedGeoJSON,
+  }
+
+  // Jotai Setters
+  const setCurrLayer = useSetAtom(currLayerAtom)
+  const updateMapByNewFeature = useSetAtom(updateMapByNewFeatureAtom)
+
+  useHydrateAtoms([[mapAtom, decodedMap]]) // Hydrate Jotai map atom
+
+  // Use the custom useMapLibre hook
+  const { mapContainer } = useMapLibre({
+    styleUrl: 'https://demotiles.maplibre.org/style.json',
+    onMapLoad: (mapRef, drawRef, handler) => {
+      // Ran when both MapRef and DrawRef has both loaded
+      // Render the Initial Geojson File from server
+
+      renderCollection(
+        mapRef,
+        drawRef,
+        handler,
+        setCurrLayer,
+        decodedMap.geojson
+      )
+
+      // Initialize event listener for when a map-gl-draw create a shape
+      mapRef.on('draw.create', (event) => {
+        handleCreate(
+          event,
+          mapRef,
+          drawRef,
+          handler,
+          setCurrLayer,
+          updateMapByNewFeature
+        )
+      })
+
+      // Initialize event listener for when a map-gl-draw selects a shape
+      mapRef.on('draw.selectionchange', (event) => {
+        handleSelectionChange(
+          event,
+          mapRef,
+          drawRef,
+          handler,
+          setCurrLayer,
+          updateMapByNewFeature
+        )
+      })
+    },
+  })
 
   return (
     <div className="flex h-screen w-full flex-col">
-      {/* Fixed Top MenuBar */}
       <MenuBar />
       <div className="flex h-screen justify-between">
         <ResizablePanelGroup direction="horizontal">
@@ -32,16 +92,19 @@ export default function MapEditPage({
           </ResizablePanel>
           <ResizableHandle withHandle />
 
-          {/* Main Content */}
           <ResizablePanel defaultSize={60}>
-            <div className="flex h-full max-h-[calc(100vh-74px)] flex-grow justify-center border-x-2 border-zinc-700">
+            <div
+              className="relative flex h-full max-h-[calc(100vh-74px)] flex-grow justify-center border-x-2 border-zinc-700"
+              ref={mapContainer}
+              id="map-container"
+            >
               {/* Your main content goes here */}
-              {/* <Choropleth/> */}
+              <DescriptionBox />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={20}>
-            <RightSideBar/>
+            <RightBar />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

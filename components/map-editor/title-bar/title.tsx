@@ -54,17 +54,12 @@ export default function Title() {
 
         const result = await response.json()
 
+        toast({
+          description: result.message,
+        })
+
         if (response.ok) {
-          setTitleText(titleText) // Update the title state
-          // Optumistic update
-          setMapField({ field: 'title', value: titleText })
-          toast({
-            description: 'Title updated successfully',
-          })
-        } else {
-          toast({
-            description: result.error || 'Failed to update title',
-          })
+          setMapField({ field: 'title', value: result.payload.title }) // Update the global title state
         }
       } catch (error) {
         toast({

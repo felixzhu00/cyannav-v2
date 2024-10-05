@@ -5,7 +5,7 @@ import {
   Image as ImageIcon,
   Smile,
 } from 'lucide-react'
-import { Input } from '../../ui/input'
+import { Input } from '../../../ui/input'
 
 export default function CommentInput() {
   const [isFocused, setIsFocused] = useState(false)

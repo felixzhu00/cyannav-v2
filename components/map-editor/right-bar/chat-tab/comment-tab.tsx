@@ -1,10 +1,10 @@
 import CommentInput from './comment-input'
 import Comment from './comment'
-import { useAtom } from 'jotai'
+import { useAtomValue } from 'jotai'
 import { mapAtom } from '@/lib/jotai'
 
 export default function CommentTab() {
-  const [map] = useAtom(mapAtom)
+  const map = useAtomValue(mapAtom)
 
   const messageList = map.messages
 
@@ -18,14 +18,15 @@ export default function CommentTab() {
   return (
     <div className="flex-col justify-between">
       <div>
-        {messageList?.map((message) => (
-          <Comment
-            key={message?._id}
-            message={message.text}
-            user={message.author}
-            time={message.dateCreated}
-          />
-        ))}
+        {messageList.length !== 0 &&
+          messageList.map((message, index) => (
+            <Comment
+              key={message._id + index.toString()}
+              message={message.text}
+              user={message.author}
+              time={message.dateCreated || new Date()}
+            />
+          ))}
       </div>
       <CommentInput />
     </div>

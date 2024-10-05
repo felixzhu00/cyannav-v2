@@ -1,44 +1,49 @@
-import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { MapFields } from '@/core/_entities/types/map.types'
+import { IMapDocument, MapFields } from '@/core/_entities/types/map.types'
 import { updateMapFieldsById } from '@/core/data-access/map/update-map.persistence'
+import { APIResponse } from '@/core/_entities/types/api.types'
+import { createErrorResponse } from '@/lib/utils'
 
 export async function updateMapFieldsUseCase(
   id: string,
   updateFields: MapFields
-) {
-  try {
-    // Check if valid id is passed
-    if (!id) {
-      return NextResponse.json(
-        {
-          errors: { id: ['Invalid ID'] },
-          message: 'Invalid ID',
-        },
-        { status: 400 }
-      )
-    }
+): Promise<APIResponse> {
+  // Check if valid id is passed
+  if (!id) {
+    return createErrorResponse(
+      400,
+      'Invalid Map ID',
+      'Map ID can not be null, undefined, or empty string'
+    )
+  }
+  if (!updateFields) {
+    return createErrorResponse(
+      400,
+      'Invalid Update Map Field(s)',
+      'Map Field(s) can not be null, undefined, or empty key-value pair(s)'
+    )
+  }
 
-    // Update Map object in DB
-    const updatedMap = await updateMapFieldsById(id, updateFields)
+  // Update Map object in DB
+  const dbRes = await updateMapFieldsById(id, updateFields)
 
-    // If not valid Map found in DB
-    if (!updatedMap) {
-      return NextResponse.json({ error: 'Map not found' }, { status: 404 })
-    }
+  // Check DB request errored
+  if ('error' in dbRes) {
+    return dbRes
+  }
 
-    // Revalidate the specific path after the map is updated
-    revalidatePath(`/map/${id}`)
+  // map should be IMapDocument
+  const updatedMap = dbRes.payload as IMapDocument
 
-    // Return success
-    return NextResponse.json({
-      message: 'Map updated successfully',
-      map: updatedMap,
-    })
-  } catch (error) {
-    // Log error on console for dev debug
-    console.error(error)
-    // Send generic response for user API calls
-    return NextResponse.json({ error: 'Failed to update map' }, { status: 500 })
+  // Revalidate the specific path after the map is updated
+  revalidatePath(`/map/${id}`)
+
+  // Get Keys of param
+  const keys = Object.keys(updateFields)
+
+  return {
+    status: 200,
+    message: `Map ${keys.length === 1 ? keys[0] : keys} updated successfully`,
+    payload: updatedMap,
   }
 }

@@ -95,13 +95,13 @@ export default function DeleteItemDialog({
       <DialogTrigger asChild disabled={!hasTrash}>
         <Button
           variant="ghost"
-          className={`px-3 ${!hasTrash ? 'cursor-not-allowed' : ''}`} // Add a not-allowed cursor when disabled
+          className={`flex-shrink aspect-square px-3 ${!hasTrash ? 'cursor-not-allowed' : ''}`} // Add a not-allowed cursor when disabled
           onClick={(e) => {
             e.stopPropagation()
           }}
         >
           <Minus
-            className={`h-4 w-4 ${hasTrash ? 'text-red-500' : 'text-gray-300'}`}
+            className={`w-full h-full ${hasTrash ? 'text-red-500' : 'text-gray-300'}`}
           />
         </Button>
       </DialogTrigger>

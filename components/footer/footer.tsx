@@ -52,13 +52,13 @@ export default function Footer() {
       <div className="flex flex-row justify-between">
         {/* Footer Intro */}
         <div className="flex flex-col space-y-5">
-          <Image
+          {/* <Image
             src={theme === 'dark' ? logo_white : logo_black}
             alt="Logo"
             width={129}
             height={65}
             priority
-          />
+          /> */}
           <p className="text-sm font-medium">
             Create and design stunning maps to share with others.
           </p>

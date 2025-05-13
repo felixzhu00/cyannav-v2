@@ -87,7 +87,7 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
       <MenuBar />
       <div className="flex h-screen justify-between">
         <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel className="min-w-[134px]" defaultSize={20}>
+          <ResizablePanel className="min-w-[160px]" defaultSize={20}>
             <LeftSidebar />
           </ResizablePanel>
           <ResizableHandle withHandle />

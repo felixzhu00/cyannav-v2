@@ -73,6 +73,7 @@ export default function EditToolbar({ className }: { className: string }) {
 
   // Download canvas
   const handlePNG = () => {
+    console.log("clickerd")
     if (mapRef) {
       const imgData = mapRef.getCanvas().toDataURL('image/png')
 
@@ -245,7 +246,7 @@ export default function EditToolbar({ className }: { className: string }) {
   }, [currSelectedMode, drawRef, mapRef])
 
   return (
-    <div className={cn('h-full flex-1', className)}>
+    <div className={cn('h-full', className)}>
       <Menubar className="inline-flex h-full space-x-0 border-0 bg-transparent p-0 dark:bg-transparent">
         {/* File Option : using SelectMenuBar just for identical styling */}
         <SelectMenuBar

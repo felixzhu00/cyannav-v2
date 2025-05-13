@@ -13,7 +13,10 @@ import { useAtom } from 'jotai'
 interface MenuItem {
   label: string
   icon: React.ReactNode
+  onClick?: () => void;
+
 }
+
 
 interface SelectMenuBarProps {
   items: MenuItem[]
@@ -43,10 +46,9 @@ export default function SelectMenuBar({
   const currMenuItem = items[currSelectedIndex.current]
 
   const triggerStyle = () =>
-    `flex flex-row items-center aspect-square h-full justify-center ${
-      isActive
-        ? 'bg-blue-800 dark:bg-blue-800 hover:bg-blue-800 dark:hover:bg-blue-800'
-        : 'bg-transparent dark:bg-transparent hover:bg-zinc-700 dark:hover:bg-zinc-700'
+    `flex flex-row items-center aspect-square h-full justify-center ${isActive
+      ? 'bg-blue-800 dark:bg-blue-800 hover:bg-blue-800 dark:hover:bg-blue-800'
+      : 'bg-transparent dark:bg-transparent hover:bg-zinc-700 dark:hover:bg-zinc-700'
     }`
 
   const handleChangeMode = (currentIndex: number) => {
@@ -80,6 +82,7 @@ export default function SelectMenuBar({
                     onClick={() => {
                       // Set the selected menu item on click and run the provided onClick
                       if (!isFile) handleChangeMode(index) // Preventing default if you are chooseing Content
+                      if (item.onClick) item.onClick()
                     }}
                     className="flex-row gap-2"
                   >

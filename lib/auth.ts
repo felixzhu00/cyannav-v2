@@ -29,6 +29,9 @@ async function fetchImageAsBuffer(url: string): Promise<Buffer> {
 
 const providers: Provider[] = [
   GitHub({
+    clientId: process.env.GITHUB_ID,
+    clientSecret: process.env.GITHUB_SECRET,
+    authorization: { params: { scope: 'read:user' } },
     profile: async (profile: GitHubProfile) => {
       const profilePictureBuffer = await fetchImageAsBuffer(profile.avatar_url)
       const user = {
@@ -42,6 +45,8 @@ const providers: Provider[] = [
     allowDangerousEmailAccountLinking: true,
   }),
   Google({
+    clientId: process.env.GOOGLE_ID,
+    clientSecret: process.env.GOOGLE_SECRET,
     profile: async (profile: GoogleProfile) => {
       const profilePictureBuffer = await fetchImageAsBuffer(profile.picture)
       const user = {

@@ -6,8 +6,10 @@ import crypto from 'crypto'
 import geobuf from 'geobuf'
 import { nanoid } from 'nanoid'
 import Pbf from 'pbf'
+import { readFile } from 'fs/promises';
 
-import geojsonData from './public/aus_state.geo.json' assert { type: 'json' }
+const file = await readFile('./public/aus_state.geo.json', 'utf-8');
+const geojsonData = JSON.parse(file);
 
 import mongoose from 'mongoose'
 const { Schema } = mongoose

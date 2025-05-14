@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { pricingModels } from '@/lib/const'
+import HeadingRow from './heading-row'
 
 interface PricingProps {
   title: string
@@ -18,7 +19,7 @@ const PricingCard: React.FC<PricingProps> = ({
   features,
 }) => {
   return (
-    <div className="flex w-full max-w-lg flex-col justify-between rounded-lg border p-6 text-center shadow-md">
+    <div className="flex flex-1 flex-col justify-between rounded-lg border p-6 text-center shadow-md">
       <div>
         <h2 className="text-lg font-semibold">{title}</h2>
         <p className="my-4 text-4xl font-bold">{price}</p>
@@ -44,12 +45,7 @@ export default function Pricing() {
 
   return (
     <section id="pricing" className="flex flex-col space-y-10">
-      <div className="space-between flex h-full w-full flex-row items-end">
-        <h1 className="flex-grow text-4xl font-bold">Pricing</h1>
-        <p className="text-2xl opacity-50">
-          From basic tools to advanced features.
-        </p>
-      </div>
+      <HeadingRow heading="Pricing" subheading="From basic tools to advanced features." />
       <div className="flex items-center justify-center space-x-2">
         <Label htmlFor="montly">Monthly</Label>
         <Switch
@@ -58,7 +54,7 @@ export default function Pricing() {
         />
         <Label htmlFor="annual">Annual</Label>
       </div>
-      <div className="flex h-full justify-center space-x-4">
+      <div className="flex h-full justify-center gap-4">
         {pricingModels.map((model, index) => (
           <PricingCard
             key={index}

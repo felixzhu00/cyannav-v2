@@ -11,16 +11,12 @@ import mapPlaceholder from '@/public/map_placeholder.png'
 import Image from 'next/image'
 import { Star, ThumbsUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import HeadingRow from './heading-row'
 
 export default function Community() {
   return (
     <section id="community" className="space-y-10">
-      <div className="space-between flex h-full w-full flex-row items-end">
-        <h1 className="flex-grow text-4xl font-bold">Popular Community Maps</h1>
-        <p className="text-2xl opacity-50">
-          View the most popular maps users created.
-        </p>
-      </div>
+      <HeadingRow heading='Popular Community Maps' subheading='View the most popular maps users created.' />
       <Carousel
         opts={{
           align: 'start',

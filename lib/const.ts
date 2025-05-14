@@ -231,9 +231,9 @@ export const pricingModels = [
     yearlyPrice: '$0/year',
     description: 'Forever free!',
     features: [
-      'Building an creating multiple maps and being able to save it to your file',
-      'Feature 2',
-      'Feature 3',
+      'Always Free',
+      'Share & View Maps',
+      'Basic Drawing Tools'
     ],
   },
   {
@@ -241,7 +241,9 @@ export const pricingModels = [
     monthlyPrice: '$9.99/month',
     yearlyPrice: '$99.99/year',
     description: 'Even more features for our pro users!',
-    features: ['Feature 1', 'Feature 2', 'Feature 3'],
+    features: ['Unlimited Map Storage',
+      'Access to Beta Features',
+      'Advanced Tools & Customization'],
   },
 ]
 

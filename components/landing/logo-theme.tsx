@@ -17,8 +17,8 @@ export default function LogoTheme() {
 
   const isDark = theme === 'dark'
   const logoSrc = isDark
-    ? '/logo-text-white.png'
-    : '/logo-text-black.png'
+    ? logo_white
+    : logo_black
 
 
   return (
@@ -26,9 +26,7 @@ export default function LogoTheme() {
       <Image
         src={logoSrc}
         alt="Logo"
-        width={157}
-        height={65}
-        className="object-contain"
+        className="object-contain w-[157px] h-[65px]"
         priority
       />
     </Link>

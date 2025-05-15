@@ -24,11 +24,11 @@ export default function RootLayout({
                 <SessionWrapper>
                     <ThemeProvider
                         attribute="class"
-                        defaultTheme="dark"
+                        defaultTheme="light"
                         enableSystem
                         disableTransitionOnChange
                     >
-                        <main className="flex-grow">{children}</main>
+                    <main className="flex-grow">{children}</main>
                     </ThemeProvider>
                 </SessionWrapper>
             </body>

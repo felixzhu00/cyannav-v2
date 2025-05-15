@@ -37,8 +37,3 @@ export default function Faq() {
     </section>
   )
 }
-//
-// Feature flex lok
-// princing max width
-// a spacer for header?
-// More margin x for page

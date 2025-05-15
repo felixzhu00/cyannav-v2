@@ -39,7 +39,6 @@ export default function Footer() {
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    const { email } = data
     toast({
       description: 'Thank you for subscribing to our newsletter.',
     })

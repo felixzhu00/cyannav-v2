@@ -14,7 +14,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="mb-24 flex w-full flex-col space-y-40 px-24 md:px-44 lg:px-75">
+    <main className="mb-24 flex w-full flex-col space-y-40 px-24 md:px-44 lg:px-75 xl:px-80">
       <Intro />
       <Features />
       <Community />

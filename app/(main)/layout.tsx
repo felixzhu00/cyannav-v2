@@ -1,5 +1,3 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import Header from '@/components/header/header'
 import Footer from '@/components/footer/footer'
 // import ThemeToggle from '@/components/theme-toggle';
@@ -13,8 +11,10 @@ export default function RootLayout({
 
 
   return (
-    <>          <Header />
+    <>
+      <Header />
       {children}
-      <Footer /></>
+      <Footer />
+    </>
   )
 }

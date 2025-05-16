@@ -129,12 +129,12 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
       <DeleteItemDialog featureName={name} featureId={id} hasTrash={hasTrash} />
       <div
         className={cn(
-          'gap-1 flex flex-1 min-w-0 items-center justify-between rounded-md border border-transparent px-2 py-0.5 hover:border-blue-500',
+          'gap-1 flex flex-1 min-w-0 items-center justify-between rounded-md border border-transparent px-2 py-0.5 hover:border-sidebar-primary',
           currLayer === id && 'border-white-500'
         )}
         onClick={handleLayerChange}
       >
-        <span className="flex-1 min-w-0 ml-2 overflow-hidden text-ellipsis whitespace-nowrap text-white">
+        <span className="flex-1 min-w-0 ml-2 overflow-hidden text-ellipsis whitespace-nowrap">
           {name}
         </span>
         <div className="flex-shrink min-w-0 items-center ">

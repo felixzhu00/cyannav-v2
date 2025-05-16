@@ -6,7 +6,7 @@ import Title from './title'
 
 export default function MenuBar() {
   return (
-    <div className="h-24 flex w-full items-center justify-between border-b-2 border-zinc-700 bg-zinc-900 text-white shadow min-h-0">
+    <div className="h-24 flex w-full items-center justify-between border-b-2 border-border bg-pf shadow min-h-0">
       <EditToolbar className="flex-1 flex-shrink-1" />
 
       {/* TODO display where fork from */}

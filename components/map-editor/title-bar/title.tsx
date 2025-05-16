@@ -70,7 +70,7 @@ export default function Title({ className }: { className: string }) {
     }
   }
   return (
-    <div className={cn("ml-4 flex flex-shrink items-center justify-center py-4 ", className)}>
+    <div className={cn("ml-4 flex flex-shrink items-center justify-center py-4 text-primary", className)}>
       {isEditingTitle ? (
         <Input
           ref={inputRef}
@@ -87,8 +87,8 @@ export default function Title({ className }: { className: string }) {
         </div>
       )}
 
-      <span className="mr-4 text-xl font-semibold text-zinc-400">/</span>
-      <span className="text-zinc-500">By {owner.username}</span>
+      <span className="mr-4 text-xl font-semibold text-muted-forground">/</span>
+      <span className="text-ring">By {owner.username}</span>
     </div>
   )
 }

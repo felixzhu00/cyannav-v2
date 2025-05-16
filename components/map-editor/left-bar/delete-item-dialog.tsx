@@ -101,7 +101,7 @@ export default function DeleteItemDialog({
           }}
         >
           <Minus
-            className={`w-full h-full ${hasTrash ? 'text-red-500' : 'text-gray-300'}`}
+            className={`w-full h-full ${hasTrash ? 'text-red-500' : ''}`}
           />
         </Button>
       </DialogTrigger>
@@ -116,8 +116,8 @@ export default function DeleteItemDialog({
             <DialogTitle>Delete Layer</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete{' '}
-              <span className="font-bold text-gray-100">{featureName}</span>{' '}
-              from <span className="font-bold text-gray-100">Map</span>
+              <span className="font-bold text-primary">{featureName}</span>{' '}
+              from <span className="font-bold text-primary">Map</span>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

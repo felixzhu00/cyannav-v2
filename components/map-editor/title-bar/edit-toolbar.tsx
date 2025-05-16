@@ -114,7 +114,7 @@ export default function EditToolbar({ className }: { className: string }) {
     // Trigger Icon Only
     {
       label: 'Trigger',
-      icon: <File className="h-5 w-5" />,
+      icon: <File className="h-5 w-5 text-primary" />,
       draw: undefined,
       onClick: () => {},
     },

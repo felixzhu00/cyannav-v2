@@ -5,6 +5,7 @@ import './globals.css'
 // import ThemeProvider from '@/components/theme-provider';
 import SessionWrapper from '@/components/session-wrapper'
 import ThemeProvider from '@/components/theme-provider'
+import Footer from '@/components/footer/footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -28,9 +29,12 @@ export default function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
-                    <main className="flex-grow">{children}</main>
+                        <main className="flex-grow">{children}</main>
+                        <Footer />
+
                     </ThemeProvider>
                 </SessionWrapper>
+
             </body>
         </html>
     )

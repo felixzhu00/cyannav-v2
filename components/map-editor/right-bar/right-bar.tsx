@@ -6,7 +6,7 @@ export default function RightBar() {
   return (
     <Tabs
       defaultValue="edit"
-      className="h-full max-h-[calc(100vh-74px)] w-full bg-zinc-900"
+      className="h-full max-h-[calc(100vh-74px)] w-full"
     >
       <TabsList className="w-full">
         <TabsTrigger className="flex-1" value="edit">

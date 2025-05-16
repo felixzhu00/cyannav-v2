@@ -10,7 +10,7 @@ export default function LeftSidebar() {
   if (!map.geojson) return <div>GeoJSON not found</div>
 
   return (
-    <div className="h-full max-h-[calc(100vh-74px)] w-full overflow-y-auto bg-zinc-900 pt-8">
+    <div className="h-full max-h-[calc(100vh-74px)] w-full overflow-y-auto pt-8">
       {/* Feature List */}
       <div className="w-full h-full">
         <ul className="flex flex-col h-full w-full">

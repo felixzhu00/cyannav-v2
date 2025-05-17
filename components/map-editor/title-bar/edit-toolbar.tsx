@@ -73,7 +73,7 @@ export default function EditToolbar({ className }: { className: string }) {
 
   // Download canvas
   const handlePNG = () => {
-    console.log("clickerd")
+    console.log('clickerd')
     if (mapRef) {
       const imgData = mapRef.getCanvas().toDataURL('image/png')
 
@@ -114,7 +114,7 @@ export default function EditToolbar({ className }: { className: string }) {
     // Trigger Icon Only
     {
       label: 'Trigger',
-      icon: <File className="h-5 w-5 text-primary" />,
+      icon: <File className="h-5 w-5" />,
       draw: undefined,
       onClick: () => {},
     },

@@ -8,16 +8,6 @@ import { signIn, providerMap } from '@/lib/auth'
 import { AuthError } from 'next-auth'
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { z } from 'zod'
-import LoginForm from '@/components/auth/login-form'
-
-export const FormSchema = z.object({
-  email: z
-    .string()
-    .nonempty({ message: 'Email is required.' })
-    .email({ message: 'Please enter a valid email address.' }),
-  password: z.string().nonempty({ message: 'Password is required.' }),
-})
 
 export default async function Page() {
   const session = await auth()
@@ -28,7 +18,7 @@ export default async function Page() {
 
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-      <div className="hidden bg-muted lg:block">
+      <div className="bg-muted hidden lg:block">
         <Image
           src={placeholder}
           alt="Image"
@@ -40,25 +30,11 @@ export default async function Page() {
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid gap-6">
           <div className="grid gap-2 text-center">
-            <h1 className="text-2xl font-bold"> Log into your account</h1>
+            <h1 className="text-2xl font-bold">Login</h1>
+            <p className="text-muted-foreground text-balance">
+              Sign in using one of the following providers
+            </p>
           </div>
-
-          <LoginForm />
-
-          <div className="flex justify-between px-4 text-center text-xs">
-            <Link href="/forget-password" className="hover:underline">
-              Forgot Password?
-            </Link>
-            <Link href="/help" className="hover:underline">
-              Get help
-            </Link>
-          </div>
-          <div className="my-4 flex items-center gap-4">
-            <hr className="flex-grow border border-ring" />
-            <span className="text-sm text-muted-foreground">or</span>
-            <hr className="flex-grow border border-ring" />
-          </div>
-
           <div className="grid gap-4">
             <div className="flex flex-col gap-2">
               {Object.values(providerMap).map((provider) => (
@@ -99,13 +75,20 @@ export default async function Page() {
             </div>
           </div>
 
+          <hr className="my-2" />
+
+          <div className="text-center text-xs">
+            <Link href="#" className="hover:underline">
+              Get help
+            </Link>
+          </div>
           <div className="text-center text-xs">
             By signing in, you agree to our{' '}
-            <Link href="#" className="underline hover:text-chart-2">
+            <Link href="#" className="hover:underline">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="#" className="underline hover:text-chart-2">
+            <Link href="#" className="hover:underline">
               Privacy Policy
             </Link>
             {'.'}

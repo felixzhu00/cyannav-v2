@@ -12,7 +12,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -21,12 +20,10 @@ import { Button } from '@/components/ui/button'
 import React from 'react'
 
 const FormSchema = z.object({
-  email: z.string().email({
+  email: z.string().nonempty({ message: 'Email is required.' }).email({
     message: 'Invalid email address.',
   }),
-  password: z.string().min(6, {
-    message: 'Password must be at least 6 characters.',
-  }),
+  password: z.string().nonempty({ message: 'Password is required.' }),
 })
 
 type FormData = z.infer<typeof FormSchema>
@@ -74,9 +71,13 @@ export default function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input {...field} type="email" placeholder="m@cyannav.com" />
+                <Input
+                  {...field}
+                  type="email"
+                  placeholder="Email
+"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -88,9 +89,8 @@ export default function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input {...field} type="password" placeholder="Your password" />
+                <Input {...field} type="password" placeholder="Password" />
               </FormControl>
               <FormMessage />
             </FormItem>

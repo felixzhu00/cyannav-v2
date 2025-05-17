@@ -94,7 +94,7 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
 
           <ResizablePanel defaultSize={60}>
             <div
-              className="relative flex h-full max-h-[calc(100vh-74px)] flex-grow justify-center border-x-2 border-ring text-primary"
+              className="relative flex h-full max-h-[calc(100vh-74px)] flex-grow justify-center border-x-2 border-ring"
               ref={mapContainer}
               id="map-container"
             >

@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={`${inter.className} flex min-h-screen flex-col`}>
+            <body className={`${inter.className} flex min-h-screen flex-col bg-pf`}>
                 <SessionWrapper>
                     <ThemeProvider
                         attribute="class"

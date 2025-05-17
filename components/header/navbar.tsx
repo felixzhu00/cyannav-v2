@@ -26,7 +26,7 @@ export default async function Navbar() {
 
   return (
     <NavigationMenu>
-      <NavigationMenuList className="space-x-5">
+      <NavigationMenuList className="space-x-4">
         {session && session.user ? (
           <>
             <NavigationMenuItem>
@@ -68,15 +68,6 @@ export default async function Navbar() {
           </>
         ) : (
           <>
-            <NavigationMenuItem>
-              <Link href="#intro" legacyBehavior passHref>
-                <NavigationMenuLink
-                  className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
-                >
-                  Getting Started
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
             <NavigationMenuItem>
               <Link href="#features" legacyBehavior passHref>
                 <NavigationMenuLink

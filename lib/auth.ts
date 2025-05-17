@@ -8,6 +8,8 @@ import { GitHubProfile } from 'next-auth/providers/github'
 import GitHub from 'next-auth/providers/github'
 import type { Provider } from 'next-auth/providers'
 import User from '@/db/user.model'
+import Credentials from 'next-auth/providers/credentials'
+import { IUserDocument } from '@/core/_entities/types/user.types'
 
 declare module 'next-auth' {
   interface Session {
@@ -28,6 +30,36 @@ async function fetchImageAsBuffer(url: string): Promise<Buffer> {
 }
 
 const providers: Provider[] = [
+  Credentials({
+    name: 'Credentials',
+    credentials: {
+      email: { label: 'Email', type: 'email' },
+      password: { label: 'Password', type: 'password' },
+    },
+    async authorize(credentials) {
+      const user = (await User.findOne({
+        email: credentials.email,
+      })) as IUserDocument
+
+      if (!user) {
+        throw new Error('No user found with this email')
+      }
+
+      // Example password validation (replace with hashed comparison)
+      const isValid = user.password === credentials.password
+
+      if (!isValid) {
+        throw new Error('Invalid password')
+      }
+
+      return {
+        id: user._id.toString(),
+        email: user.email,
+        username: user.username,
+        profilePicture: user.profilePicture,
+      }
+    },
+  }),
   GitHub({
     clientId: process.env.GITHUB_ID,
     clientSecret: process.env.GITHUB_SECRET,

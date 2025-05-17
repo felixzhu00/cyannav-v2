@@ -12,12 +12,8 @@ export interface IUser {
   dateCreated?: Date
   plan?: 'free' | 'pro'
 }
-// export interface IUserDocument extends IUser, Document {}
+export interface IUserDocument extends IUser, Document {}
 
-
-export interface IUserDocument extends IUser, Document<Types.ObjectId> {
-  _id: Types.ObjectId
-}
 // Populate User with only username
 export interface PopulatedAuthor extends Pick<IUser, 'username'> {}
 

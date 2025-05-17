@@ -49,8 +49,8 @@ export default async function Page() {
             <Link href="/forget-password" className="hover:underline">
               Forgot Password?
             </Link>
-            <Link href="/help" className="hover:underline">
-              Get help
+            <Link href="/register" className="hover:underline">
+              Don't have an account?
             </Link>
           </div>
           <div className="my-4 flex items-center gap-4">
@@ -109,6 +109,11 @@ export default async function Page() {
               Privacy Policy
             </Link>
             {'.'}
+          </div>
+          <div className="text-center text-xs">
+            <Link href="/help" className="hover:underline">
+              Get help
+            </Link>
           </div>
         </div>
       </div>

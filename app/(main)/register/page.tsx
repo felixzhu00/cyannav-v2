@@ -3,13 +3,34 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import placeholder from '@/public/map_placeholder.png'
 import { FcGoogle } from 'react-icons/fc'
-import { FaGithub, FaApple } from 'react-icons/fa'
+import { FaGithub } from 'react-icons/fa'
 import { signIn, providerMap } from '@/lib/auth'
 import { AuthError } from 'next-auth'
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { z } from 'zod'
+import RegisterForm from '@/components/auth/register-form'
 
-export default async function Page() {
+export const RegisterFormSchema = z
+  .object({
+    email: z
+      .string()
+      .nonempty({ message: 'Email is required.' })
+      .email({ message: 'Please enter a valid email address.' }),
+    password: z
+      .string()
+      .nonempty({ message: 'Password is required.' })
+      .min(6, { message: 'Password must be at least 6 characters.' }),
+    confirmPassword: z
+      .string()
+      .nonempty({ message: 'Please confirm your password.' }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match.',
+    path: ['confirmPassword'],
+  })
+
+export default async function Register() {
   const session = await auth()
 
   if (session) {
@@ -18,7 +39,7 @@ export default async function Page() {
 
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-      <div className="bg-muted hidden lg:block">
+      <div className="hidden bg-muted lg:block">
         <Image
           src={placeholder}
           alt="Image"
@@ -30,11 +51,27 @@ export default async function Page() {
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid gap-6">
           <div className="grid gap-2 text-center">
-            <h1 className="text-2xl font-bold">Login</h1>
-            <p className="text-muted-foreground text-balance">
-              Sign in using one of the following providers
-            </p>
+            <h1 className="text-2xl font-bold">Create An Account</h1>
           </div>
+
+          <RegisterForm />
+
+          <div className="text-center text-sm">
+            Already have an account?{' '}
+            <Link
+              href="/login"
+              className="font-medium underline hover:text-chart-2"
+            >
+              Log in
+            </Link>
+          </div>
+
+          <div className="my-4 flex items-center gap-4">
+            <hr className="flex-grow border border-ring" />
+            <span className="text-sm text-muted-foreground">or</span>
+            <hr className="flex-grow border border-ring" />
+          </div>
+
           <div className="grid gap-4">
             <div className="flex flex-col gap-2">
               {Object.values(providerMap).map((provider) => (
@@ -49,9 +86,6 @@ export default async function Page() {
                     } catch (error) {
                       if (error instanceof AuthError) {
                         return
-                        // redirect(
-                        //   `${SIGNIN_ERROR_URL}?error=${error.type}`
-                        // )
                       }
                       throw error
                     }
@@ -67,31 +101,23 @@ export default async function Page() {
                     {provider.id === 'github' && (
                       <FaGithub className="text-lg" />
                     )}
-                    {provider.id === 'apple' && <FaApple className="text-lg" />}
-                    <span>Sign in with {provider.name}</span>
+                    <span>Sign up with {provider.name}</span>
                   </Button>
                 </form>
               ))}
             </div>
           </div>
 
-          <hr className="my-2" />
-
           <div className="text-center text-xs">
-            <Link href="#" className="hover:underline">
-              Get help
-            </Link>
-          </div>
-          <div className="text-center text-xs">
-            By signing in, you agree to our{' '}
-            <Link href="#" className="hover:underline">
+            By signing up, you agree to our{' '}
+            <Link href="#" className="underline hover:text-chart-2">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="#" className="hover:underline">
+            <Link href="#" className="underline hover:text-chart-2">
               Privacy Policy
             </Link>
-            {'.'}
+            .
           </div>
         </div>
       </div>

@@ -69,7 +69,16 @@ export default async function Navbar() {
         ) : (
           <>
             <NavigationMenuItem>
-              <Link href="#features" legacyBehavior passHref>
+              <Link href="/" legacyBehavior passHref>
+                <NavigationMenuLink
+                  className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
+                >
+                  Home
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/#features" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
                 >
@@ -78,7 +87,7 @@ export default async function Navbar() {
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="#community" legacyBehavior passHref>
+              <Link href="/#community" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
                 >
@@ -87,7 +96,7 @@ export default async function Navbar() {
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="#pricing" legacyBehavior passHref>
+              <Link href="/#pricing" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
                 >
@@ -96,7 +105,7 @@ export default async function Navbar() {
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="/" legacyBehavior passHref>
+              <Link href="/support" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
                 >
@@ -106,7 +115,12 @@ export default async function Navbar() {
             </NavigationMenuItem>
             <NavigationMenuItem>
               <Link href="/login" legacyBehavior passHref>
-                <Button variant="default">Get Started</Button>
+                <Button variant="default">Login</Button>
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/register" legacyBehavior passHref>
+                <Button variant="default">Register</Button>
               </Link>
             </NavigationMenuItem>
           </>

@@ -47,7 +47,7 @@ export default async function Page() {
 
           <div className="flex justify-between px-4 text-center text-xs">
             <Link href="/forget-password" className="hover:underline">
-              Forgot Password?
+              Forgot password?
             </Link>
             <Link href="/register" className="hover:underline">
               Don't have an account?

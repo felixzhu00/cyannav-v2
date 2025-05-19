@@ -1,15 +1,23 @@
 import { IUserDocument } from '@/core/_entities/types/user.types'
 import { Schema, model, models } from 'mongoose'
 
+// Next-Auth fields - username, email, image, emailVerified
+// createUser fields - profilePicture
 const UserSchema = new Schema<IUserDocument>({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: false },
-  salt: { type: String, required: true },
-  profilePicture: { type: Buffer },
-  favorite: [{ type: Schema.Types.ObjectId, ref: 'Map' }],
+  password: { type: String },
+  salt: { type: String },
+  profilePicture: { type: Buffer, default: null },
+  favorite: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'Map' }],
+    default: [],
+  },
   dateCreated: { type: Date, default: Date.now },
   plan: { type: String, enum: ['free', 'pro'], default: 'free' },
+  emailVerified: { type: Date, default: null },
+  image: { type: String },
+  providers: { type: [String], default: [] },
 })
 
 // Use the existing model if it exists, otherwise create a new one

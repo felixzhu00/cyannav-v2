@@ -1,7 +1,7 @@
 import NextAuth, { type DefaultSession } from 'next-auth'
 import type { NextAuthConfig } from 'next-auth'
 import { MongoDBAdapter } from '@auth/mongodb-adapter'
-import client from '@/lib/db'
+import clientPromise from '@/lib/db'
 import Google from 'next-auth/providers/google'
 import { GoogleProfile } from 'next-auth/providers/google'
 import { GitHubProfile } from 'next-auth/providers/github'
@@ -10,15 +10,14 @@ import type { Provider } from 'next-auth/providers'
 import User from '@/db/user.model'
 import Credentials from 'next-auth/providers/credentials'
 import { IUserDocument } from '@/core/_entities/types/user.types'
+import dbConnect from '@/db/dbConnect'
 
 declare module 'next-auth' {
   interface Session {
     user: {
-      profilePicture: string
       username: string
-      email: string
-    }
-    userId: string & DefaultSession['user']
+    } & DefaultSession['user']
+    userId: string
   }
 }
 
@@ -37,6 +36,7 @@ const providers: Provider[] = [
       password: { label: 'Password', type: 'password' },
     },
     async authorize(credentials) {
+      console.log(credentials)
       const user = (await User.findOne({
         email: credentials.email,
       })) as IUserDocument
@@ -52,27 +52,30 @@ const providers: Provider[] = [
         throw new Error('Invalid password')
       }
 
+      const image =
+        user.profilePicture instanceof Buffer
+          ? `data:image/png;base64,${user.profilePicture.toString('base64')}`
+          : '/cyannav cyan.svg'
+
       return {
-        id: user._id.toString(),
-        email: user.email,
+        id: user.id.toString(),
         username: user.username,
-        profilePicture: user.profilePicture,
+        email: user.email,
+        image,
       }
     },
   }),
   GitHub({
     clientId: process.env.GITHUB_ID,
     clientSecret: process.env.GITHUB_SECRET,
-    authorization: { params: { scope: 'read:user' } },
+    authorization: { params: { scope: 'read:user user:email' } },
     profile: async (profile: GitHubProfile) => {
-      const profilePictureBuffer = await fetchImageAsBuffer(profile.avatar_url)
-      const user = {
+      return {
+        id: profile.id.toString(),
         username: profile.name || profile.login,
         email: profile.email,
-        salt: '1',
-        profilePicture: profilePictureBuffer,
+        image: profile.avatar_url,
       }
-      return user
     },
     allowDangerousEmailAccountLinking: true,
   }),
@@ -80,43 +83,100 @@ const providers: Provider[] = [
     clientId: process.env.GOOGLE_ID,
     clientSecret: process.env.GOOGLE_SECRET,
     profile: async (profile: GoogleProfile) => {
-      const profilePictureBuffer = await fetchImageAsBuffer(profile.picture)
-      const user = {
-        username: profile.name,
+      return {
+        id: profile.sub.toString(),
+        username: profile.name || profile.login,
         email: profile.email,
-        salt: '1',
-        profilePicture: profilePictureBuffer,
+        image: profile.avatar_url,
       }
-      return user
     },
     allowDangerousEmailAccountLinking: true,
   }),
 ]
 
-const adapter = MongoDBAdapter(client, {
+export const adapter = MongoDBAdapter(clientPromise, {
+  databaseName: 'cyan',
   collections: {
-    Users: User.collection.name,
+    Users: 'users', // or your actual collection name
   },
 })
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const authConfig = {
   adapter,
   providers,
   pages: {
     signIn: '/login',
   },
   callbacks: {
+    async signIn({ user, account }) {
+      if (!account?.provider || !user?.email) return true
+
+      await dbConnect()
+
+      const existingUser = await User.findOne({ email: user.email })
+
+      if (existingUser) {
+        await User.updateOne(
+          { email: user.email },
+          { $addToSet: { providers: account.provider } }
+        )
+      } else {
+        // User doesn't exist yet, create manually with providers array
+        await User.create({
+          email: user.email,
+          username: user.name || user.email,
+          providers: [account.provider],
+          // other defaults as needed
+        })
+      }
+
+      return true
+    },
     session({ session, user }) {
       return {
         ...session,
         user: {
           ...session.user,
           userId: user.id,
+          username: (user as any).username, // assuming it's on the user object
         },
       }
     },
   },
-} satisfies NextAuthConfig)
+  events: {
+    async createUser({ user }) {
+      await dbConnect()
+      // Runs upon first user login, this is here as an in
+      const userHasBuffer = await User.findOne({
+        email: user.email,
+        profilePicture: { $ne: null },
+      })
+      if (!userHasBuffer) {
+        //Fetch avatar and store buffer in DB
+        const imageRes = await fetch(user.image as string)
+        const buffer = await imageRes.arrayBuffer()
+
+        // Update the newly created user
+        await User.updateOne(
+          { email: user.email },
+          {
+            $set: {
+              plan: 'free',
+              dateCreated: new Date(),
+              profilePicture: Buffer.from(buffer),
+              favorite: [],
+            },
+          }
+        )
+      }
+    },
+  },
+  session: {
+    strategy: 'database', // stores sessions in DB
+  },
+} satisfies NextAuthConfig
+
+export const { handlers, auth, signIn, signOut } = NextAuth(authConfig)
 
 export const providerMap = providers
   .map((provider) => {

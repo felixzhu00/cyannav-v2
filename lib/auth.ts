@@ -123,10 +123,14 @@ export const authConfig = {
         )
       } else {
         // User doesn't exist yet, create manually with providers array
+
+        const imageRes = await fetch(user.image as string)
+        const buffer = await imageRes.arrayBuffer()
         await User.create({
           email: user.email,
           username: user.name || user.email,
           providers: [account.provider],
+          profilePicture: Buffer.from(buffer),
           // other defaults as needed
         })
       }
@@ -141,34 +145,6 @@ export const authConfig = {
           userId: user.id,
           username: (user as any).username, // assuming it's on the user object
         },
-      }
-    },
-  },
-  events: {
-    async createUser({ user }) {
-      await dbConnect()
-      // Runs upon first user login, this is here as an in
-      const userHasBuffer = await User.findOne({
-        email: user.email,
-        profilePicture: { $ne: null },
-      })
-      if (!userHasBuffer) {
-        //Fetch avatar and store buffer in DB
-        const imageRes = await fetch(user.image as string)
-        const buffer = await imageRes.arrayBuffer()
-
-        // Update the newly created user
-        await User.updateOne(
-          { email: user.email },
-          {
-            $set: {
-              plan: 'free',
-              dateCreated: new Date(),
-              profilePicture: Buffer.from(buffer),
-              favorite: [],
-            },
-          }
-        )
       }
     },
   },

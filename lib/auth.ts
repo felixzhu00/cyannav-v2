@@ -16,7 +16,8 @@ declare module 'next-auth' {
   interface Session {
     user: {
       username: string
-    } & DefaultSession['user']
+    } & DefaultSession['user'] &
+      IUserDocument
     userId: string
   }
 }
@@ -55,7 +56,7 @@ const providers: Provider[] = [
       const image =
         user.profilePicture instanceof Buffer
           ? `data:image/png;base64,${user.profilePicture.toString('base64')}`
-          : '/cyannav cyan.svg'
+          : '/logo.svg'
 
       return {
         id: user.id.toString(),

@@ -37,6 +37,7 @@ export async function PUT(request: Request) {
   try {
     const res = await saveUsernameUseCase(userId, username)
 
+    console.log(res)
     if ('error' in res) {
       return NextResponse.json({ message: res.message }, { status: res.status })
     }

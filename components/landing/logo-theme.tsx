@@ -1,34 +1,17 @@
-'use client'
-import { useState, useEffect } from 'react'
-import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import logo_white from '@/public/logo-text-white.png'
-import logo_black from '@/public/logo-text-black.png'
+import logo from '@/public/logo.svg'
 
-export default function LogoTheme() {
-  const { theme, resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => setMounted(true), [])
-
-  if (!mounted) return null
-
-
-  const isDark = theme === 'dark'
-  const logoSrc = isDark
-    ? logo_white
-    : logo_black
-
-
+export default function Logo() {
   return (
-    <Link href="/" passHref suppressHydrationWarning>
+    <Link href="/" passHref className="flex items-center space-x-2">
       <Image
-        src={logoSrc}
+        src={logo}
         alt="Logo"
-        className="object-contain w-[157px] h-[65px]"
+        className="h-[65px] w-[65px] object-contain"
         priority
       />
+      <h1 className="text-2xl font-extrabold tracking-widest">CYANNAV</h1>
     </Link>
   )
 }

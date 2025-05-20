@@ -1,23 +1,27 @@
 import { UserFields } from '@/core/_entities/types/user.types'
 import { FilterQuery } from 'mongoose'
 import User from '@/db/user.model'
-import { handleDBError } from '@/lib/utils'
+import { createErrorResponse, handleDBError } from '@/lib/utils'
+import dbConnect from '@/db/dbConnect'
 
 export async function getUsersByFields(
   userFields: UserFields,
   option: 'union' | 'intersection' = 'union' // Default to 'union'
 ) {
   try {
+    await dbConnect()
+
+    // All keys to string
+    const fields = userFields
+      ? Object.keys(userFields).join(', ')
+      : 'User Fields'
     // Ensure 'params' is not null or undefined before proceeding
     if (!userFields) {
-      return {
-        status: 400,
-        error: {
-          context: 'getUsersByFields',
-          issue: 'userFields cannot be null or undefined',
-        },
-        message: 'Invalid user field',
-      }
+      return createErrorResponse(
+        400,
+        `${fields}cannot be null or undefined`,
+        'Invalid user field'
+      )
     }
     // Prepare the query object based on the 'option' parameter
     let query: FilterQuery<typeof User>
@@ -39,18 +43,37 @@ export async function getUsersByFields(
 
     // Check if Users are found in DB
     if (!user) {
-      return {
-        status: 404,
-        error: {
-          context: 'getUsersByFields',
-          issue: 'No user with the specified userFields in the database',
-        },
-        message: 'User(s) not found',
-      }
+      return createErrorResponse(
+        400,
+        'No user with the specified fields in the database',
+        'User(s) not found'
+      )
     }
 
-    return { payload: user }
-  } catch (error: any) {
-    return handleDBError(error, 'getUsersByFields')
+    return {
+      status: 200,
+      message: 'Successfully retrieved User',
+      payload: user,
+    }
+  } catch (error) {
+    return handleDBError(error)
   }
 }
+
+// export async function checkUserByUsername(username: string) {
+//   await dbConnect()
+//   const userExists = await User.findOne({ username })
+//   if (userExists) {
+//     return {
+//       status: 200,
+//       message: 'Username was found in database', // to the user
+//       payload: true,
+//     }
+//   } else {
+//     return {
+//       status: 400,
+//       message: 'Username was not found in database',
+//       error: "The user provided an username that's already in use", // to developer
+//     }
+//   }
+// }

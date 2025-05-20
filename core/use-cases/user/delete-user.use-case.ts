@@ -1,42 +1,28 @@
 import deleteUserById from '@/core/data-access/user/delete-user.persistence'
+import { createErrorResponse } from '@/lib/utils'
 
-export default async function deleteUserUseCase(userId: string, email: string) {
-  if (!email)
-    return {
-      status: 400,
-      message: 'Email is required',
-      error: 'The user did not provide an email',
-    }
-
+export default async function deleteUserUseCase(userId: string) {
+  
+  // Check if User ID is valid
   if (!userId)
-    return {
-      status: 400,
-      message: 'Please relogin.',
-      error:
-        'The userId was not detected. The user will need to be reauthenticated.',
-    }
+    return createErrorResponse(
+      400,
+      'User ID is required',
+      'Map ID can not be null, undefined, or empty string'
+    )
 
-  try {
-    const deletedUser = await deleteUserById(userId, email)
+  const dbRes = await deleteUserById(userId)
 
-    if (deletedUser.status === 200) {
-      return {
-        status: 200,
-        message: 'User has been deleted',
-      }
-    }
-
-    return {
-      status: 400,
-      message: 'An error has occurred from deleting user.',
-      error: 'An error occurred while deleting user',
-    }
-  } catch (error) {
-    console.error(error)
-    return {
-      status: 400,
-      message: 'An error occurred while deleting user',
-      error: 'An error occurred while deleting user',
-    }
+  // Check DB request errored
+  if ('error' in dbRes) {
+    return dbRes
   }
+
+  return {
+    status: 200,
+    message: 'User has been deleted',
+    payload: true,
+  }
+
+  
 }

@@ -13,7 +13,7 @@ export interface IUser {
   plan?: 'free' | 'pro'
   emailVerified: Date
   image?: String
-  providers: { type: [String]; default: [] } // e.g. ['github', 'credentials']
+  providers: string[] // e.g. ['github', 'credentials']
 }
 export interface IUserDocument extends IUser, Document {}
 

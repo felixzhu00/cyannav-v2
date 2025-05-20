@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import logo from '@/public/cyannav cyan.svg'
+import logo from '@/public/logo.svg'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
@@ -18,7 +18,7 @@ export default function Intro() {
         <span className="font-semibold">collaborate</span> on stunning maps,
         fostering a vibrant community of innovators and explorers.
       </h2>
-      <Link href='/login'>
+      <Link href="/login">
         <Button variant="default" className="py-6">
           <Image
             className="mr-2 h-[28px] w-[28px]"

@@ -8,7 +8,7 @@ import {
 import TemplateCard from '@/components/dashboard/template-card'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft } from 'lucide-react'
-import logo from '@/public/cyannav cyan.svg'
+import logo from '@/public/logo.svg'
 import Image from 'next/image'
 
 interface Template {

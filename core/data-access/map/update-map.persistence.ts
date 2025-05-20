@@ -22,6 +22,18 @@ export async function updateMapFieldsById(
       )
     }
 
+    // Ensure updateFields is not empty or undefined
+    if (!updateFields || Object.keys(updateFields).length === 0) {
+      const fields = updateFields
+        ? Object.keys(updateFields).join(', ')
+        : 'none'
+      return createErrorResponse(
+        400,
+        'Update fields cannot be null, undefined, or empty',
+        `Invalid update fields: ${fields}`
+      )
+    }
+
     // Update the map in the database
     const updatedMap = await Map.findByIdAndUpdate(
       id,

@@ -1,35 +1,38 @@
-import { updateUsernameById } from '@/core/data-access/user/update-username-by-id.persistence'
+import { updateUserFieldsById } from '@/core/data-access/user/update-user.persistence'
+import { createErrorResponse } from '@/lib/utils'
 
 export default async function saveUsernameUseCase(
   id: string,
   newUsername: string
 ) {
+  // Check if username is valid
   if (!newUsername)
-    return {
-      status: 400,
-      message: 'Username is required', // displayed to the user
-      error: 'The user did not provide a username',
-    }
+    return createErrorResponse(
+      400,
+      'Username is required',
+      'The user did not provide a username'
+    )
 
-  try {
-    const savedUsername = await updateUsernameById(id, newUsername)
-    if (!('payload' in savedUsername)) {
-      return {
-        status: 200,
-        message: 'New username has been saved',
-      }
-    }
+  // Check if ID is valid
+  if (!id)
+    return createErrorResponse(
+      400,
+      'ID is required',
+      'ID param missing or invalid'
+    )
 
-    return {
-      status: 400,
-      message: 'An error has occurred from saving new username.',
-    }
-  } catch (error) {
-    console.error(error)
-    return {
-      status: 400,
-      message: 'An error occurred while checking username availability',
-      error: 'An error occurred while checking username availability',
-    }
+  const dbRes = await updateUserFieldsById(id, {
+    username: newUsername,
+  })
+
+  // Check DB request errored
+  if ('error' in dbRes) {
+    return dbRes
+  }
+
+  return {
+    status: 200,
+    message: 'New username has been saved',
+    payload: true,
   }
 }

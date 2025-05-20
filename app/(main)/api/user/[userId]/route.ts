@@ -8,7 +8,7 @@ export async function DELETE(request: Request) {
   const email = body.email
 
   try {
-    const res = await deleteUserUseCase(userId, email)
+    const res = await deleteUserUseCase(userId)
 
     if ('error' in res) {
       return NextResponse.json({ message: res.message }, { status: res.status })

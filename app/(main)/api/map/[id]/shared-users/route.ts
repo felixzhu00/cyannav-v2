@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { addUserToMapUseCase } from '@/core/use-cases/map/share-map.use-case'
-import { getAUserIdByFields } from '@/core/use-cases/user/get-user.use-case'
+import { getAUserIdByFieldsUseCase } from '@/core/use-cases/user/get-user.use-case'
 import { UserFields } from '@/core/_entities/types/user.types'
 
 export async function POST(
@@ -17,7 +17,7 @@ export async function POST(
     // Assume user var is email
 
     // Obtain userId from user(can be uniqueName? or email)
-    const getUserRes = await getAUserIdByFields({
+    const getUserRes = await getAUserIdByFieldsUseCase({
       email: user,
     } as UserFields)
 

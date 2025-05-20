@@ -1,4 +1,4 @@
-import { updateProfilePictureById } from '@/core/data-access/user/update-profile-picture-by-id.persistence'
+import { updateUserFieldsById } from '@/core/data-access/user/update-user.persistence'
 
 export default async function updateUserProfilePictureUseCase(
   userId: string,
@@ -12,10 +12,9 @@ export default async function updateUserProfilePictureUseCase(
     }
 
   try {
-    const savedProfilePicture = await updateProfilePictureById(
-      userId,
-      profilePicture
-    )
+    const savedProfilePicture = await updateUserFieldsById(userId, {
+      profilePicture: profilePicture,
+    })
     if (savedProfilePicture.status == 200) {
       return {
         status: 200,

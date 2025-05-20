@@ -23,7 +23,6 @@ import Notification from './notifications'
 
 export default async function Navbar() {
   const session = await auth()
-
   return (
     <NavigationMenu>
       <NavigationMenuList className="space-x-4">
@@ -41,10 +40,11 @@ export default async function Navbar() {
             <NavigationMenuItem>
               <span className="flex justify-center">
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <Avatar className="h-10 w-10 rounded-full border border-zinc-200 dark:border-zinc-700">
+                  <DropdownMenuTrigger className="focus:outline-none focus:ring-0">
+                    <Avatar className="h-10 w-10 rounded-full border-2 border-muted-foreground">
                       <AvatarImage
                         src={`data:image/jpeg;base64,${session.user.profilePicture}`}
+                        className="select-none"
                       />
                       <AvatarFallback className="h-10 w-10">
                         <CircleUserRound />

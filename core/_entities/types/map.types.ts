@@ -12,6 +12,7 @@ export interface IMap {
   thumbnail?: Buffer
   geojson?: Buffer
   likes?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
+  dislikes?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
   messages?: IMessageDocument[] | IMessageDocument['_id'][] | Types.ObjectId[]
   sharedUsers?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
   forkedFrom?: IMapDocument | IMapDocument['_id'] | Types.ObjectId

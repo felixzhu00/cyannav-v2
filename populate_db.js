@@ -6,10 +6,10 @@ import crypto from 'crypto'
 import geobuf from 'geobuf'
 import { nanoid } from 'nanoid'
 import Pbf from 'pbf'
-import { readFile } from 'fs/promises';
+import { readFile } from 'fs/promises'
 
-const file = await readFile('./public/aus_state.geo.json', 'utf-8');
-const geojsonData = JSON.parse(file);
+const file = await readFile('./public/aus_state.geo.json', 'utf-8')
+const geojsonData = JSON.parse(file)
 
 import mongoose from 'mongoose'
 const { Schema } = mongoose
@@ -62,7 +62,12 @@ const MapSchema = new Schema({
       ref: 'User',
     },
   ],
-
+  dislikes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
   messages: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -281,6 +286,7 @@ async function createMap(
   geojson,
   thumbnail,
   likes,
+  dislikes,
   messages,
   sharedUsers,
   forkedFrom,
@@ -294,6 +300,7 @@ async function createMap(
     geojson,
     thumbnail,
     likes,
+    dislikes,
     messages,
     sharedUsers,
     forkedFrom,
@@ -430,7 +437,24 @@ async function createBotMap(amount, userList, messageList) {
 
     // Generate like and dislike arrays
     const numVotes = Math.floor(Math.random() * (userList.length / 2))
-    const voteList = getRandomUsers(numVotes, userList, owner)
+
+    // Randomly choose a subset of users to be downvotes and upvotes
+    const voteList = getRandomUsers(
+      numVotes,
+      userList.filter((user) => user.toString() !== owner.toString())
+    )
+
+    const downVotes = []
+    const upVotes = []
+
+    // Assign users to downvotes or upvotes randomly
+    while (voteList.length > 0) {
+      if (Math.random() > 0.3) {
+        upVotes.push(voteList.pop())
+      } else {
+        downVotes.push(voteList.pop())
+      }
+    }
 
     // Generate shareUsers
     const shareUsers = getRandomUsers(
@@ -459,7 +483,8 @@ async function createBotMap(amount, userList, messageList) {
         'public', // isPublished
         finalBuffer, // Assuming geojson is a Buffer or compatible type
         undefined, // Optional thumbnail
-        voteList, // Likes
+        upVotes, // Likes
+        downVotes, // Dislikes
         chatroomMessages, // Messages
         shareUsers, // Share users
         undefined,

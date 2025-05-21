@@ -1,5 +1,3 @@
-// THIS FILE IS NOT BEING USED. PLEASE LEAVE HERE!
-
 'use client'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -16,7 +14,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-
 import React from 'react'
 
 const FormSchema = z.object({
@@ -41,23 +38,14 @@ export default function LoginForm() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response: any = await signIn('credentials', {
+      // Handle NextAuth Credential Login
+      await signIn('credentials', {
         email: data.email,
         password: data.password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: '/dashboard?view=recent-maps',
       })
-
-      console.log({ response })
-
-      if (!response?.error) {
-        toast({ title: 'Login Successful' })
-        router.push('/')
-        router.refresh()
-      } else {
-        throw new Error(response.error)
-      }
     } catch (error: any) {
-      console.error('Login Failed:', error)
       toast({ title: 'Login Failed', description: error.message })
     }
   }

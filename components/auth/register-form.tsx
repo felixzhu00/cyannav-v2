@@ -8,11 +8,11 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { redirect } from 'next/navigation'
 
 // Validation schema
 const FormSchema = z
@@ -56,12 +56,15 @@ export default function RegisterForm() {
         },
         body: JSON.stringify({ username, email, password, confirmPassword }),
       })
+
+      // Throw error if response fail
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.message)
       }
-      // Process response here
-      toast({ title: 'Registration Successful' })
+
+      // else go to /login
+      redirect('/dashboard?view=recent-maps')
     } catch (error: any) {
       toast({ title: 'Registration Failed', description: error.message })
     }

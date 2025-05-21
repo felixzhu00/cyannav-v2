@@ -67,9 +67,10 @@ export default async function Page() {
                   action={async () => {
                     'use server'
                     try {
-                      await signIn(provider.id, {
+                      const a = await signIn(provider.id, {
                         redirectTo: '/dashboard?view=recent-maps',
                       })
+                      console.log(a)
                     } catch (error) {
                       if (error instanceof AuthError) {
                         return

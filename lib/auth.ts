@@ -11,6 +11,9 @@ import User from '@/db/user.model'
 import Credentials from 'next-auth/providers/credentials'
 import { IUserDocument } from '@/core/_entities/types/user.types'
 import dbConnect from '@/db/dbConnect'
+import crypto from 'crypto'
+import { randomUUID } from 'crypto'
+import { encode as defaultEncode } from 'next-auth/jwt'
 
 declare module 'next-auth' {
   interface Session {
@@ -37,7 +40,11 @@ const providers: Provider[] = [
       password: { label: 'Password', type: 'password' },
     },
     async authorize(credentials) {
-      console.log(credentials)
+      if (!credentials?.email || !credentials?.password) {
+        return null
+      }
+
+      await dbConnect()
       const user = (await User.findOne({
         email: credentials.email,
       })) as IUserDocument
@@ -46,8 +53,17 @@ const providers: Provider[] = [
         throw new Error('No user found with this email')
       }
 
-      // Example password validation (replace with hashed comparison)
-      const isValid = user.password === credentials.password
+      const hashedAttempt = crypto
+        .pbkdf2Sync(
+          credentials.password as string,
+          user.salt as string,
+          100,
+          64,
+          'sha256'
+        )
+        .toString('hex')
+
+      const isValid = hashedAttempt === user.password
 
       if (!isValid) {
         throw new Error('Invalid password')
@@ -110,28 +126,26 @@ export const authConfig = {
   },
   callbacks: {
     async signIn({ user, account }) {
-      if (!account?.provider || !user?.email) return true
-
       await dbConnect()
 
+      // Check if user is in db
       const existingUser = await User.findOne({ email: user.email })
 
+      // Add provider to the list of provider user login in with
       if (existingUser) {
         await User.updateOne(
           { email: user.email },
-          { $addToSet: { providers: account.provider } }
+          { $addToSet: { providers: account?.provider } }
         )
       } else {
-        // User doesn't exist yet, create manually with providers array
-
+        // User first time login
         const imageRes = await fetch(user.image as string)
         const buffer = await imageRes.arrayBuffer()
         await User.create({
           email: user.email,
           username: user.name || user.email,
-          providers: [account.provider],
-          profilePicture: Buffer.from(buffer),
-          // other defaults as needed
+          providers: [account?.provider],
+          profilePicture: Buffer.from(buffer), // Store profile picture in DB
         })
       }
 
@@ -143,13 +157,43 @@ export const authConfig = {
         user: {
           ...session.user,
           userId: user.id,
-          username: (user as any).username, // assuming it's on the user object
+          username: (user as any).username,
         },
       }
+    },
+    async jwt({ token, user, account }) {
+      if (account?.provider === 'credentials') {
+        token.credentials = true
+      }
+      return token
     },
   },
   session: {
     strategy: 'database', // stores sessions in DB
+  },
+  jwt: {
+    encode: async function (params) {
+      if (params.token?.credentials) {
+        const sessionToken = randomUUID()
+
+        if (!params.token.sub) {
+          throw new Error('No user ID found in token')
+        }
+
+        const createdSession = await adapter?.createSession?.({
+          sessionToken: sessionToken,
+          userId: params.token.sub,
+          expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        })
+
+        if (!createdSession) {
+          throw new Error('Failed to create session')
+        }
+
+        return sessionToken
+      }
+      return defaultEncode(params)
+    },
   },
 } satisfies NextAuthConfig
 

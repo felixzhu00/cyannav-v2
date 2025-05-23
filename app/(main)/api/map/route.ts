@@ -1,0 +1,60 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getStarredMapByUserId } from '@/core/data-access/map/get-map.persistence'
+import { getMapsByMapFieldsUseCase } from '@/core/use-cases/map/get-map.use-case'
+
+import { auth } from '@/lib/auth'
+
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url)
+  const view = url.searchParams.get('view')
+
+  // Get server session
+  const session = await auth()
+
+  // Now user id should be available if set in session
+  const userId = session?.user?.id
+
+  if (!view || !userId) {
+    return NextResponse.json({ message: 'Invalid request', status: 400 })
+  }
+
+  try {
+    let maps
+
+    switch (view) {
+      case 'my-maps':
+        maps = await getMapsByMapFieldsUseCase({ owner: userId })
+        break
+      case 'community':
+        maps = await getMapsByMapFieldsUseCase({ isPublished: 'public' })
+        break
+      case 'shared-with-me':
+        maps = await getMapsByMapFieldsUseCase({ sharedUsers: userId })
+        break
+      case 'starred-maps':
+        maps = await getStarredMapByUserId(userId)
+        break
+      default:
+        return NextResponse.json({
+          message: 'Invalid view parameter',
+          status: 400,
+        })
+    }
+    
+
+    return NextResponse.json({
+      payload: maps.payload,
+      message: 'Maps fetched successfully',
+      status: 200,
+    })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      {
+        message: 'Internal Server Error',
+        status: 500,
+      },
+      { status: 500 }
+    )
+  }
+}

@@ -64,7 +64,7 @@ export default function RegisterForm() {
       }
 
       // else go to /login
-      redirect('/dashboard?view=recent-maps')
+      redirect('/dashboard')
     } catch (error: any) {
       toast({ title: 'Registration Failed', description: error.message })
     }

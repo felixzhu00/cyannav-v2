@@ -43,7 +43,7 @@ export default function LoginForm() {
         email: data.email,
         password: data.password,
         redirect: true,
-        callbackUrl: '/dashboard?view=recent-maps',
+        callbackUrl: '/dashboard',
       })
     } catch (error: any) {
       toast({ title: 'Login Failed', description: error.message })

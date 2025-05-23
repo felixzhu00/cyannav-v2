@@ -23,7 +23,7 @@ export default async function Page() {
   const session = await auth()
 
   if (session) {
-    redirect('/dashboard?view=recent-maps')
+    redirect('/dashboard')
   }
 
   return (
@@ -68,7 +68,7 @@ export default async function Page() {
                     'use server'
                     try {
                       const a = await signIn(provider.id, {
-                        redirectTo: '/dashboard?view=recent-maps',
+                        redirectTo: '/dashboard',
                       })
                       console.log(a)
                     } catch (error) {

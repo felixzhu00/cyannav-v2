@@ -1,7 +1,12 @@
 import { getMapUseCase } from '@/core/use-cases/map/get-map.use-case'
-import { updateMapFieldsUseCase } from '@/core/use-cases/map/update-map.use-case'
+import {
+  toggleMapArrayFieldsByIdUseCase,
+  updateMapFieldsUseCase,
+} from '@/core/use-cases/map/update-map.use-case'
 import { MapFields } from '@/core/_entities/types/map.types'
 import { NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { Types } from 'mongoose'
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   console.error('getMap', params)
@@ -71,6 +76,45 @@ export async function PUT(
       {
         errors: { server: ['Internal server error'] },
         message: 'Internal server error',
+      },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    // Get map ID from route param
+    const { id: mapId } = params
+
+    // Get current user session
+    const session = await auth()
+    const userId = session?.user?.id
+
+    const { updateKey } = await request.json()
+
+    const res = await toggleMapArrayFieldsByIdUseCase(mapId, userId, updateKey)
+
+    // If use case error
+    if ('error' in res) {
+      console.error(res.error)
+      return NextResponse.json({ message: res.message }, { status: res.status })
+    }
+
+    return NextResponse.json({
+      message: 'Toggle successful',
+      status: 200,
+      payload: true,
+    })
+  } catch (error) {
+    console.error('Error toggling like:', error)
+    return NextResponse.json(
+      {
+        message: 'Internal Server Error',
+        status: 500,
       },
       { status: 500 }
     )

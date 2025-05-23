@@ -31,6 +31,7 @@ export interface CustomFeature extends Feature {
 }
 
 export interface MapFields extends Partial<IMapDocument> {}
+export type MapFieldKey = keyof MapFields
 
 export interface MapAtom {
   _id: string

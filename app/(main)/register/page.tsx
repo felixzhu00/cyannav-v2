@@ -34,7 +34,7 @@ export default async function Register() {
   const session = await auth()
 
   if (session) {
-    redirect('/dashboard?view=recent-maps')
+    redirect('/dashboard')
   }
 
   return (

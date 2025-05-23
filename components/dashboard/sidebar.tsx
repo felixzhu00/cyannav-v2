@@ -40,7 +40,7 @@ export default function DashboardSidebar({
   }
 
   const baseLinkClass =
-    'flex flex-row items-center space-x-2.5 px-4 py-2 my-2 border-l-4 border-l-transparent'
+    'flex flex-row items-center space-x-2.5 px-4 py-2 my-2 border-l-4 border-l-transparent w-52'
   const iconClass = 'h-6 w-6'
 
   const sidebarLinks = [
@@ -78,7 +78,7 @@ export default function DashboardSidebar({
 
   return (
     <div className="min-h-screen">
-      <div className="z-40 mb-20 inline-block h-full max-w-xs bg-sidebar-accent">
+      <div className="z-40 mb-20 inline-block h-full max-w-lg bg-sidebar-accent">
         <div className="h-full space-y-4 px-12 pt-12">
           <div className="flex flex-col justify-center">
             {sidebarLinks.map(({ label, href, icon: Icon, viewKey }) => (

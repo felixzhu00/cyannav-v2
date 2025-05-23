@@ -4,7 +4,7 @@ import logo from '@/public/logo.svg'
 
 export default function Logo() {
   return (
-    <Link href="/" passHref className="flex items-center space-x-2">
+    <Link href="/" passHref className="flex items-center space-x-2 min-w-max">
       <Image
         src={logo}
         alt="Logo"

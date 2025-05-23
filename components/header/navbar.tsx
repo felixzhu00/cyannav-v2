@@ -21,6 +21,19 @@ import { auth } from '@/lib/auth'
 import UpgradeButton from './upgrade-button'
 import Notification from './notifications'
 
+import { Menu } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/#features', label: 'Features' },
+  { href: '/#community', label: 'Community' },
+  { href: '/#pricing', label: 'Pricing' },
+  { href: '/support', label: 'Support' },
+]
+
+const hamItemClass = 'text-lg font-bold p-3 justify-center bg-pf'
+
 export default async function Navbar() {
   const session = await auth()
   return (
@@ -68,7 +81,58 @@ export default async function Navbar() {
           </>
         ) : (
           <>
-            <NavigationMenuItem>
+            {/* Mobile/Hamburger */}
+            <div className="md:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="focus:outline-none focus:ring-0 focus:ring-offset-0" >
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-40 space-y-2 md:hidden">
+                  {links.map(({ href, label }) => (
+                    <DropdownMenuItem
+                      key={href}
+                      className={hamItemClass}
+                      asChild
+                    >
+                      <Link href={href}>{label}</Link>
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuItem className={cn(hamItemClass, 'bg-primary text-pf')} asChild>
+                    <Link href="/login">Login</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className={cn(hamItemClass, 'bg-primary text-pf')} asChild>
+                    <Link href="/register">Register</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            {/* Desktop */}
+            <div className="hidden gap-x-4 md:flex">
+              {links.map(({ href, label }) => (
+                <NavigationMenuItem key={href}>
+                  <Link href={href} legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
+                    >
+                      {label}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              ))}
+              <NavigationMenuItem>
+                <Link href="/login" legacyBehavior passHref>
+                  <Button variant="default">Login</Button>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/register" legacyBehavior passHref>
+                  <Button variant="default">Register</Button>
+                </Link>
+              </NavigationMenuItem>
+            </div>
+            {/* <NavigationMenuItem>
               <Link href="/" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
@@ -122,7 +186,7 @@ export default async function Navbar() {
               <Link href="/register" legacyBehavior passHref>
                 <Button variant="default">Register</Button>
               </Link>
-            </NavigationMenuItem>
+            </NavigationMenuItem> */}
           </>
         )}
       </NavigationMenuList>

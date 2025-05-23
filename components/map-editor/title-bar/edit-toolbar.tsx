@@ -73,7 +73,6 @@ export default function EditToolbar({ className }: { className: string }) {
 
   // Download canvas
   const handlePNG = () => {
-    console.log('clickerd')
     if (mapRef) {
       const imgData = mapRef.getCanvas().toDataURL('image/png')
 

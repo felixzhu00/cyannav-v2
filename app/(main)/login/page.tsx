@@ -70,7 +70,6 @@ export default async function Page() {
                       const a = await signIn(provider.id, {
                         redirectTo: '/dashboard',
                       })
-                      console.log(a)
                     } catch (error) {
                       if (error instanceof AuthError) {
                         return

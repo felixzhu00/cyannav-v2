@@ -14,7 +14,6 @@ export async function POST(
       mapId: params.id,
       userId,
     })
-    console.log(result)
 
     return NextResponse.json(result, { status: result.status })
   } catch (error) {

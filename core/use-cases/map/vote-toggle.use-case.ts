@@ -2,6 +2,7 @@ import { Types } from 'mongoose'
 import { getMapById } from '@/core/data-access/map/get-map.persistence'
 import { updateMapFieldsById } from '@/core/data-access/map/update-map.persistence'
 import { IMapDocument } from '@/core/_entities/types/map.types'
+import { UserFields } from '@/core/_entities/types/user.types'
 
 type VoteType = 'like' | 'dislike'
 
@@ -37,6 +38,18 @@ export async function toggleMapVoteUseCase({
 
   const mapRes = mapDoc.payload as IMapDocument
 
+  // Check if user can vote
+  // case 1: if user is owner
+  const notOwner = (mapRes.owner as UserFields)._id == userObjectId
+  if (notOwner) return { status: 400, message: 'Can not vote as owner' }
+  // case 2: if user is not sharedUser and map is not public
+  const userInSharedUser = mapRes.sharedUsers?.some(
+    (id: any) => id.toString() === userId
+  )
+  if (!userInSharedUser && mapRes.isPublished !== 'public')
+    return { status: 400, message: 'Can not vote on restricted map' }
+
+  // Toggle Vote logic
   const hasLiked = mapRes.likes?.some((id: any) => id.toString() === userId)
   const hasDisliked = mapRes.dislikes?.some(
     (id: any) => id.toString() === userId
@@ -61,7 +74,6 @@ export async function toggleMapVoteUseCase({
       }
     }
   }
-
 
   const updatedMap = await updateMapFieldsById(mapId, update)
 

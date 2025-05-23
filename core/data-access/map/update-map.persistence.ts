@@ -34,11 +34,23 @@ export async function updateMapFieldsById(
       )
     }
 
-    // Update the map in the database
+    // // Update the map in the database
+    // const updatedMap = await Map.findByIdAndUpdate(
+    //   id,
+    //   updateFields, // Update fields based on the payload
+    //   { new: true } // Return the updated document
+    // )
+
+    const shouldUpdateDate = Object.keys(updateFields).includes('geojson')
+
+    console.log(shouldUpdateDate)
     const updatedMap = await Map.findByIdAndUpdate(
       id,
-      updateFields, // Update fields based on the payload
-      { new: true } // Return the updated document
+      {
+        ...updateFields,
+        ...(shouldUpdateDate && { dateUpdated: new Date() }), // only adds if geojson is present
+      },
+      { new: true }
     )
 
     // Check if a Map is found in DB

@@ -54,6 +54,8 @@ export function useFilteredMaps(
         break
       case 'most_positive':
         result.sort((a, b) => getScore(b) - getScore(a))
+        const getScore = (m: MapFields) =>
+          (m.likes?.length ?? 0) - (m.dislikes?.length ?? 0)
         break
       case 'most_negative':
         result.sort((a, b) => getScore(a) - getScore(b))

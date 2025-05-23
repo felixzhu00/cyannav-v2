@@ -12,11 +12,48 @@ import Image from 'next/image'
 import { Star, ThumbsUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import HeadingRow from './heading-row'
+import { MapFields } from '@/core/_entities/types/map.types'
 
-export default function Community() {
+export default async function Community() {
+  let mapList: MapFields[] = []
+
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/map?view=community`,
+      {
+        method: 'GET',
+        cache: 'no-store',
+      }
+    )
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      return <p>Error: {errorData.message}</p>
+    }
+
+    const maps = await response.json()
+    mapList = maps.payload as MapFields[]
+
+    // Score function: likes - dislikes
+    const getScore = (m: MapFields) =>
+      (m.likes?.length ?? 0) - (m.dislikes?.length ?? 0)
+    
+    // Sort by score descending
+    mapList.sort((a, b) => getScore(b) - getScore(a))
+
+    // Slice to top 11
+    mapList = mapList.slice(0, 11)
+  } catch (error) {
+    console.log(error)
+    return <p>Error loading maps</p>
+  }
+
   return (
     <section id="community" className="space-y-10">
-      <HeadingRow heading='Popular Community Maps' subheading='View the most popular maps users created.' />
+      <HeadingRow
+        heading="Popular Community Maps"
+        subheading="View the most popular maps users created."
+      />
       <Carousel
         opts={{
           align: 'start',
@@ -24,8 +61,8 @@ export default function Community() {
         }}
         className="w-full"
       >
-        <CarouselContent className='gap-x-10'>
-          {Array.from({ length: 11 }).map((_, index) => (
+        <CarouselContent className="gap-x-10">
+          {mapList.map((_, index) => (
             <CarouselItem key={index} className="min-w-[310px]">
               <div>
                 <Card className="h-[310px] w-[310px] bg-zinc-100">
@@ -58,7 +95,7 @@ export default function Community() {
             </CarouselItem>
           ))}
           <CarouselItem className="min-w-[310px]">
-            <Card className="h-[310px] w-[310px] bg-zinc-100 flex items-center justify-center">
+            <Card className="flex h-[310px] w-[310px] items-center justify-center bg-zinc-100">
               <CardContent className="flex flex-col items-center justify-center text-center">
                 <p className="mb-4 text-lg font-semibold">Want more?</p>
                 <Button>Click Here to View More</Button>

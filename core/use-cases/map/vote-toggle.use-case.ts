@@ -62,6 +62,7 @@ export async function toggleMapVoteUseCase({
     }
   }
 
+
   const updatedMap = await updateMapFieldsById(mapId, update)
 
   if (!updatedMap || !updatedMap.payload) {

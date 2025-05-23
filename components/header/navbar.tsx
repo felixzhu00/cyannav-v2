@@ -82,14 +82,14 @@ export default async function Navbar() {
         ) : (
           <>
             {/* Mobile/Hamburger */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="focus:outline-none focus:ring-0 focus:ring-offset-0" >
                     <Menu className="h-6 w-6" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-40 space-y-2 md:hidden">
+                <DropdownMenuContent className="w-40 space-y-2 lg:hidden">
                   {links.map(({ href, label }) => (
                     <DropdownMenuItem
                       key={href}
@@ -109,7 +109,7 @@ export default async function Navbar() {
               </DropdownMenu>
             </div>
             {/* Desktop */}
-            <div className="hidden gap-x-4 md:flex">
+            <div className="hidden gap-x-4 lg:flex">
               {links.map(({ href, label }) => (
                 <NavigationMenuItem key={href}>
                   <Link href={href} legacyBehavior passHref>

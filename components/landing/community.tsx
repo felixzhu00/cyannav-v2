@@ -13,6 +13,10 @@ import { Star, ThumbsUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import HeadingRow from './heading-row'
 import { MapFields } from '@/core/_entities/types/map.types'
+import Link from 'next/link'
+import { UserFields } from '@/core/_entities/types/user.types'
+import StarToggle from '../dashboard/card-grid/star-toggle'
+import VoteBox from '../dashboard/card-grid/vote-box'
 
 export default async function Community() {
   let mapList: MapFields[] = []
@@ -37,7 +41,7 @@ export default async function Community() {
     // Score function: likes - dislikes
     const getScore = (m: MapFields) =>
       (m.likes?.length ?? 0) - (m.dislikes?.length ?? 0)
-    
+
     // Sort by score descending
     mapList.sort((a, b) => getScore(b) - getScore(a))
 
@@ -62,43 +66,54 @@ export default async function Community() {
         className="w-full"
       >
         <CarouselContent className="gap-x-10">
-          {mapList.map((_, index) => (
+          {mapList.map((map, index) => (
             <CarouselItem key={index} className="min-w-[310px]">
-              <div>
-                <Card className="h-[310px] w-[310px] bg-zinc-100">
-                  <CardContent className="flex flex-col items-center justify-center">
-                    <Image
-                      src={mapPlaceholder}
-                      className="h-[220px] w-[310px] rounded-t-lg"
-                      width={310}
-                      height={220}
-                      style={{ objectFit: 'cover' }}
-                      alt="map image"
+              <Card
+                key={index}
+                className="h-80 w-full bg-zinc-100 shadow-md transition-transform duration-300 ease-in-out hover:scale-105"
+              >
+                <CardContent className="flex flex-col items-center justify-center">
+                  {/* thumbnail */}
+                  <Image
+                    src={mapPlaceholder}
+                    className="h-[220px] w-full rounded-t-lg"
+                    width={310}
+                    height={220}
+                    style={{ objectFit: 'cover' }}
+                    alt="map image"
+                  />
+                  <div className="align-center flex w-full flex-row items-center justify-between space-x-4 p-4">
+                    <VoteBox
+                      id={map._id as string}
+                      count={
+                        (map.likes?.length ?? 0) - (map.dislikes?.length ?? 0)
+                      }
+                      upvoted={false}
+                      downvoted={false}
                     />
-                    <div className="flex w-full flex-row items-center justify-between px-4 pt-6">
-                      <div className="flex w-full flex-col">
-                        <h3 className="truncate text-xl font-bold">Map Name</h3>
-                        <p className="text-xs">By: Author</p>
-                      </div>
-                      <div className="flex space-x-3">
-                        <button>
-                          <Star />
-                        </button>
-                        <button>
-                          <ThumbsUp />
-                        </button>
-                      </div>
+                    <div className="flex w-full flex-col">
+                      <h3 className="truncate text-xl font-bold">
+                        {map.title}
+                      </h3>
+                      <p className="text-xs">
+                        By: {(map.owner as UserFields).username}
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                    <div className="flex space-x-3">
+                      <StarToggle mapId={map._id as string} isStarred={false} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </CarouselItem>
           ))}
           <CarouselItem className="min-w-[310px]">
             <Card className="flex h-[310px] w-[310px] items-center justify-center bg-zinc-100">
               <CardContent className="flex flex-col items-center justify-center text-center">
                 <p className="mb-4 text-lg font-semibold">Want more?</p>
-                <Button>Click Here to View More</Button>
+                <Button>
+                  <Link href={'/login'}>Click Here to View More</Link>
+                </Button>
               </CardContent>
             </Card>
           </CarouselItem>
@@ -106,9 +121,6 @@ export default async function Community() {
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
-      <div>
-        <Button>Click Here to View More</Button>
-      </div>
     </section>
   )
 }

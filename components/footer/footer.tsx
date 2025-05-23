@@ -46,10 +46,10 @@ export default function Footer() {
   }
 
   return (
-    <footer className="flex h-[325px] w-full flex-col justify-center space-y-12 border-t border-gray-200 bg-white px-16 py-14 dark:border-zinc-700 dark:bg-zinc-900">
-      <div className="flex flex-row justify-between gap-x-6">
+    <footer className="flex h-full w-full flex-col justify-center space-y-12 border-t border-gray-200 bg-white px-16 py-14 dark:border-zinc-700 dark:bg-zinc-900">
+      <div className="flex flex-row justify-between gap-x-6 gap-y-6 flex-wrap">
         {/* Footer Intro */}
-        <div className="flex flex-col space-y-5">
+        <div className="flex flex-col space-y-5 ">
           <LogoTheme />
           <p className="text-sm font-medium">
             Create and design stunning maps to share with others.

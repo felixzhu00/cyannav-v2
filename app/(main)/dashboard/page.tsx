@@ -5,48 +5,9 @@ import DashboardSidebar from '@/components/dashboard/sidebar'
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import GeneralContent from '@/components/dashboard/general-content'
-import CardGrid from '@/components/dashboard/card-grid/card-grid'
 import { cookies } from 'next/headers'
 import { MapFields } from '@/core/_entities/types/map.types'
-
-type DashboardView = {
-  title: string
-  searchable: boolean
-  selectOptions: { label: string; value: string }[]
-}
-
-const dashboardViews: { [key: string]: DashboardView } = {
-  'my-maps': {
-    title: 'My Maps',
-    searchable: true,
-    selectOptions: [
-      { label: 'Recently Updated', value: 'updated_at' }, // default
-      { label: 'A-Z', value: 'alphabet-a-z' },
-      { label: 'Recently Created', value: 'created_at' },
-    ],
-  },
-  community: {
-    title: 'Community',
-    searchable: true,
-    selectOptions: [
-      { label: 'Most Positive', value: 'most_positive' }, // default
-      { label: 'Most Negative', value: 'most_negative' },
-      { label: 'Recently Updated', value: 'updated_at' },
-      { label: 'A-Z', value: 'alphabet-a-z' },
-      { label: 'Recently Created', value: 'created_at' },
-    ],
-  },
-  'shared-with-me': {
-    title: 'Shared with Me',
-    searchable: false,
-    selectOptions: [], // no sort options
-  },
-  'starred-maps': {
-    title: 'Starred Maps',
-    searchable: false,
-    selectOptions: [], // no sort options
-  },
-}
+import { dashboardViews } from '@/lib/const'
 
 export default async function Page({
   searchParams,
@@ -97,13 +58,7 @@ export default async function Page({
     return (
       <div className="grid w-full grid-cols-[auto,1fr]">
         <DashboardSidebar view={view} />
-        <GeneralContent
-          title={dashboardViews[view].title}
-          searchable={dashboardViews[view].searchable}
-          selectOptions={dashboardViews[view].selectOptions}
-        >
-          <CardGrid showAddNewMap={view === 'my-maps'} mapList={mapList} />
-        </GeneralContent>
+        <GeneralContent view={view} mapList={mapList} />
       </div>
     )
   } catch (error) {

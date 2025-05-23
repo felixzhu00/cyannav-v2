@@ -14,6 +14,7 @@ const MapSchema = new Schema<IMapDocument>({
   sharedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   forkedFrom: { type: Schema.Types.ObjectId, ref: 'Map' },
   dateCreated: { type: Date, default: Date.now },
+  dateUpdated: { type: Date, default: Date.now },
 })
 
 delete models.Map

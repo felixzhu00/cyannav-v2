@@ -9,17 +9,18 @@ import VoteBox from './vote-box'
 import { auth } from '@/lib/auth'
 import { Types } from 'mongoose'
 import StarToggle from './star-toggle'
+import { useSession } from 'next-auth/react'
 interface CardComponentProps {
   index: number
   mapMeta: MapFields
 }
 
-export default async function CardComponent({
+export default function CardComponent({
   index,
   mapMeta,
 }: CardComponentProps) {
   // Get the current session
-  const session = await auth()
+  const { data: session, status } = useSession()
 
   // Get the current user viewing the card(can be guest or login user)
   const userId = new Types.ObjectId(session?.userId)

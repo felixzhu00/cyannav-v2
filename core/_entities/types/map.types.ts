@@ -17,6 +17,7 @@ export interface IMap {
   sharedUsers?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
   forkedFrom?: IMapDocument | IMapDocument['_id'] | Types.ObjectId
   dateCreated?: Date
+  dateUpdated?: Date
 }
 export interface IMapDocument extends IMap, Document {}
 

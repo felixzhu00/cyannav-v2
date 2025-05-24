@@ -66,11 +66,17 @@ export async function getMapsByMapFieldsUseCase(
   // map should be IMapDocument
   const maps = dbRes.payload as IMapDocument[]
 
+  console.log(maps)
+  const transformedMap = maps.map((mapElement) => {
+    return transformMap(mapElement)
+  })
+
+  console.log(transformedMap)
   // Return processed Map
   return {
     status: 200,
     message: 'Sucessfully Retrieved Maps Metadata',
-    payload: maps,
+    payload: transformedMap,
   }
 }
 

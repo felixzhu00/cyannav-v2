@@ -89,3 +89,18 @@ export function renderCollection(
     }
   })
 }
+
+// Lite version of above function that renders a GeoJSON collection for image generation
+export function renderCollectionImnage(
+  mapRef: maplibregl.Map | null,
+  mapGeo: CustomFeatureCollection
+) {
+  // Iterate over mapGeo features and add individual sources and layers
+  mapGeo.features.forEach((feature) => {
+    try {
+      renderFeatureLayer(mapRef, feature)
+    } catch (error) {
+      console.error(error)
+    }
+  })
+}

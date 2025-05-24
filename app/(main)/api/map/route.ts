@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
         })
     }
 
+    console.log(maps.payload)
     return NextResponse.json({
       payload: maps.payload,
       message: 'Maps fetched successfully',

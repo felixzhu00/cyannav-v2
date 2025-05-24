@@ -6,6 +6,7 @@ const MapSchema = new Schema<IMapDocument>({
   owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   mapType: { type: String, required: true },
   isPublished: { type: String, default: 'private' },
+  isTemplate: { type: Boolean },
   thumbnail: { type: Buffer },
   geojson: { type: Buffer },
   likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
@@ -15,6 +16,7 @@ const MapSchema = new Schema<IMapDocument>({
   forkedFrom: { type: Schema.Types.ObjectId, ref: 'Map' },
   dateCreated: { type: Date, default: Date.now },
   dateUpdated: { type: Date, default: Date.now },
+  dateThumbnailUpdated: { type: Date },
 })
 
 delete models.Map

@@ -9,6 +9,7 @@ export interface IMap {
   owner: IUserDocument | IUserDocument['_id'] | Types.ObjectId
   mapType: string
   isPublished: 'public' | 'private' | 'invited'
+  isTemplate?: boolean
   thumbnail?: Buffer
   geojson?: Buffer
   likes?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
@@ -18,6 +19,7 @@ export interface IMap {
   forkedFrom?: IMapDocument | IMapDocument['_id'] | Types.ObjectId
   dateCreated?: Date
   dateUpdated?: Date
+  dateThumbnailUpdated?: Date
 }
 export interface IMapDocument extends IMap, Document {}
 

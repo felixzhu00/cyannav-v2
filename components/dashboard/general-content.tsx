@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Select,
   SelectContent,
@@ -11,7 +11,10 @@ import {
 } from '@/components/ui/select'
 import Search from '@/components/dashboard/search'
 import CardGrid from './card-grid/card-grid'
-import { MapFields } from '@/core/_entities/types/map.types'
+import {
+  CustomFeatureCollection,
+  MapFields,
+} from '@/core/_entities/types/map.types'
 import { useFilteredMaps } from '@/lib/hooks/use-filtered-maps'
 
 import { dashboardViews } from '@/lib/const'

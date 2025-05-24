@@ -1,24 +1,19 @@
 import React from 'react'
 import { Card } from '../../ui/card'
 import { CardContent } from '../../ui/card'
-import Image from 'next/image'
-import mapPlaceholder from '@/public/map_placeholder.png'
 import { MapFields } from '@/core/_entities/types/map.types'
 import { UserFields } from '@/core/_entities/types/user.types'
 import VoteBox from './vote-box'
-import { auth } from '@/lib/auth'
 import { Types } from 'mongoose'
 import StarToggle from './star-toggle'
 import { useSession } from 'next-auth/react'
+import BufferImage from './buffer-image'
 interface CardComponentProps {
   index: number
   mapMeta: MapFields
 }
 
-export default function CardComponent({
-  index,
-  mapMeta,
-}: CardComponentProps) {
+export default function CardComponent({ index, mapMeta }: CardComponentProps) {
   // Get the current session
   const { data: session, status } = useSession()
 
@@ -30,9 +25,12 @@ export default function CardComponent({
     owner,
     mapType,
     isPublished,
+    isTemplate,
+    thumbnail,
     geojson,
     likes,
     dislikes,
+    messages,
     sharedUsers,
     dateCreated,
   } = mapMeta
@@ -53,13 +51,13 @@ export default function CardComponent({
     >
       <CardContent className="flex flex-col items-center justify-center">
         {/* thumbnail */}
-        <Image
-          src={mapPlaceholder}
-          className="h-[220px] w-full rounded-t-lg"
+        <BufferImage
+          buffer={thumbnail}
+          alt="map image"
           width={310}
           height={220}
+          className="h-[220px] w-full rounded-t-lg"
           style={{ objectFit: 'cover' }}
-          alt="map image"
         />
         <div className="align-center flex w-full flex-row items-center justify-between space-x-4 p-4">
           <VoteBox

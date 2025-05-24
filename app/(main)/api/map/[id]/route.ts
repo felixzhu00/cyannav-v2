@@ -3,10 +3,9 @@ import {
   toggleMapArrayFieldsByIdUseCase,
   updateMapFieldsUseCase,
 } from '@/core/use-cases/map/update-map.use-case'
-import { MapFields } from '@/core/_entities/types/map.types'
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { Types } from 'mongoose'
+import { MapFields } from '@/core/_entities/types/map.types'
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   console.error('getMap', params)
@@ -43,35 +42,60 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
   }
 }
 
+export const config = {
+  api: {
+    bodyParser: false, // Important! We disable built-in parser to parse multipart manually
+  },
+}
+
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    // Destructure the id from param /map/${id}
     const { id } = params
-    // Destructure and assign type to updateFields data from request
-    const updateFields = (await request.json()) as MapFields
+    const contentType = request.headers.get('content-type') || ''
 
-    // Update Any Map Fields
+    let updateFields: Record<string, any> = {}
+
+    if (contentType.includes('application/json')) {
+      updateFields = await request.json()
+    } else if (contentType.includes('multipart/form-data')) {
+      const formData = await request.formData()
+      const entries = Array.from(formData.entries())
+      for (const [key, value] of entries) {
+        if (value instanceof Blob) {
+          const arrayBuffer = await value.arrayBuffer()
+          const buffer = Buffer.from(arrayBuffer)
+
+          updateFields[key] = buffer
+        } else {
+          try {
+            updateFields[key] = JSON.parse(value as string)
+          } catch {
+            updateFields[key] = value
+          }
+        }
+      }
+    } else {
+      return NextResponse.json(
+        { message: 'Unsupported content type' },
+        { status: 400 }
+      )
+    }
+
     const res = await updateMapFieldsUseCase(id, updateFields)
 
-    // If use case error
     if ('error' in res) {
-      console.error(res.error)
       return NextResponse.json({ message: res.message }, { status: res.status })
     }
 
-    // Return success
     return NextResponse.json(
       { message: res.message, payload: res.payload },
       { status: res.status }
     )
   } catch (error) {
-    // Log error on console for dev debug
     console.error(error)
-
-    // Send generic response for user API calls
     return NextResponse.json(
       {
         errors: { server: ['Internal server error'] },
@@ -81,6 +105,46 @@ export async function PUT(
     )
   }
 }
+
+// export async function PUT(
+//   request: Request,
+//   { params }: { params: { id: string } }
+// ) {
+//   try {
+//     // Destructure the id from param /map/${id}
+//     const { id } = params
+//     // Destructure and assign type to updateFields data from request
+//     const updateFields = (await request.json()) as MapFields
+
+//     console.log(updateFields)
+//     // Update Any Map Fields
+//     const res = await updateMapFieldsUseCase(id, updateFields)
+
+//     // If use case error
+//     if ('error' in res) {
+//       console.error(res.error)
+//       return NextResponse.json({ message: res.message }, { status: res.status })
+//     }
+
+//     // Return success
+//     return NextResponse.json(
+//       { message: res.message, payload: res.payload },
+//       { status: res.status }
+//     )
+//   } catch (error) {
+//     // Log error on console for dev debug
+//     console.error(error)
+
+//     // Send generic response for user API calls
+//     return NextResponse.json(
+//       {
+//         errors: { server: ['Internal server error'] },
+//         message: 'Internal server error',
+//       },
+//       { status: 500 }
+//     )
+//   }
+// }
 
 export async function POST(
   request: Request,

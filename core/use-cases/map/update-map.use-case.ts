@@ -114,6 +114,9 @@ export async function toggleMapArrayFieldsByIdUseCase(
     toggleTo
   )
 
+  // Revalidate dashboard path
+  // revalidatePath('/dashboard')
+
   // Check DB request errored
   if ('error' in dbRes) {
     return dbRes
@@ -125,5 +128,3 @@ export async function toggleMapArrayFieldsByIdUseCase(
     payload: dbRes,
   }
 }
-
-

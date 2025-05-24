@@ -13,7 +13,6 @@ export default function CardGrid({
   showAddNewMap = true,
   mapList,
 }: CardGridProps) {
-  console.log(mapList)
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       {showAddNewMap && (
@@ -29,7 +28,7 @@ export default function CardGrid({
 
       {/* Grid of map cards */}
       {mapList.map((_, index) => (
-        <CardComponent key={index} index={index} mapMeta={mapList[index]} />
+        <CardComponent key={index} index={index} mapMeta={mapList[index]}  />
       ))}
     </div>
   )

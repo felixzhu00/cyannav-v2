@@ -54,8 +54,8 @@ export default async function Page({
 
     // Get the maplist field
     const mapList = maps.payload as MapFields[]
+    console.log('mapList')
     console.log(mapList)
-
     return (
       <div className="grid w-full grid-cols-[auto,1fr]">
         <DashboardSidebar view={view} />

@@ -1,6 +1,8 @@
 'use client'
 
 import { Star, StarOff } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
 interface StarToggleProps {
@@ -8,14 +10,16 @@ interface StarToggleProps {
   isStarred: boolean
 }
 
-export default function StarToggle({ mapId, isStarred: initialStarred }: StarToggleProps) {
+export default function StarToggle({
+  mapId,
+  isStarred: initialStarred,
+}: StarToggleProps) {
   const [isStarred, setIsStarred] = useState(initialStarred)
-  const [loading, setLoading] = useState(false)
+  const { update } = useSession()
+  const router = useRouter()
 
   const handleToggleStar = async () => {
     try {
-      setLoading(true)
-
       const res = await fetch(`/api/map/${mapId}/star`, {
         method: 'POST',
         body: JSON.stringify({ toggle: true }),
@@ -24,22 +28,28 @@ export default function StarToggle({ mapId, isStarred: initialStarred }: StarTog
 
       if (!res.ok) throw new Error('Failed to toggle star')
 
+      //update session after api success
+      await update()
+
+      //Refresh route so server mapList can update
+      router.refresh() // refreshes server componenet
       setIsStarred((prev) => !prev)
     } catch (err) {
       console.error(err)
-    } finally {
-      setLoading(false)
     }
   }
 
   return (
     <button
       onClick={handleToggleStar}
-      className={`text-yellow-500 hover:text-yellow-600 transition-colors ${loading ? 'opacity-50' : ''}`}
-      disabled={loading}
+      className={`text-yellow-500 transition-colors hover:text-yellow-600`}
       aria-label="Toggle Star"
     >
-      {isStarred ? <Star fill="currentColor" size={20} /> : <StarOff size={20} />}
+      {isStarred ? (
+        <Star fill="currentColor" size={20} />
+      ) : (
+        <StarOff size={20} />
+      )}
     </button>
   )
 }

@@ -66,12 +66,13 @@ export async function getMapsByMapFieldsUseCase(
   // map should be IMapDocument
   const maps = dbRes.payload as IMapDocument[]
 
-  console.log(maps)
   const transformedMap = maps.map((mapElement) => {
     return transformMap(mapElement)
   })
 
-  console.log(transformedMap)
+  // // Revalidate dashboard path
+  // revalidatePath('/dashboard')
+
   // Return processed Map
   return {
     status: 200,
@@ -102,6 +103,9 @@ export async function getFavoriteMapsByUserIdUseCase(
 
   // map should be IMapDocument
   const maps = dbRes.payload as IMapDocument[]
+
+  // // Revalidate dashboard path
+  // revalidatePath('/dashboard')
 
   // Return processed Map
   return {

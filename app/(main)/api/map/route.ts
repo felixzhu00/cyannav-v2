@@ -3,6 +3,7 @@ import { getStarredMapByUserId } from '@/core/data-access/map/get-map.persistenc
 import { getMapsByMapFieldsUseCase } from '@/core/use-cases/map/get-map.use-case'
 
 import { auth } from '@/lib/auth'
+import { revalidatePath } from 'next/cache'
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url)
@@ -52,7 +53,9 @@ export async function GET(request: NextRequest) {
         })
     }
 
-    console.log(maps.payload)
+    // Revalidate dashboard path
+    // revalidatePath('/dashboard') // dont need this if no-store in api call
+
     return NextResponse.json({
       payload: maps.payload,
       message: 'Maps fetched successfully',

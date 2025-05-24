@@ -43,7 +43,6 @@ export async function updateMapFieldsById(
 
     const shouldUpdateDate = Object.keys(updateFields).includes('geojson')
 
-    console.log(updateFields)
     const updatedMap = await Map.findByIdAndUpdate(
       id,
       {

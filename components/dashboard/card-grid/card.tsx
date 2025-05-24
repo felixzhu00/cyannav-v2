@@ -11,9 +11,14 @@ import BufferImage from './buffer-image'
 interface CardComponentProps {
   index: number
   mapMeta: MapFields
+  // userMeta: UserFields
 }
 
-export default function CardComponent({ index, mapMeta }: CardComponentProps) {
+export default function CardComponent({
+  index,
+  mapMeta,
+  // userMeta,
+}: CardComponentProps) {
   // Get the current session
   const { data: session, status } = useSession()
 
@@ -42,7 +47,10 @@ export default function CardComponent({ index, mapMeta }: CardComponentProps) {
 
   // Param to pass to Star
   const idStr = (_id as Types.ObjectId).toString() // cast id to string form
-  const isStar = (session?.user?.favorite ?? []).includes(idStr)
+  const isStar = (session?.user?.favorite ?? []).includes(idStr.toString())
+
+  console.log(session?.user?.favorite)
+  console.log(isStar)
 
   return (
     <Card

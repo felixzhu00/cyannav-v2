@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '../ui/button'
-import TemplateDialog from '@/components/dashboard/dialogs/templates-dialog'
+import TemplateDialog from '@/components/dashboard/dialogs/template/templates-dialog'
 import ImportMapDialog from '@/components/dashboard/dialogs/import-maps-dialog'
 
 export default function DashboardSidebar({
@@ -24,6 +24,7 @@ export default function DashboardSidebar({
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
 
   const handleTemplateClick = () => {
+    console.log('open')
     setIsTemplateDialogOpen(true) // Open the template dialog
   }
 

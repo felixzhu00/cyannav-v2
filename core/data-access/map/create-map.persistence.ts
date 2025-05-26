@@ -1,10 +1,10 @@
 import { APIResponse } from '@/core/_entities/types/api.types'
-import { IMap } from '@/core/_entities/types/map.types'
+import { MapFields } from '@/core/_entities/types/map.types'
 import dbConnect from '@/db/dbConnect'
 import Map from '@/db/map.model'
 import { createErrorResponse, handleDBError } from '@/lib/utils'
 
-export async function createMap(params: IMap): Promise<APIResponse> {
+export async function createMap(params: MapFields): Promise<APIResponse> {
   try {
     await dbConnect()
     // Ensure 'params' is not null or undefined before proceeding

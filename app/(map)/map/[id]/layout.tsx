@@ -1,5 +1,4 @@
 import { LeftToast } from '@/components/map-editor/bottom-left-toaster'
-import { Toaster } from '@/components/ui/toaster'
 import { Provider } from 'jotai'
 import React from 'react'
 

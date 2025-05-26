@@ -44,7 +44,8 @@ export async function getMapUseCase(id: string): Promise<APIResponse> {
 }
 
 export async function getMapsByMapFieldsUseCase(
-  mapFields: MapFields
+  mapFields: MapFields,
+  option: 'union' | 'intersection' = 'union' // Default to 'union'
 ): Promise<APIResponse> {
   // Check if valid id is passed
   if (!mapFields) {
@@ -56,7 +57,7 @@ export async function getMapsByMapFieldsUseCase(
   }
 
   // Get Map object from DB
-  const dbRes = await getMapsByFields(mapFields)
+  const dbRes = await getMapsByFields(mapFields, option)
 
   // Check DB request errored
   if ('error' in dbRes) {

@@ -4,8 +4,7 @@ import updateUserProfilePictureUseCase from '@/core/use-cases/user/update-profil
 
 export async function DELETE(request: Request) {
   const body = await request.json()
-  const userId = body.userId
-  const email = body.email
+  const { userId } = body
 
   try {
     const res = await deleteUserUseCase(userId)
@@ -32,8 +31,8 @@ export async function DELETE(request: Request) {
 
 export async function PUT(request: Request) {
   const body = await request.json()
-  const userId = body.userId
-  const profilePicture = body.profilePicture
+
+  const { userId, profilePicture } = body
 
   try {
     const res = await updateUserProfilePictureUseCase(userId, profilePicture)

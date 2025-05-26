@@ -43,7 +43,8 @@ export function decodeGeo(geojsonBuffer: { type: string; data: number[] }) {
   const buffer = Buffer.from(new Uint8Array(geojsonBuffer.data))
 
   // Decode the Buffer using geobuf
-  const geo = geobuf.decode(new Pbf(buffer)) as CustomFeatureCollection
+  const uint8Array = new Uint8Array(geojsonBuffer.data)
+  const geo = geobuf.decode(new Pbf(uint8Array)) as CustomFeatureCollection
 
   // Populate default in case the geojson from db does not have render properties
   const defaultFeatureList = geo.features.map((feature) =>
@@ -102,7 +103,7 @@ export function convertToCustomFeatureCollection(
 
     return {
       type: 'FeatureCollection',
-      features: [finalGeo],
+      features: [finalGeo] as CustomFeature[], // Could be different type
       _shared: new Map<string, string | number>(),
     }
   }

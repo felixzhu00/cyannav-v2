@@ -7,15 +7,19 @@ import {
   mapLibreAtom,
   mapSourceAtom,
 } from '../jotai'
+// @ts-ignore
 import MapboxDraw from '@mapbox/mapbox-gl-draw'
 import {
   SimpleSelectModeBezierOverride,
   DirectModeBezierOverride,
   DrawBezierCurve,
   customStyles,
+  // @ts-ignore
 } from 'mapbox-gl-draw-bezier-curve-mode'
+// @ts-ignore
 import DrawRectangle from 'mapbox-gl-draw-rectangle-mode'
 import * as MapboxDrawGeodesic from 'mapbox-gl-draw-geodesic'
+// @ts-ignore
 import PaintMode from 'mapbox-gl-draw-paint-mode'
 import { NoOpMode, SelectMode } from '../maplibre-actions/map-var-const'
 

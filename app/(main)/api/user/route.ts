@@ -31,8 +31,7 @@ export async function GET(request: Request) {
 
 export async function PUT(request: Request) {
   const body = await request.json()
-  const username = body.username
-  const userId = body.userId
+  const { username, userId } = body
 
   try {
     const res = await saveUsernameUseCase(userId, username)

@@ -1,5 +1,5 @@
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
-import { renderCollectionImnage } from './maplibre-actions/map-render-layers'
+import { renderCollectionImage } from './maplibre-actions/map-render-layers'
 import maplibregl from 'maplibre-gl'
 import * as turf from '@turf/turf'
 
@@ -41,7 +41,7 @@ export const initializeOffScreenMapDiv = async (
 
     map.on('load', () => {
       // Render the GeoJson like Edit
-      renderCollectionImnage(map, geojson as CustomFeatureCollection)
+      renderCollectionImage(map, geojson as CustomFeatureCollection)
 
       // Fit to bounds(false: do not bound geojson feature)
       if (fitBound) {

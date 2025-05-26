@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ui/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import {
   Form,
   FormControl,
@@ -15,30 +14,22 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import React from 'react'
-
-const FormSchema = z.object({
-  email: z.string().nonempty({ message: 'Email is required.' }).email({
-    message: 'Invalid email address.',
-  }),
-  password: z.string().nonempty({ message: 'Password is required.' }),
-})
-
-type FormData = z.infer<typeof FormSchema>
+import {
+  LoginFormData,
+  LoginFormSchema,
+} from '@/core/_entities/z-schemas/form.schema'
 
 export default function LoginForm() {
-  const router = useRouter()
-
-  const form = useForm<FormData>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(LoginFormSchema),
     defaultValues: {
       email: '',
       password: '',
     },
   })
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      // Handle NextAuth Credential Login
       await signIn('credentials', {
         email: data.email,
         password: data.password,
@@ -53,25 +44,18 @@ export default function LoginForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-        {/* Email Field */}
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input
-                  {...field}
-                  type="email"
-                  placeholder="Email
-"
-                />
+                <Input {...field} type="email" placeholder="Email" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        {/* Password Field */}
         <FormField
           control={form.control}
           name="password"

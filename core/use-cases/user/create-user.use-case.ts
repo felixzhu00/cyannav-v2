@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import { pbkdf2Sync, randomBytes } from 'crypto'
 import { IUser, UserFields } from '@/core/_entities/types/user.types'
 import { createUser } from '@/core/data-access/user/create-user.persistence'
 import { APIResponse } from '@/core/_entities/types/api.types'
@@ -61,10 +61,14 @@ export default async function createUserUseCase(
   }
 
   // Create a hashed password to be store in DB
-  const salt = crypto.randomBytes(16).toString('hex')
-  const hashedPassword = crypto
-    .pbkdf2Sync(password as string, salt, 100, 64, 'sha256')
-    .toString('hex')
+  const salt = randomBytes(16).toString('hex')
+  const hashedPassword = pbkdf2Sync(
+    password as string,
+    salt,
+    100,
+    64,
+    'sha256'
+  ).toString('hex')
 
   const dbRes = await createUser({
     username: username as string,
@@ -88,5 +92,6 @@ export default async function createUserUseCase(
   return {
     status: 200,
     message: 'Sucessfully Registered User',
+    payload: dbRes.payload,
   }
 }

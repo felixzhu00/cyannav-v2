@@ -89,7 +89,7 @@ export async function getMapsByFields(
       // Return only meta data json
       maps = await Map.find(query)
         .select(
-          'title owner isPublished mapType thumbnail dateCreated geojson likes dislikes sharedUsers'
+          'title owner isPublished isTemplate mapType thumbnail dateCreated geojson likes dislikes sharedUsers'
         )
         .populate('owner', 'username')
         .lean()

@@ -55,17 +55,14 @@ export async function toggleUserFavoriteUseCase({
     update.$pull = {
       ['favorite']: mapObjectId,
     }
-    console.log('pull')
   } else {
     update.$addToSet = { ['favorite']: mapObjectId }
-    console.log('add')
   }
 
   const updatedUser = await updateUserFieldsById(userId, update)
   if (!updatedUser || !updatedUser.payload) {
     return { status: 404, message: 'User update failed' }
   }
-  console.log(updatedUser)
 
   const updatedUserRes = updatedUser.payload as IUserDocument
 

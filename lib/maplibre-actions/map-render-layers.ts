@@ -91,7 +91,7 @@ export function renderCollection(
 }
 
 // Lite version of above function that renders a GeoJSON collection for image generation
-export function renderCollectionImnage(
+export function renderCollectionImage(
   mapRef: maplibregl.Map | null,
   mapGeo: CustomFeatureCollection
 ) {

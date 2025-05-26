@@ -5,7 +5,6 @@ import {
 } from '@/core/use-cases/map/update-map.use-case'
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { MapFields } from '@/core/_entities/types/map.types'
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   console.error('getMap', params)
@@ -42,11 +41,6 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
   }
 }
 
-export const config = {
-  api: {
-    bodyParser: false, // Important! We disable built-in parser to parse multipart manually
-  },
-}
 
 export async function PUT(
   request: Request,

@@ -28,7 +28,7 @@ export default async function Page({
   if (!view || typeof view !== 'string')
     return redirect('/dashboard?view=my-maps')
 
-  //default to my-map if invalid
+  // default to my-map if invalid
   if (!view || !Object.keys(dashboardViews).includes(view))
     return redirect('/dashboard?view=my-maps')
 
@@ -54,8 +54,6 @@ export default async function Page({
 
     // Get the maplist field
     const mapList = maps.payload as MapFields[]
-    console.log('mapList')
-    console.log(mapList)
     return (
       <div className="grid w-full grid-cols-[auto,1fr]">
         <DashboardSidebar view={view} />
@@ -63,7 +61,11 @@ export default async function Page({
       </div>
     )
   } catch (error) {
-    console.log(error)
-    return <p>Error fetching map</p>
+    console.error(error)
+    return (
+      <p className="mx-0 my-auto h-full w-full select-none justify-center pt-20 text-center text-3xl text-muted-foreground">
+        Error fetching map
+      </p>
+    )
   }
 }

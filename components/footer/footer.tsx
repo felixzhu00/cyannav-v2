@@ -4,7 +4,6 @@ import { Github, Linkedin, Twitter } from 'lucide-react'
 import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -20,36 +19,31 @@ import { toast } from '@/components/ui/use-toast'
 import ThemeSwitcher from '@/components/theme-toggle'
 import LogoTheme from '../landing/logo-theme'
 import { FooterColumn } from './footer-column'
-
-
-
-const FormSchema = z.object({
-  email: z.string().email({
-    message: 'Please enter a valid email address.',
-  }),
-})
+import {
+  FooterEmailFormData,
+  FooterEmailFormSchema,
+} from '@/core/_entities/z-schemas/form.schema'
 
 export default function Footer() {
-
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<FooterEmailFormData>({
+    resolver: zodResolver(FooterEmailFormSchema),
     defaultValues: {
       email: '',
     },
   })
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  function onSubmit(data: FooterEmailFormData) {
     toast({
       description: 'Thank you for subscribing to our newsletter.',
     })
-    form.reset({ email: "" });
+    form.reset({ email: '' })
   }
 
   return (
     <footer className="flex h-full w-full flex-col justify-center space-y-12 border-t border-gray-200 bg-white px-16 py-14 dark:border-zinc-700 dark:bg-zinc-900">
-      <div className="flex flex-row justify-between gap-x-6 gap-y-6 flex-wrap">
+      <div className="flex flex-row flex-wrap justify-between gap-x-6 gap-y-6">
         {/* Footer Intro */}
-        <div className="flex flex-col space-y-5 ">
+        <div className="flex flex-col space-y-5">
           <LogoTheme />
           <p className="text-sm font-medium">
             Create and design stunning maps to share with others.
@@ -90,7 +84,6 @@ export default function Footer() {
             { label: 'Pricing', href: '/pricing' },
           ]}
         />
-
 
         {/* Company */}
         <FooterColumn
@@ -141,7 +134,6 @@ export default function Footer() {
             </form>
           </Form>
         </FooterColumn>
-
       </div>
       <div className="flex flex-row justify-between">
         <p className="text-sm font-medium">
@@ -157,4 +149,3 @@ export default function Footer() {
     </footer>
   )
 }
-

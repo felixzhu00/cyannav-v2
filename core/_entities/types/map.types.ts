@@ -49,7 +49,10 @@ export interface MapAtom {
   thumbnail?: string
   likes: string[]
   messages: MessageFields[]
-  sharedUsers: string[]
+  sharedUsers: {
+    username: string
+    email: string
+  }[]
   dateCreated: Date
   forkedFrom: string[]
 }

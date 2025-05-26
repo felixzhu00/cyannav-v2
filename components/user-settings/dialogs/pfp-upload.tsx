@@ -89,7 +89,7 @@ export function PfpUpload() {
         })
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
       setErrorMessage('An error occurred while uploading the picture.')
     }
   }

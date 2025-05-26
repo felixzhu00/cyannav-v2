@@ -3,7 +3,8 @@ import { getStarredMapByUserId } from '@/core/data-access/map/get-map.persistenc
 import { getMapsByMapFieldsUseCase } from '@/core/use-cases/map/get-map.use-case'
 
 import { auth } from '@/lib/auth'
-import { revalidatePath } from 'next/cache'
+import { createMapUseCase } from '@/core/use-cases/map/create-map.use-case'
+import { IMapDocument } from '@/core/_entities/types/map.types'
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url)
@@ -25,18 +26,36 @@ export async function GET(request: NextRequest) {
         if (!userId) {
           return NextResponse.json({ message: 'Unauthorized', status: 401 })
         }
-        maps = await getMapsByMapFieldsUseCase({ owner: userId })
+        maps = await getMapsByMapFieldsUseCase(
+          {
+            owner: userId,
+            isTemplate: false,
+          },
+          'intersection'
+        )
         break
 
       case 'community':
-        maps = await getMapsByMapFieldsUseCase({ isPublished: 'public' })
+        maps = await getMapsByMapFieldsUseCase(
+          {
+            isPublished: 'public',
+            isTemplate: false,
+          },
+          'intersection'
+        )
         break
 
       case 'shared-with-me':
         if (!userId) {
           return NextResponse.json({ message: 'Unauthorized', status: 401 })
         }
-        maps = await getMapsByMapFieldsUseCase({ sharedUsers: userId })
+        maps = await getMapsByMapFieldsUseCase(
+          {
+            sharedUsers: userId,
+            isTemplate: false,
+          },
+          'intersection'
+        )
         break
 
       case 'starred-maps':
@@ -44,6 +63,14 @@ export async function GET(request: NextRequest) {
           return NextResponse.json({ message: 'Unauthorized', status: 401 })
         }
         maps = await getStarredMapByUserId(userId)
+        break
+      case 'templates':
+        if (!userId) {
+          return NextResponse.json({ message: 'Unauthorized', status: 401 })
+        }
+        maps = await getMapsByMapFieldsUseCase({
+          isTemplate: true,
+        })
         break
 
       default:
@@ -63,6 +90,52 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error(error)
+    return NextResponse.json(
+      {
+        message: 'Internal Server Error',
+        status: 500,
+      },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    // Get current user session
+    const session = await auth()
+    const userId = session?.user?.id
+
+    // Extract request
+    const { geojson, title } = await request.json()
+
+    const mapFields = {
+      title,
+      owner: userId,
+      mapType: 'heatmap', // consider haveing a default in Imap interface
+      geojson,
+    }
+
+    // Call Usecase
+    const res = await createMapUseCase(mapFields)
+
+    // If use case error
+    if ('error' in res) {
+      console.error(res.error)
+      return NextResponse.json({ message: res.message }, { status: res.status })
+    }
+
+    // Get created map
+    const map = res.payload as IMapDocument
+
+    // return new Map Id so page know where to direct user to new page
+    return NextResponse.json({
+      message: 'User map created',
+      status: 200,
+      payload: map._id,
+    })
+  } catch (error) {
+    console.error('Error toggling like:', error)
     return NextResponse.json(
       {
         message: 'Internal Server Error',

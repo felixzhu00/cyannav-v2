@@ -49,9 +49,6 @@ export default function CardComponent({
   const idStr = (_id as Types.ObjectId).toString() // cast id to string form
   const isStar = (session?.user?.favorite ?? []).includes(idStr.toString())
 
-  console.log(session?.user?.favorite)
-  console.log(isStar)
-
   return (
     <Card
       key={index}

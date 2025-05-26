@@ -4,20 +4,10 @@ import { Button } from '@/components/ui/button'
 import placeholder from '@/public/map_placeholder.png'
 import { FcGoogle } from 'react-icons/fc'
 import { FaGithub, FaApple } from 'react-icons/fa'
-import { signIn, providerMap } from '@/lib/auth'
+import { auth, signIn, providerMap } from '@/lib/auth'
 import { AuthError } from 'next-auth'
-import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { z } from 'zod'
 import LoginForm from '@/components/auth/login-form'
-
-export const FormSchema = z.object({
-  email: z
-    .string()
-    .nonempty({ message: 'Email is required.' })
-    .email({ message: 'Please enter a valid email address.' }),
-  password: z.string().nonempty({ message: 'Password is required.' }),
-})
 
 export default async function Page() {
   const session = await auth()

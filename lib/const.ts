@@ -9,46 +9,7 @@ import {
   Users,
 } from 'lucide-react'
 
-// Dynamically import heavy components
-const Choropleth = dynamic(() => import('../components/templates/Choropleth'))
-const DistributiveFlow = dynamic(
-  () => import('../components/templates/DistributiveFlow')
-)
-const Heat = dynamic(() => import('../components/templates/Heat'))
-const Point = dynamic(() => import('../components/templates/Point'))
-const ThreeDRectangle = dynamic(
-  () => import('../components/templates/ThreeDRectangle')
-)
-
 // eslint-disable-next-line import/prefer-default-export
-export const featureMap = [
-  {
-    name: 'Choropleth Map',
-    description: 'template',
-    component: Choropleth,
-  },
-  {
-    name: 'Distributive Flow Map',
-    description: 'template',
-    component: DistributiveFlow,
-  },
-  {
-    name: 'Heat Map',
-    description: 'template',
-    component: Heat,
-  },
-  {
-    name: 'Point Map',
-    description: 'template',
-    component: Point,
-  },
-  {
-    name: '3D Rectangle Map',
-    description: 'template',
-    component: ThreeDRectangle,
-  },
-]
-
 export const items = [
   { value: 'Name', label: 'name', placeholder: 'Costa Rica' },
   { value: 'GDP', label: 'gdp', placeholder: '450353432' },

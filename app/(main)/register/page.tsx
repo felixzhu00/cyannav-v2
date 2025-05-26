@@ -4,31 +4,10 @@ import { Button } from '@/components/ui/button'
 import placeholder from '@/public/map_placeholder.png'
 import { FcGoogle } from 'react-icons/fc'
 import { FaGithub } from 'react-icons/fa'
-import { signIn, providerMap } from '@/lib/auth'
+import { auth, signIn, providerMap } from '@/lib/auth'
 import { AuthError } from 'next-auth'
-import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { z } from 'zod'
 import RegisterForm from '@/components/auth/register-form'
-
-export const RegisterFormSchema = z
-  .object({
-    email: z
-      .string()
-      .nonempty({ message: 'Email is required.' })
-      .email({ message: 'Please enter a valid email address.' }),
-    password: z
-      .string()
-      .nonempty({ message: 'Password is required.' })
-      .min(6, { message: 'Password must be at least 6 characters.' }),
-    confirmPassword: z
-      .string()
-      .nonempty({ message: 'Please confirm your password.' }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match.',
-    path: ['confirmPassword'],
-  })
 
 export default async function Register() {
   const session = await auth()

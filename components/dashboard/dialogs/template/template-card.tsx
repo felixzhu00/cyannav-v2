@@ -6,17 +6,13 @@ import logo from '@/public/logo.svg'
 export default function TemplateCard({
   creatorName,
   title,
-  description,
+  geojson,
   onLearnMore, // Pass down this function from TemplateDialog
 }: {
   creatorName: string
   title: string
-  description: string
-  onLearnMore: (template: {
-    creatorName: string
-    title: string
-    description: string
-  }) => void
+  geojson: Buffer | undefined
+  onLearnMore: () => void
 }) {
   const [isHovered, setIsHovered] = useState(false)
 
@@ -30,9 +26,6 @@ export default function TemplateCard({
         {isHovered && (
           <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white/90 p-6 opacity-100 transition-opacity duration-300">
             <div>
-              <p className="text-md mb-4 line-clamp-4 max-h-[6rem] overflow-hidden lg:text-xs">
-                {description}
-              </p>
               <div className="flex w-full justify-start space-x-2">
                 <Button className="transform bg-cyan-300 text-sm text-black transition-transform duration-200 hover:scale-105 hover:bg-cyan-400 md:text-sm lg:text-xs">
                   Use Template
@@ -40,11 +33,9 @@ export default function TemplateCard({
                 <Button
                   variant="secondary"
                   className="transform text-sm transition-transform duration-200 hover:scale-105 md:text-sm lg:text-xs"
-                  onClick={() =>
-                    onLearnMore({ creatorName, title, description })
-                  }
+                  onClick={() => onLearnMore()}
                 >
-                  Learn More
+                  View Template
                 </Button>
               </div>
             </div>

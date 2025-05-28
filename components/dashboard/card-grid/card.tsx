@@ -1,13 +1,17 @@
 import React from 'react'
 import { Card } from '../../ui/card'
 import { CardContent } from '../../ui/card'
-import { MapFields } from '@/core/_entities/types/map.types'
+import {
+  CustomFeatureCollection,
+  MapFields,
+} from '@/core/_entities/types/map.types'
 import { UserFields } from '@/core/_entities/types/user.types'
 import VoteBox from './vote-box'
 import { Types } from 'mongoose'
 import StarToggle from './star-toggle'
 import { useSession } from 'next-auth/react'
 import BufferImage from './buffer-image'
+import { decodeGeo } from '@/lib/utils'
 interface CardComponentProps {
   index: number
   mapMeta: MapFields
@@ -57,6 +61,8 @@ export default function CardComponent({
       <CardContent className="flex flex-col items-center justify-center">
         {/* thumbnail */}
         <BufferImage
+          id={_id as string}
+          geojson={decodeGeo(geojson) as CustomFeatureCollection}
           buffer={thumbnail}
           alt="map image"
           width={310}

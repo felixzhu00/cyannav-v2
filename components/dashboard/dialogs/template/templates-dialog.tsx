@@ -11,8 +11,8 @@ import { ChevronLeft } from 'lucide-react'
 import { MapFields } from '@/core/_entities/types/map.types'
 import { UserFields } from '@/core/_entities/types/user.types'
 import MapPreviewPage from './map-preview'
-import { toast } from '@/components/ui/use-toast'
 import { useRouter } from 'next/navigation'
+import { handleUseTemplate } from '@/lib/utils'
 
 export default function TemplateDialog({
   isOpen,
@@ -41,6 +41,8 @@ export default function TemplateDialog({
       // Get the list of maps to display
       const maps = await response.json()
 
+      
+
       // set the maplist state
       setMapList(maps.payload)
     }
@@ -54,31 +56,6 @@ export default function TemplateDialog({
 
   const handleBackToGrid = () => {
     setSelectedTemplateIndex(null)
-  }
-
-  const handleUseTemplate = async (geojson: Buffer, title: string) => {
-    try {
-      // API call to create a new map for user under my maps
-      const res = await fetch(`/api/map`, {
-        method: 'POST',
-        body: JSON.stringify({ geojson, title }),
-        cache: 'no-store',
-      })
-
-      console.log(res)
-
-      // if fail toast and go back to templates
-      if (!res.ok) {
-        toast({
-          description: 'Fail to create Map from template',
-        })
-      }
-
-      const data = await res.json()
-
-      // If sucsess direct user to new map/[id]
-      router.push(`/map/${data.payload}`)
-    } catch (error) {}
   }
 
   if (!isOpen) return null
@@ -114,12 +91,13 @@ export default function TemplateDialog({
                   {mapList[selectedTemplateIndex || 0].title}
                 </h1>
                 <Button
-                  onClick={() =>
-                    handleUseTemplate(
+                  onClick={async () => {
+                    const res = await handleUseTemplate(
                       mapList[selectedTemplateIndex].geojson,
                       mapList[selectedTemplateIndex || 0].title
                     )
-                  }
+                    if (res) router.push(res)
+                  }}
                   className="w-full bg-cyan-200 text-black sm:w-auto lg:w-40"
                 >
                   Use template

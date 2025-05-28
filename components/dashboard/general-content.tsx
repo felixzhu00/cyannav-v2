@@ -73,7 +73,8 @@ export default function GeneralContent({ view, mapList }: GeneralContentProps) {
 
       {filteredMapList.length ? (
         <CardGrid
-          showAddNewMap={view === 'my-maps'}
+          // showAddNewMap={view === 'my-maps'}
+          showAddNewMap={false}
           mapList={filteredMapList}
         />
       ) : (

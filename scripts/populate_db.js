@@ -602,7 +602,7 @@ async function main() {
   const users = await createBotUsers(10)
   const Messages = await createBotMessages(users, 20)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const maps = await createBotMap(20, users, Messages)
+  const maps = await createBotMap(1, users, Messages)
 
   // create Admin
   const admin = await createUser(

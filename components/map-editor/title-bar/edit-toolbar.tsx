@@ -35,7 +35,7 @@ import {
 import { renderCollection } from '@/lib/maplibre-actions/map-render-layers'
 import { populateDefault } from '@/lib/maplibre-actions/map-utils'
 import { menu } from '@/lib/maplibre-actions/map-var-const'
-import { handleThumbnailDownload } from '@/lib/generate-image'
+import { handleThumbnail } from '@/lib/generate-image'
 
 const icons = {
   Cursor: <MousePointer className="h-5 w-5" />,
@@ -76,7 +76,7 @@ export default function EditToolbar({ className }: { className: string }) {
   const handlePNG = async () => {
     if (mapRef) {
       // Programmatically create a download link and trigger the download
-      await handleThumbnailDownload(mapData.title, mapGeo, { fitBound: false })
+      await handleThumbnail(mapData.title, mapGeo, { fitBound: true })
     }
   }
 

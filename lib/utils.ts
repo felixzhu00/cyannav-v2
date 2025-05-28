@@ -23,6 +23,9 @@ import { Types } from 'mongoose'
 import { toast } from '@/components/ui/use-toast'
 import { populateDefault } from './maplibre-actions/map-utils'
 import { initializeOffScreenMapDiv } from './generate-image'
+import shp from 'shpjs'
+import { kml as kmlToGeoJSON } from '@tmcw/togeojson'
+
 // eslint-disable-next-line import/prefer-default-export
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -65,23 +68,46 @@ export function convertToCustomFeatureCollection(
   geojson: GeoJSON
 ): CustomFeatureCollection {
   if (geojson.type === 'FeatureCollection') {
-    const postGeo = geojson.features.map((feature, index) => ({
-      ...feature,
-      properties: {
-        name: feature.properties?.name || `Feature${index}`,
-        ...feature.properties,
-        _self: {
-          _id: nanoid(),
-          _visible: true,
-          _lock: false,
+    const postGeo = geojson.features.map((feature, index) => {
+      const tempId = nanoid(32) // Declare tempId inside the map function
+      return {
+        ...feature,
+        id: tempId, // Set the feature's id to the generated tempId
+        properties: {
+          id: tempId, // Also include the tempId in the properties
+          render: {
+            name: {
+              payload: feature.properties?.name || `Feature${index}`,
+              variableType: 'string',
+            },
+            visible: {
+              payload: true,
+              variableType: 'boolean',
+            },
+            lock: {
+              payload: false,
+              variableType: 'boolean',
+            },
+            draw: {
+              payload: 'feature',
+              variableType: 'string',
+            },
+            trash: {
+              payload: false,
+              variableType: 'boolean',
+            },
+          },
+          old: {
+            ...feature.properties,
+          },
         },
-      },
-    }))
+      }
+    })
 
     const finalGeo = {
       type: 'FeatureCollection',
       features: postGeo,
-      _shared: new Map<string, string | number>(),
+      _shared: { mode: 'none' },
     }
 
     return finalGeo as CustomFeatureCollection
@@ -545,3 +571,89 @@ export const propNameToString = (str: string) =>
     .join(' ') // Join them back with spaces}
 
 //create a instace
+
+export const parseKML = (fileData: string) => {
+  const kmlDom = new DOMParser().parseFromString(fileData, 'text/xml')
+  const geojson = kmlToGeoJSON(kmlDom)
+  return geojson
+}
+
+export const parseShapefile = async (file: string | File | ArrayBuffer) => {
+  let arrayBuffer: ArrayBuffer
+
+  if (typeof file === 'string') {
+    // Convert string to ArrayBuffer using TextEncoder
+    const uint8array = new TextEncoder().encode(file)
+    arrayBuffer = uint8array.slice().buffer
+  } else if (file instanceof File) {
+    arrayBuffer = await file.arrayBuffer()
+  } else {
+    arrayBuffer = file
+  }
+
+  const geojson = await shp(arrayBuffer)
+  return geojson
+}
+
+// export const handleUseTemplate = async (geojson: Buffer, title: string) => {
+//   try {
+//     // API call to create a new map for user under my maps
+//     const res = await fetch(`/api/map`, {
+//       method: 'POST',
+//       body: JSON.stringify({ geojson, title }),
+//       cache: 'no-store',
+//     })
+
+//     console.log(res)
+
+//     // if fail toast and go back to templates
+//     if (!res.ok) {
+//       toast({
+//         description: 'Fail to create Map',
+//       })
+//     }
+
+//     const data = await res.json()
+
+//     // If sucsess direct user to new map/[id]
+//     router.push(`/map/${data.payload}`)
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
+export const handleUseTemplate = async (
+  geojson: Buffer,
+  title: string,
+  thumbnail: Buffer
+) => {
+  try {
+    const formData = new FormData()
+
+    // Convert Buffers to Blob
+    const thumbnailBlob = new Blob([thumbnail], { type: 'image/png' }) // adjust MIME type as needed
+
+    formData.append('geojson', JSON.stringify(geojson))
+    formData.append('title', title)
+    formData.append('thumbnail', thumbnailBlob)
+
+    const res = await fetch('/api/map', {
+      method: 'POST',
+      body: formData,
+      cache: 'no-store',
+    })
+
+    // if fail toast and go back to templates
+    if (!res.ok) {
+      toast({
+        description: 'Fail to create Map',
+      })
+    }
+
+    const data = await res.json()
+
+    // If sucsess direct user to new map/[id]
+    return `/map/${data.payload}`
+  } catch (error) {
+    console.error(error)
+  }
+}

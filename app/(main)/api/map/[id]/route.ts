@@ -7,7 +7,6 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {
-  console.error('getMap', params)
   try {
     // Destructure the id from param /map/${id}
     const { id } = params
@@ -40,7 +39,6 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     )
   }
 }
-
 
 export async function PUT(
   request: Request,

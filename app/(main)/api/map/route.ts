@@ -106,14 +106,44 @@ export async function POST(request: NextRequest) {
     const session = await auth()
     const userId = session?.user?.id
 
-    // Extract request
-    const { geojson, title } = await request.json()
+    const contentType = request.headers.get('content-type') || ''
+
+    let updateFields: Record<string, any> = {}
+
+    if (contentType.includes('application/json')) {
+      updateFields = await request.json()
+    } else if (contentType.includes('multipart/form-data')) {
+      const formData = await request.formData()
+      const entries = Array.from(formData.entries())
+      for (const [key, value] of entries) {
+        if (value instanceof Blob) {
+          const arrayBuffer = await value.arrayBuffer()
+          const buffer = Buffer.from(arrayBuffer)
+
+          updateFields[key] = buffer
+        } else {
+          try {
+            updateFields[key] = JSON.parse(value as string)
+          } catch {
+            updateFields[key] = value
+          }
+        }
+      }
+    } else {
+      return NextResponse.json(
+        { message: 'Unsupported content type' },
+        { status: 400 }
+      )
+    }
+
+    const { geojson, title, thumbnail } = updateFields
 
     const mapFields = {
       title,
       owner: userId,
       mapType: 'heatmap', // consider haveing a default in Imap interface
       geojson,
+      thumbnail,
     }
 
     // Call Usecase

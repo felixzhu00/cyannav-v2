@@ -22,9 +22,9 @@ export default function DashboardSidebar({
 }) {
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
   const handleTemplateClick = () => {
-    console.log('open')
     setIsTemplateDialogOpen(true) // Open the template dialog
   }
 
@@ -37,6 +37,14 @@ export default function DashboardSidebar({
   }
 
   const handleImportDialogClose = () => {
+    setIsImportDialogOpen(false)
+  }
+
+  const handleAddClick = () => {
+    setIsImportDialogOpen(true)
+  }
+
+  const handleAddDialogClose = () => {
     setIsImportDialogOpen(false)
   }
 
@@ -128,6 +136,10 @@ export default function DashboardSidebar({
           onClose={handleImportDialogClose}
         />
       )}
+
+      {/* {isAddDialogOpen && (
+        <AddMapDialog isOpen={isAddDialogOpen} onClose={handleAddDialogClose} />
+      )} */}
     </div>
   )
 }

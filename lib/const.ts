@@ -8,6 +8,7 @@ import {
   BellRing,
   Users,
 } from 'lucide-react'
+import { Step } from 'react-joyride'
 
 // eslint-disable-next-line import/prefer-default-export
 export const items = [
@@ -297,3 +298,66 @@ export const dashboardViews: { [key: string]: DashboardView } = {
     selectOptions: [], // no sort options
   },
 }
+
+export const steps: Step[] = [
+  {
+    target: 'body',
+    placement: 'center',
+    content:
+      '👋 Welcome to CyanNav Dashboard! Here you can manage your maps and discover others.',
+    disableBeacon: true,
+  },
+  // Navbar
+  {
+    target: '#navbar-notification-icon',
+    content: '🔔 This icon shows all the messages you’ve received.',
+  },
+  {
+    target: '#navbar-help-icon',
+    content: '❓ Click here for help and guides when you’re lost.',
+  },
+  {
+    target: '#navbar-profile-icon',
+    content:
+      '👤 View your profile, manage settings, and even delete your account here.',
+  },
+  // Sidebar
+  {
+    target: '#sidebar-mymaps',
+    content: '🗺️ “My Maps” shows all the maps you own.',
+  },
+  {
+    target: '#sidebar-community',
+    content: '🌍 “Community” displays public maps from other users.',
+  },
+  {
+    target: '#sidebar-shared',
+    content: '🤝 “Shared with Me” shows maps others have shared with you.',
+  },
+  {
+    target: '#sidebar-starred',
+    content: '⭐ “Starred Maps” are your favorited maps for quick access.',
+  },
+  {
+    target: '#sidebar-import-button',
+    content:
+      '➕ Use this button to import your own map files like NavJSON, GeoJSON, KML, or Shapefile.',
+  },
+  {
+    target: '#sidebar-template-button',
+    content:
+      ' 🗺️ Click here to choose a ready-made template and start quickly.',
+  },
+
+  // General Area
+  {
+    target: '#map-grid',
+    content:
+      '📁 This is where your maps are displayed in a grid. You can search and sort them here.',
+  },
+  {
+    target: 'body',
+    placement: 'center',
+    content: '🎉 That’s the tour! Now go explore CyanNav.',
+  },
+]

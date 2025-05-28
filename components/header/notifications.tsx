@@ -55,7 +55,7 @@ export default function Notification() {
   const unreadCount = notifications.length
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={setIsOpen} >
       <PopoverTrigger asChild>
         <div
           className="hover:bg-accent relative cursor-pointer rounded-full p-2 transition-colors duration-200"
@@ -63,7 +63,7 @@ export default function Notification() {
           tabIndex={0}
           aria-label="Toggle notifications"
         >
-          <Bell className="h-7 w-7" />
+          <Bell className="h-7 w-7" id="navbar-notification-icon"/>
           {unreadCount > 0 && (
             <span className="absolute right-0 top-0 -mr-1 -mt-1 rounded-full bg-red-600 px-2 py-1 text-xs font-bold leading-none text-red-100">
               {unreadCount}

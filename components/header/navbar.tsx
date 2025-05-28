@@ -24,6 +24,8 @@ import Notification from './notifications'
 import { Menu } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+import { DashboardTour } from '@/components/tour'
+
 const links = [
   { href: '/', label: 'Home' },
   { href: '/#features', label: 'Features' },
@@ -48,13 +50,17 @@ export default async function Navbar() {
               <Notification />
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <HelpCircle className="h-7 w-7 cursor-pointer" />
+              {/* <HelpCircle className="h-7 w-7 cursor-pointer" /> */}
+              <DashboardTour />
             </NavigationMenuItem>
             <NavigationMenuItem>
               <span className="flex justify-center">
                 <DropdownMenu>
                   <DropdownMenuTrigger className="focus:outline-none focus:ring-0">
-                    <Avatar className="h-10 w-10 rounded-full border-2 border-muted-foreground">
+                    <Avatar
+                      className="h-10 w-10 rounded-full border-2 border-muted-foreground"
+                      id="navbar-profile-icon"
+                    >
                       <AvatarImage
                         src={`data:image/jpeg;base64,${session.user.profilePicture}`}
                         className="select-none"
@@ -85,7 +91,11 @@ export default async function Navbar() {
             <div className="lg:hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="focus:outline-none focus:ring-0 focus:ring-offset-0" >
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="focus:outline-none focus:ring-0 focus:ring-offset-0"
+                  >
                     <Menu className="h-6 w-6" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -99,10 +109,16 @@ export default async function Navbar() {
                       <Link href={href}>{label}</Link>
                     </DropdownMenuItem>
                   ))}
-                  <DropdownMenuItem className={cn(hamItemClass, 'bg-primary text-pf')} asChild>
+                  <DropdownMenuItem
+                    className={cn(hamItemClass, 'bg-primary text-pf')}
+                    asChild
+                  >
                     <Link href="/login">Login</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className={cn(hamItemClass, 'bg-primary text-pf')} asChild>
+                  <DropdownMenuItem
+                    className={cn(hamItemClass, 'bg-primary text-pf')}
+                    asChild
+                  >
                     <Link href="/register">Register</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

@@ -61,7 +61,6 @@ const BufferImage: React.FC<BufferImageProps> = ({
       // }
       // Convert Buffer to url to be displayed
       const base64 = realBuffer.toString('base64')
-      console.log(base64)
       setUrl(`data:image/png;base64,${base64}`)
     }
 

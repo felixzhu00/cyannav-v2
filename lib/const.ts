@@ -299,14 +299,7 @@ export const dashboardViews: { [key: string]: DashboardView } = {
   },
 }
 
-export const steps: Step[] = [
-  {
-    target: 'body',
-    placement: 'center',
-    content:
-      '👋 Welcome to CyanNav Dashboard! Here you can manage your maps and discover others.',
-    disableBeacon: true,
-  },
+export const sharedNavbarSteps: Step[] = [
   // Navbar
   {
     target: '#navbar-notification-icon',
@@ -321,6 +314,16 @@ export const steps: Step[] = [
     content:
       '👤 View your profile, manage settings, and even delete your account here.',
   },
+]
+export const dashboardSteps: Step[] = [
+  {
+    target: 'body',
+    placement: 'center',
+    content:
+      '👋 Welcome to CyanNav Dashboard! Here you can manage your maps and discover others.',
+    disableBeacon: true,
+  },
+  ...sharedNavbarSteps,
   // Sidebar
   {
     target: '#sidebar-mymaps',
@@ -359,5 +362,37 @@ export const steps: Step[] = [
     target: 'body',
     placement: 'center',
     content: '🎉 That’s the tour! Now go explore CyanNav.',
+  },
+]
+
+export const userSettingsSteps: Step[] = [
+  {
+    target: 'body',
+    placement: 'center',
+    content:
+      '👋 Welcome to your User Settings page! Here you can manage your personal information and view your activity.',
+    disableBeacon: true,
+  },
+  ...sharedNavbarSteps,
+
+  // Tabs
+  {
+    target: '#user-settings-back-tab',
+    content: '⬅️ Click here to go back to the previous page or dashboard.',
+  },
+  {
+    target: '#user-settings-profile-tab',
+    content:
+      '🧑 This tab lets you update your profile picture, change your username, or delete your account.',
+  },
+  {
+    target: '#user-settings-transactions-tab',
+    content: '📜 View a full history of your past transactions here.',
+  },
+
+  {
+    target: 'body',
+    placement: 'center',
+    content: '🎉 That’s it! Your settings are just a few clicks away.',
   },
 ]

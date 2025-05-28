@@ -1,10 +1,16 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import Joyride, { CallBackProps, STATUS, EVENTS } from 'react-joyride'
-import { steps } from '@/lib/const'
+import Joyride, { CallBackProps, STATUS, EVENTS, Step } from 'react-joyride'
 import { HelpCircle } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import { usePathname } from 'next/navigation'
+import { dashboardSteps, userSettingsSteps } from '@/lib/const'
+
+export const stepsDictionary: Record<string, Step[]> = {
+  '/dashboard': dashboardSteps,
+  '/user': userSettingsSteps,
+}
 
 export const DashboardTour = () => {
   const [run, setRun] = useState(false)
@@ -13,6 +19,15 @@ export const DashboardTour = () => {
   const { theme } = useTheme()
 
   const isDark = theme === 'dark'
+
+  // Display different help base on path
+  const pathname = usePathname()
+
+  const steps = stepsDictionary[pathname] || []
+  const stepWithoutBeacon = steps.map((step) => ({
+    ...step,
+    disableBeacon: true,
+  }))
 
   useEffect(() => setMounted(true), [])
 
@@ -42,10 +57,7 @@ export const DashboardTour = () => {
   return (
     <>
       <Joyride
-        steps={steps.map((step) => ({
-          ...step,
-          disableBeacon: true,
-        }))}
+        steps={stepWithoutBeacon}
         run={run}
         stepIndex={stepIndex}
         callback={handleCallback}

@@ -22,7 +22,6 @@ export default async function Page({
     <div className="grid w-full grid-cols-[auto,1fr]">
       <Sidebar view={view} />
       {view === 'settings' && <ProfileSettings />}
-      {view === 'transactions' && <TransactionHistory />}
     </div>
   )
 }

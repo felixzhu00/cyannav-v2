@@ -28,7 +28,7 @@ export default function Sidebar({ view }: { view: string | string[] }) {
               <Settings2 className="h-6 w-6" />
               <p>Profile Settings</p>
             </Link>
-            <Link
+            {/* <Link
               href="/user?view=transactions"
               className={cn(
                 'flex flex-row items-center space-x-2.5',
@@ -38,7 +38,7 @@ export default function Sidebar({ view }: { view: string | string[] }) {
             >
               <File className="h-6 w-6" />
               <p>Transaction History</p>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

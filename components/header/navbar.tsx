@@ -30,8 +30,8 @@ const links = [
   { href: '/', label: 'Home' },
   { href: '/#features', label: 'Features' },
   { href: '/#community', label: 'Community' },
-  { href: '/#pricing', label: 'Pricing' },
-  { href: '/support', label: 'Support' },
+  // { href: '/#pricing', label: 'Pricing' },
+  // { href: '/support', label: 'Support' },
 ]
 
 const hamItemClass = 'text-lg font-bold p-3 justify-center bg-pf'
@@ -43,12 +43,12 @@ export default async function Navbar() {
       <NavigationMenuList className="space-x-4">
         {session && session.user ? (
           <>
-            <NavigationMenuItem>
+            {/* <NavigationMenuItem>
               <UpgradeButton />
             </NavigationMenuItem>
             <NavigationMenuItem>
               <Notification />
-            </NavigationMenuItem>
+            </NavigationMenuItem> */}
             <NavigationMenuItem>
               {/* <HelpCircle className="h-7 w-7 cursor-pointer" /> */}
               <DashboardTour />

@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { pricingModels } from '@/lib/const'
+import { monthlyPriceId, pricingModels, yearlyPriceId } from '@/lib/const'
 import HeadingRow from './heading-row'
 
 interface PricingProps {
@@ -12,12 +12,35 @@ interface PricingProps {
   features: string[]
 }
 
-const PricingCard: React.FC<PricingProps> = ({
+export const PricingCard: React.FC<PricingProps> = ({
   title,
   price,
   description,
   features,
 }) => {
+  const handlePurchace = async () => {
+    //TODO
+    const pricingId = price == '$9.99/month' ? monthlyPriceId : yearlyPriceId
+    try {
+      // Create a Stripe Checkout Session
+      const response = await fetch('api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          priceId: pricingId,
+        }),
+      })
+
+      if (!response.ok) throw new Error(`Server Error: ${response.status}`)
+
+      // Redirect to Stripe Checkout Page
+      const { url } = await response.json()
+      window.location.href = url //TODO make this more nextjs
+    } catch (error) {
+      console.error('Error : ', error)
+    }
+  }
+
   return (
     <div className="flex flex-1 flex-col justify-between rounded-lg border p-6 text-center shadow-md">
       <div>
@@ -33,7 +56,10 @@ const PricingCard: React.FC<PricingProps> = ({
           ))}
         </ul>
       </div>
-      <button className="mt-auto w-full rounded-lg bg-black px-4 py-2 text-white">
+      <button
+        className="mt-auto w-full rounded-lg bg-black px-4 py-2 text-white"
+        onClick={handlePurchace} // Sign Up link
+      >
         Sign up
       </button>
     </div>
@@ -45,7 +71,10 @@ export default function Pricing() {
 
   return (
     <section id="pricing" className="flex flex-col space-y-10">
-      <HeadingRow heading="Pricing" subheading="From basic tools to advanced features." />
+      <HeadingRow
+        heading="Pricing"
+        subheading="From basic tools to advanced features."
+      />
       <div className="flex items-center justify-center space-x-2">
         <Label htmlFor="montly">Monthly</Label>
         <Switch
@@ -54,7 +83,7 @@ export default function Pricing() {
         />
         <Label htmlFor="annual">Annual</Label>
       </div>
-      <div className="flex h-full justify-center gap-4">
+      <div className="flex w-full flex-wrap gap-4">
         {pricingModels.map((model, index) => (
           <PricingCard
             key={index}

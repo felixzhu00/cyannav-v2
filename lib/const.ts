@@ -396,3 +396,7 @@ export const userSettingsSteps: Step[] = [
     content: '🎉 That’s it! Your settings are just a few clicks away.',
   },
 ]
+
+
+export const yearlyPriceId = 'price_1RfTeYFJGOpcxqCyUirbAqcq'
+export const monthlyPriceId = 'price_1RfTh2FJGOpcxqCyrhLMLTAF'

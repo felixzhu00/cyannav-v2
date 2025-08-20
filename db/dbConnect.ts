@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import User from '@/db/user.model'
 import Message from '@/db/message.model'
 import Map from '@/db/map.model'
+import Subscription from '@/db/subscription.model'
 
 declare global {
   // eslint-disable-next-line no-var, vars-on-top
@@ -32,6 +33,7 @@ async function dbConnect() {
   const user = User.findById(1)
   const messages = Message.findById(1)
   const map = Map.findById(1)
+  const subscription = Subscription.findById(1)
 
   if (!cached.promise) {
     const opts = {

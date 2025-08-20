@@ -1,5 +1,6 @@
 import { Document, Types } from 'mongoose'
 import { IMapDocument } from './map.types'
+import { ISubscription } from './subscription.types'
 
 // DB User Structure
 export interface IUser {
@@ -10,7 +11,7 @@ export interface IUser {
   profilePicture: Buffer | string
   favorite?: IMapDocument[] | IMapDocument['_id'][] | Types.ObjectId[] // Array of Map references
   dateCreated?: Date
-  plan?: 'free' | 'pro'
+  subscriptions: ISubscription[]
   emailVerified: Date
   image?: String
   providers: string[] // e.g. ['github', 'credentials']

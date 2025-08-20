@@ -14,7 +14,7 @@ const UserSchema = new Schema<IUserDocument>({
     default: [],
   },
   dateCreated: { type: Date, default: Date.now },
-  plan: { type: String, enum: ['free', 'pro'], default: 'free' },
+subscriptions: [{ type: Schema.Types.ObjectId, ref: 'Subscription' }],
   emailVerified: { type: Date, default: null },
   image: { type: String },
   providers: { type: [String], default: [] },

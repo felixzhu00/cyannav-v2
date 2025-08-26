@@ -22,6 +22,7 @@ import { IMessageDocument } from '@/core/_entities/types/messages.types'
 import { Types } from 'mongoose'
 import { toast } from '@/components/ui/use-toast'
 import { populateDefault } from './maplibre-actions/map-utils'
+import { initializeOffScreenMapDiv } from './generate-image'
 // eslint-disable-next-line import/prefer-default-export
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -42,7 +43,8 @@ export function decodeGeo(geojsonBuffer: { type: string; data: number[] }) {
   const buffer = Buffer.from(new Uint8Array(geojsonBuffer.data))
 
   // Decode the Buffer using geobuf
-  const geo = geobuf.decode(new Pbf(buffer)) as CustomFeatureCollection
+  const uint8Array = new Uint8Array(geojsonBuffer.data)
+  const geo = geobuf.decode(new Pbf(uint8Array)) as CustomFeatureCollection
 
   // Populate default in case the geojson from db does not have render properties
   const defaultFeatureList = geo.features.map((feature) =>
@@ -101,7 +103,7 @@ export function convertToCustomFeatureCollection(
 
     return {
       type: 'FeatureCollection',
-      features: [finalGeo],
+      features: [finalGeo] as CustomFeature[], // Could be different type
       _shared: new Map<string, string | number>(),
     }
   }
@@ -122,7 +124,7 @@ export function convertToCustomFeatureCollection(
               _lock: false,
             },
           },
-          id: ''
+          id: '',
         },
       ],
       _shared: new Map<string, string | number>(),
@@ -144,7 +146,7 @@ export function convertToCustomFeatureCollection(
             lock: false,
           },
         },
-        id: ''
+        id: '',
       },
     ],
     _shared: new Map<string, string | number>(),
@@ -378,7 +380,7 @@ export function transformMap(map: IMapDocument) {
       email: (map.owner as IUserDocument)?.email?.toString() || '', // Safely access and convert email to string, fallback to an empty string if undefined
     },
     geojson: map.geojson ? Buffer.from(map.geojson.buffer) : undefined,
-    thumbnail: map.thumbnail ? Buffer.from(map.thumbnail) : undefined,
+    thumbnail: map.thumbnail ? Buffer.from(map.thumbnail.buffer) : undefined,
     messages: map.messages?.map((m) => {
       // Explicitly assert the type of m.author
       const author = (m as IMessageDocument).author as IUserDocument
@@ -442,16 +444,21 @@ export async function updateGeoJSONAPI(
   mapId: string
 ) {
   try {
+    // Generate blob with geojson
+    const blob = await initializeOffScreenMapDiv(newGeo)
+
     // Encode geoJSON
     const encodedGeoJSON = encodeGeo(newGeo)
+
+    // Use Form data to send over data to server
+    const formData = new FormData()
+    formData.append('thumbnail', blob)
+    formData.append('geojson', JSON.stringify(encodedGeoJSON))
 
     // Call Put API
     const response = await fetch(`/api/map/${mapId}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ geojson: encodedGeoJSON }),
+      body: formData,
     })
 
     const result = await response.json()
@@ -467,6 +474,37 @@ export async function updateGeoJSONAPI(
     return error
   }
 }
+
+// export async function updateGeoJSONAPI(
+//   newGeo: CustomFeatureCollection,
+//   mapId: string
+// ) {
+//   try {
+//     // Encode geoJSON
+//     const encodedGeoJSON = encodeGeo(newGeo)
+
+//     // Call Put API
+//     const response = await fetch(`/api/map/${mapId}`, {
+//       method: 'PUT',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ geojson: encodedGeoJSON }),
+//     })
+
+//     const result = await response.json()
+
+//     toast({
+//       description: result.message,
+//     })
+//     return result
+//   } catch (error) {
+//     toast({
+//       description: 'An error occurred while updating the geojson',
+//     })
+//     return error
+//   }
+// }
 
 // Function to find min and max of a property
 export function findMinMax(
@@ -505,3 +543,5 @@ export const propNameToString = (str: string) =>
     .split('-') // Split the string by dashes
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each part
     .join(' ') // Join them back with spaces}
+
+//create a instace

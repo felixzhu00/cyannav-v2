@@ -1,26 +1,20 @@
-import { checkUserByUsername } from '@/core/data-access/user/check-user.persistence'
+import { getUsersByFields } from '@/core/data-access/user/get-user.persistence'
+import { createErrorResponse } from '@/lib/utils'
 
 export default async function checkUsernameUseCase(newUsername: string) {
   if (!newUsername)
-    return {
-      status: 400,
-      message: 'Username is required', // displayed to the user
-      error: 'The user did not provide a username', // not displayed to the developer
-    }
+    return createErrorResponse(
+      400,
+      'Username is required',
+      'Username can not be null, undefined, or empty string'
+    )
 
-  try {
-    const isUsernameAvailable = await checkUserByUsername(newUsername)
-    if (!('payload' in isUsernameAvailable)) {
-      return { status: 200, message: 'Username is available.', payload: true }
-    }
+  const dbRes = await getUsersByFields({ username: newUsername })
 
-    return { status: 400, message: 'Username already exists.', payload: false }
-  } catch (error) {
-    console.error(error)
-    return {
-      status: 400,
-      message: 'An error occurred while checking username availability', // displayed to the user
-      error: 'An error occurred while checking username availability', // not displayed to the developer
-    }
+  // Check DB request errored
+  if ('error' in dbRes) {
+    return dbRes
   }
+
+  return { status: 200, message: 'Username is available.', payload: true }
 }

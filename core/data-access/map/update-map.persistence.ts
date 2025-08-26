@@ -1,5 +1,5 @@
 import { APIResponse } from '@/core/_entities/types/api.types'
-import { MapFields } from '@/core/_entities/types/map.types'
+import { MapFieldKey, MapFields } from '@/core/_entities/types/map.types'
 import { IUserDocument } from '@/core/_entities/types/user.types'
 import dbConnect from '@/db/dbConnect'
 import Map from '@/db/map.model'
@@ -22,11 +22,34 @@ export async function updateMapFieldsById(
       )
     }
 
-    // Update the map in the database
+    // Ensure updateFields is not empty or undefined
+    if (!updateFields || Object.keys(updateFields).length === 0) {
+      const fields = updateFields
+        ? Object.keys(updateFields).join(', ')
+        : 'none'
+      return createErrorResponse(
+        400,
+        'Update fields cannot be null, undefined, or empty',
+        `Invalid update fields: ${fields}`
+      )
+    }
+
+    // // Update the map in the database
+    // const updatedMap = await Map.findByIdAndUpdate(
+    //   id,
+    //   updateFields, // Update fields based on the payload
+    //   { new: true } // Return the updated document
+    // )
+
+    const shouldUpdateDate = Object.keys(updateFields).includes('geojson')
+
     const updatedMap = await Map.findByIdAndUpdate(
       id,
-      updateFields, // Update fields based on the payload
-      { new: true } // Return the updated document
+      {
+        ...updateFields,
+        ...(shouldUpdateDate && { dateUpdated: new Date() }), // only adds if geojson is present
+      },
+      { new: true }
     )
 
     // Check if a Map is found in DB
@@ -153,6 +176,64 @@ export async function updateMapSharedUsers(
       message,
       'Redundant map action in deleting/adding'
     )
+  } catch (error) {
+    return handleDBError(error)
+  }
+}
+
+export async function toggleMapArrayFieldsById(
+  mapid: string,
+  itemId: Types.ObjectId,
+  updateKey: MapFieldKey,
+  operation: boolean // True: append, False: pop
+): Promise<APIResponse> {
+  try {
+    await dbConnect() // Ensure database connection
+
+    // Check if the ID is a valid MongoDB ObjectId
+    if (!Types.ObjectId.isValid(mapid) || !Types.ObjectId.isValid(itemId)) {
+      return createErrorResponse(
+        400,
+        'Invalid ID format',
+        'ID Should be of type mongoose ObjectId'
+      )
+    }
+
+    // Toggle the map in the database
+    let updatedMap
+
+    if (operation) {
+      updatedMap = await Map.findByIdAndUpdate(
+        mapid,
+        {
+          $addToSet: { [updateKey]: itemId },
+        },
+        { new: true }
+      )
+    } else {
+      updatedMap = await Map.findByIdAndUpdate(
+        mapid,
+        {
+          $pull: { [updateKey]: itemId },
+        },
+        { new: true }
+      )
+    }
+
+    // Check if a Map is found in DB
+    if (!updatedMap) {
+      return createErrorResponse(
+        404,
+        'Map not found',
+        'No map with the specified ID in the database'
+      )
+    }
+
+    return {
+      status: 200,
+      message: 'Successfully updated Map fields by ID ',
+      payload: updatedMap,
+    }
   } catch (error) {
     return handleDBError(error)
   }

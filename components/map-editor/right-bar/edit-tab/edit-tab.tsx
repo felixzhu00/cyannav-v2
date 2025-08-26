@@ -21,7 +21,7 @@ export default function EditTab() {
   // If no layer is currently selected
   if (!selectedFeature)
     return (
-      <div className="mt-5 text-center text-sm text-gray-500">
+      <div className="mt-5 text-center text-sm text-muted-foreground">
         Select A Layer From The Left To Edit
       </div>
     )

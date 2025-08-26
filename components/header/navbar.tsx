@@ -21,12 +21,24 @@ import { auth } from '@/lib/auth'
 import UpgradeButton from './upgrade-button'
 import Notification from './notifications'
 
+import { Menu } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/#features', label: 'Features' },
+  { href: '/#community', label: 'Community' },
+  { href: '/#pricing', label: 'Pricing' },
+  { href: '/support', label: 'Support' },
+]
+
+const hamItemClass = 'text-lg font-bold p-3 justify-center bg-pf'
+
 export default async function Navbar() {
   const session = await auth()
-
   return (
     <NavigationMenu>
-      <NavigationMenuList className="space-x-5">
+      <NavigationMenuList className="space-x-4">
         {session && session.user ? (
           <>
             <NavigationMenuItem>
@@ -41,10 +53,11 @@ export default async function Navbar() {
             <NavigationMenuItem>
               <span className="flex justify-center">
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <Avatar className="h-10 w-10 rounded-full border border-zinc-200 dark:border-zinc-700">
+                  <DropdownMenuTrigger className="focus:outline-none focus:ring-0">
+                    <Avatar className="h-10 w-10 rounded-full border-2 border-muted-foreground">
                       <AvatarImage
                         src={`data:image/jpeg;base64,${session.user.profilePicture}`}
+                        className="select-none"
                       />
                       <AvatarFallback className="h-10 w-10">
                         <CircleUserRound />
@@ -68,17 +81,68 @@ export default async function Navbar() {
           </>
         ) : (
           <>
-            <NavigationMenuItem>
-              <Link href="#intro" legacyBehavior passHref>
+            {/* Mobile/Hamburger */}
+            <div className="lg:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="focus:outline-none focus:ring-0 focus:ring-offset-0" >
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-40 space-y-2 lg:hidden">
+                  {links.map(({ href, label }) => (
+                    <DropdownMenuItem
+                      key={href}
+                      className={hamItemClass}
+                      asChild
+                    >
+                      <Link href={href}>{label}</Link>
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuItem className={cn(hamItemClass, 'bg-primary text-pf')} asChild>
+                    <Link href="/login">Login</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className={cn(hamItemClass, 'bg-primary text-pf')} asChild>
+                    <Link href="/register">Register</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            {/* Desktop */}
+            <div className="hidden gap-x-4 lg:flex">
+              {links.map(({ href, label }) => (
+                <NavigationMenuItem key={href}>
+                  <Link href={href} legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
+                    >
+                      {label}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              ))}
+              <NavigationMenuItem>
+                <Link href="/login" legacyBehavior passHref>
+                  <Button variant="default">Login</Button>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/register" legacyBehavior passHref>
+                  <Button variant="default">Register</Button>
+                </Link>
+              </NavigationMenuItem>
+            </div>
+            {/* <NavigationMenuItem>
+              <Link href="/" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
                 >
-                  Getting Started
+                  Home
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="#features" legacyBehavior passHref>
+              <Link href="/#features" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
                 >
@@ -87,7 +151,7 @@ export default async function Navbar() {
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="#community" legacyBehavior passHref>
+              <Link href="/#community" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
                 >
@@ -96,7 +160,7 @@ export default async function Navbar() {
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="#pricing" legacyBehavior passHref>
+              <Link href="/#pricing" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
                 >
@@ -105,7 +169,7 @@ export default async function Navbar() {
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="/" legacyBehavior passHref>
+              <Link href="/support" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={`${navigationMenuTriggerStyle()} dark:bg-transparent`}
                 >
@@ -115,9 +179,14 @@ export default async function Navbar() {
             </NavigationMenuItem>
             <NavigationMenuItem>
               <Link href="/login" legacyBehavior passHref>
-                <Button variant="default">Get Started</Button>
+                <Button variant="default">Login</Button>
               </Link>
             </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/register" legacyBehavior passHref>
+                <Button variant="default">Register</Button>
+              </Link>
+            </NavigationMenuItem> */}
           </>
         )}
       </NavigationMenuList>

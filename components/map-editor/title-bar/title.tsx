@@ -4,8 +4,9 @@ import { useRef, useState } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { Input } from '@/components/ui/input'
 import { Pencil } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-export default function Title() {
+export default function Title({ className }: { className: string }) {
   const [map] = useAtom(mapAtom)
   const [, setMapField] = useAtom(setMapFieldAtom)
 
@@ -69,7 +70,7 @@ export default function Title() {
     }
   }
   return (
-    <div className="ml-4 flex flex-1 items-center justify-center py-4">
+    <div className={cn("ml-4 flex flex-shrink items-center justify-center py-4 text-primary", className)}>
       {isEditingTitle ? (
         <Input
           ref={inputRef}
@@ -86,8 +87,8 @@ export default function Title() {
         </div>
       )}
 
-      <span className="mr-4 text-xl font-semibold text-zinc-400">/</span>
-      <span className="text-zinc-500">By {owner.username}</span>
+      <span className="mr-4 text-xl font-semibold text-muted-forground">/</span>
+      <span className="text-ring">By {owner.username}</span>
     </div>
   )
 }

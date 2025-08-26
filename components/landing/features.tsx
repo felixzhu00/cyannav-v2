@@ -8,6 +8,7 @@ import {
   CardFooter,
 } from '@/components/ui/card'
 import { features } from '@/lib/const'
+import HeadingRow from './heading-row'
 
 interface FeatureProps {
   Icon: LucideIcon
@@ -47,12 +48,7 @@ const FeatureCard: React.FC<FeatureProps> = ({
 export default function Features() {
   return (
     <section id="features" className="flex flex-col space-y-10">
-      <div className="space-between flex h-full w-full flex-row items-end">
-        <h1 className="flex-grow text-4xl font-bold">What's in CyanNav?</h1>
-        <p className="text-2xl opacity-50">
-          Everything you need to create stunning maps.
-        </p>
-      </div>
+      <HeadingRow heading='What is CyanNav?' subheading='Everything you need to create stunning maps.' />
       <div className="flex flex-wrap justify-center gap-4">
         {features.map((feature, index) => (
           <FeatureCard

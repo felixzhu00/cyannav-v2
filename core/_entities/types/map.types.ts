@@ -9,13 +9,17 @@ export interface IMap {
   owner: IUserDocument | IUserDocument['_id'] | Types.ObjectId
   mapType: string
   isPublished: 'public' | 'private' | 'invited'
+  isTemplate?: boolean
   thumbnail?: Buffer
   geojson?: Buffer
   likes?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
+  dislikes?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
   messages?: IMessageDocument[] | IMessageDocument['_id'][] | Types.ObjectId[]
   sharedUsers?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
   forkedFrom?: IMapDocument | IMapDocument['_id'] | Types.ObjectId
   dateCreated?: Date
+  dateUpdated?: Date
+  dateThumbnailUpdated?: Date
 }
 export interface IMapDocument extends IMap, Document {}
 
@@ -30,6 +34,7 @@ export interface CustomFeature extends Feature {
 }
 
 export interface MapFields extends Partial<IMapDocument> {}
+export type MapFieldKey = keyof MapFields
 
 export interface MapAtom {
   _id: string
@@ -44,7 +49,10 @@ export interface MapAtom {
   thumbnail?: string
   likes: string[]
   messages: MessageFields[]
-  sharedUsers: string[]
+  sharedUsers: {
+    username: string
+    email: string
+  }[]
   dateCreated: Date
   forkedFrom: string[]
 }

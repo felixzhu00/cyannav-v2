@@ -6,6 +6,8 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { faqData } from '@/lib/const'
+import HeadingRow from './heading-row'
+import { lookup } from 'dns'
 
 interface FAQProps {
   question: string
@@ -22,12 +24,7 @@ const FAQAccordion: React.FC<FAQProps> = ({ question, answer }) => (
 export default function Faq() {
   return (
     <section className="flex flex-col space-y-10">
-      <div className="space-between flex h-full w-full flex-row items-end">
-        <h1 className="flex-grow text-4xl font-bold">F.A.Q.</h1>
-        <p className="text-2xl opacity-50">
-          Clear answers to your most common questions.
-        </p>
-      </div>
+      <HeadingRow heading='F.A.Q.' subheading='Clear answers to your most common questions.' />
       <Accordion type="single" collapsible className="w-full">
         {faqData.map((item, index) => (
           <FAQAccordion

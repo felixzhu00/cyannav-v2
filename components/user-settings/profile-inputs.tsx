@@ -12,7 +12,8 @@ import { useSession } from 'next-auth/react'
 const ProfileSettings: React.FC = () => {
   const { data: session, update } = useSession()
 
-  const handleUsernameUpdate = (newUsername: string) => {
+  const handleUsernameUpdate = async (newUsername: string) => {
+    // Update the username on session(client end)
     if (session && session.user) {
       update({ ...session, user: { ...session.user, username: newUsername } })
     }
@@ -26,10 +27,8 @@ const ProfileSettings: React.FC = () => {
             <AvatarImage
               src={`data:image/jpeg;base64,${session.user.profilePicture}`}
               className="h-36 w-36"
+              loading="lazy"
             />
-            <AvatarFallback className="h-36 w-36">
-              <CircleUserRound />
-            </AvatarFallback>
           </Avatar>
         ) : (
           <Avatar className="h-36 w-36 rounded-full border border-zinc-200 dark:border-zinc-700">
@@ -45,10 +44,11 @@ const ProfileSettings: React.FC = () => {
           <Label htmlFor="text">Username</Label>
           <div className="flex flex-row space-x-6">
             <Input
-              disabled
               type="text"
               id="username"
-              placeholder={session?.user?.username ?? 'Username'}
+              value={session?.user?.username ?? ''}
+              readOnly
+              className="cursor-default text-primary focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent"
             />
             <EditUsername onUsernameUpdate={handleUsernameUpdate} />
           </div>
@@ -57,10 +57,12 @@ const ProfileSettings: React.FC = () => {
           <Label htmlFor="email">Email</Label>
           <div className="flex flex-row space-x-6">
             <Input
-              disabled
-              type="email"
+              type="text"
               id="email"
-              placeholder={session?.user?.email ?? 'email'}
+              placeholder="Email"
+              value={session?.user?.email ?? 'email'}
+              readOnly
+              className="cursor-default text-primary focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent"
             />
           </div>
         </div>

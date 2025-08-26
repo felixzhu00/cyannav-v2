@@ -9,46 +9,7 @@ import {
   Users,
 } from 'lucide-react'
 
-// Dynamically import heavy components
-const Choropleth = dynamic(() => import('../components/templates/Choropleth'))
-const DistributiveFlow = dynamic(
-  () => import('../components/templates/DistributiveFlow')
-)
-const Heat = dynamic(() => import('../components/templates/Heat'))
-const Point = dynamic(() => import('../components/templates/Point'))
-const ThreeDRectangle = dynamic(
-  () => import('../components/templates/ThreeDRectangle')
-)
-
 // eslint-disable-next-line import/prefer-default-export
-export const featureMap = [
-  {
-    name: 'Choropleth Map',
-    description: 'template',
-    component: Choropleth,
-  },
-  {
-    name: 'Distributive Flow Map',
-    description: 'template',
-    component: DistributiveFlow,
-  },
-  {
-    name: 'Heat Map',
-    description: 'template',
-    component: Heat,
-  },
-  {
-    name: 'Point Map',
-    description: 'template',
-    component: Point,
-  },
-  {
-    name: '3D Rectangle Map',
-    description: 'template',
-    component: ThreeDRectangle,
-  },
-]
-
 export const items = [
   { value: 'Name', label: 'name', placeholder: 'Costa Rica' },
   { value: 'GDP', label: 'gdp', placeholder: '450353432' },
@@ -230,18 +191,18 @@ export const pricingModels = [
     monthlyPrice: '$0/month',
     yearlyPrice: '$0/year',
     description: 'Forever free!',
-    features: [
-      'Building an creating multiple maps and being able to save it to your file',
-      'Feature 2',
-      'Feature 3',
-    ],
+    features: ['Always Free', 'Share & View Maps', 'Basic Drawing Tools'],
   },
   {
     title: 'Pro',
     monthlyPrice: '$9.99/month',
     yearlyPrice: '$99.99/year',
     description: 'Even more features for our pro users!',
-    features: ['Feature 1', 'Feature 2', 'Feature 3'],
+    features: [
+      'Unlimited Map Storage',
+      'Access to Beta Features',
+      'Advanced Tools & Customization',
+    ],
   },
 ]
 
@@ -297,3 +258,42 @@ export const faqData = [
       'Yes, CyanNav allows you to add icons to your navigation items, enhancing the visual appeal and usability of your menus.',
   },
 ]
+
+type DashboardView = {
+  title: string
+  searchable: boolean
+  selectOptions: { label: string; value: string }[]
+}
+
+export const dashboardViews: { [key: string]: DashboardView } = {
+  'my-maps': {
+    title: 'My Maps',
+    searchable: true,
+    selectOptions: [
+      { label: 'Recently Updated', value: 'updated_at' }, // default
+      { label: 'A-Z', value: 'alphabet-a-z' },
+      { label: 'Recently Created', value: 'created_at' },
+    ],
+  },
+  community: {
+    title: 'Community',
+    searchable: true,
+    selectOptions: [
+      { label: 'Most Positive', value: 'most_positive' }, // default
+      { label: 'Most Negative', value: 'most_negative' },
+      { label: 'Recently Updated', value: 'updated_at' },
+      { label: 'A-Z', value: 'alphabet-a-z' },
+      { label: 'Recently Created', value: 'created_at' },
+    ],
+  },
+  'shared-with-me': {
+    title: 'Shared with Me',
+    searchable: false,
+    selectOptions: [], // no sort options
+  },
+  'starred-maps': {
+    title: 'Starred Maps',
+    searchable: false,
+    selectOptions: [], // no sort options
+  },
+}

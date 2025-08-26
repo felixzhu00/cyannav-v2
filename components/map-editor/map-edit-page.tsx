@@ -83,18 +83,18 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
   })
 
   return (
-    <div className="flex h-screen w-full flex-col">
+    <div className="flex h-screen w-full flex-col bg-pf">
       <MenuBar />
       <div className="flex h-screen justify-between">
         <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel className="min-w-[134px]" defaultSize={20}>
+          <ResizablePanel className="min-w-[160px]" defaultSize={20}>
             <LeftSidebar />
           </ResizablePanel>
           <ResizableHandle withHandle />
 
           <ResizablePanel defaultSize={60}>
             <div
-              className="relative flex h-full max-h-[calc(100vh-74px)] flex-grow justify-center border-x-2 border-zinc-700"
+              className="relative flex h-full max-h-[calc(100vh-74px)] flex-grow justify-center border-x-2 border-ring"
               ref={mapContainer}
               id="map-container"
             >

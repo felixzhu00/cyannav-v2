@@ -13,7 +13,10 @@ import { useAtom } from 'jotai'
 interface MenuItem {
   label: string
   icon: React.ReactNode
+  onClick?: () => void;
+
 }
+
 
 interface SelectMenuBarProps {
   items: MenuItem[]
@@ -43,10 +46,9 @@ export default function SelectMenuBar({
   const currMenuItem = items[currSelectedIndex.current]
 
   const triggerStyle = () =>
-    `flex flex-row items-center aspect-square h-full justify-center ${
-      isActive
-        ? 'bg-blue-800 dark:bg-blue-800 hover:bg-blue-800 dark:hover:bg-blue-800'
-        : 'bg-transparent dark:bg-transparent hover:bg-zinc-700 dark:hover:bg-zinc-700'
+    `flex flex-row items-center aspect-square h-full justify-center ${isActive
+      ? 'bg-blue-200 dark:bg-blue-800 hover:bg-blue-200 dark:hover:bg-blue-800'
+      : 'bg-transparent hover:bg-border'
     }`
 
   const handleChangeMode = (currentIndex: number) => {
@@ -64,14 +66,16 @@ export default function SelectMenuBar({
           onClick={() => {
             if (!isActive && !isFile) handleChangeMode(currSelectedIndex.current)
           }}
+          className='text-primary'
         >
+
           {currMenuItem.icon}
           {items.length > 1 && <ChevronDown className="h-3 w-3" />}
         </MenubarTrigger>
 
         {/* TODO spline is different from everything else */}
         {items.length > 1 && (
-          <MenubarContent className="mt-3.5">
+          <MenubarContent className="mt-3.5 ">
             {/* Map over the items to render the list of menu items */}
             {items.map((item, index) =>
               index === currSelectedIndex.current ? null : (
@@ -80,8 +84,9 @@ export default function SelectMenuBar({
                     onClick={() => {
                       // Set the selected menu item on click and run the provided onClick
                       if (!isFile) handleChangeMode(index) // Preventing default if you are chooseing Content
+                      if (item.onClick) item.onClick()
                     }}
-                    className="flex-row gap-2"
+                    className="flex-row gap-2 "
                   >
                     {item.icon} {item.label}
                   </MenubarItem>

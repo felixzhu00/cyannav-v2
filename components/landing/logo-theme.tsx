@@ -1,23 +1,17 @@
-'use client'
-import React from 'react'
-import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import logo_white from '@/public/logo-text-white.png'
-import logo_black from '@/public/logo-text-black.png'
+import logo from '@/public/logo.svg'
 
-export default function LogoTheme() {
-  const { theme } = useTheme()
+export default function Logo() {
   return (
-    <Link href="/" passHref>
+    <Link href="/" passHref className="flex items-center space-x-2 min-w-max">
       <Image
-        src={theme === 'dark' ? logo_white : logo_black}
+        src={logo}
         alt="Logo"
-        width={157}
-        height={65}
-        className="object-contain"
+        className="h-[65px] w-[65px] object-contain"
         priority
       />
+      <h1 className="text-2xl font-extrabold tracking-widest">CYANNAV</h1>
     </Link>
   )
 }

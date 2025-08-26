@@ -7,7 +7,7 @@ export default function DescriptionBox() {
   const selectedMode = useAtomValue(currSelectedModeAtom)
 
   return (
-    <div className="absolute bottom-0 left-0 bg-black p-5 m-1 rounded-md">
+    <div className="absolute bottom-0 left-0 bg-pf p-5 m-1 rounded-md">
       {menu[selectedMode.menuColIndex][selectedMode.menuItemIndex].desc}
     </div>
   )

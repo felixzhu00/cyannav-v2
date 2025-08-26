@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
-import { handleThumbnail } from '@/lib/generate-image'
+import { genImageBuffer, handleThumbnail } from '@/lib/generate-image'
 
 interface BufferImageProps {
   id: string
@@ -14,7 +14,6 @@ interface BufferImageProps {
   className?: string
   style?: React.CSSProperties
 }
-
 const BufferImage: React.FC<BufferImageProps> = ({
   id,
   geojson,
@@ -36,36 +35,31 @@ const BufferImage: React.FC<BufferImageProps> = ({
           : Buffer.from((buffer as any)?.data ?? [])
 
       // If thumbnail does not exist, create one
-      // if (!realBuffer?.length) {
-      //   console.log('active')
-      //   try {
-      //     // Generate buffer from geojson
-      //     realBuffer = (await handleThumbnail(
-      //       '',
-      //       geojson,
-      //       { fitBound: true },
-      //       false
-      //     )) as Buffer
+      if (!realBuffer?.length) {
+        try {
+          // Generate buffer from geojson
+          realBuffer = await genImageBuffer(geojson)
 
-      //     // If realBuffer return success, API call to update thumbnail image
-      //     const response = await fetch(`/api/map/${id}`, {
-      //       method: 'PUT',
-      //       headers: {
-      //         'Content-Type': 'application/json',
-      //       },
-      //       body: JSON.stringify({ thumbnail: realBuffer }),
-      //     })
-      //   } catch (err) {
-      //     console.error('Error generating thumbnail:', err)
-      //   }
-      // }
+          // If realBuffer return success, API call to update thumbnail image
+          const response = await fetch(`/api/map/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ thumbnail: realBuffer }),
+          })
+        } catch (err) {
+          console.error('Error generating thumbnail:', err)
+        }
+      }
+
       // Convert Buffer to url to be displayed
       const base64 = realBuffer.toString('base64')
       setUrl(`data:image/png;base64,${base64}`)
     }
 
     generateImage()
-  }, [buffer, geojson])
+  }, [])
 
   return (
     <img

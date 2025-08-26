@@ -12,6 +12,7 @@ import StarToggle from './star-toggle'
 import { useSession } from 'next-auth/react'
 import BufferImage from './buffer-image'
 import { decodeGeo } from '@/lib/utils'
+import Link from 'next/link'
 interface CardComponentProps {
   index: number
   mapMeta: MapFields
@@ -59,29 +60,37 @@ export default function CardComponent({
       className="h-80 w-full bg-zinc-100 shadow-md transition-transform duration-300 ease-in-out hover:scale-105"
     >
       <CardContent className="flex flex-col items-center justify-center">
-        {/* thumbnail */}
-        <BufferImage
-          id={_id as string}
-          geojson={decodeGeo(geojson) as CustomFeatureCollection}
-          buffer={thumbnail}
-          alt="map image"
-          width={310}
-          height={220}
-          className="h-[220px] w-full rounded-t-lg"
-          style={{ objectFit: 'cover' }}
-        />
+        <Link href={`/map/${_id}`} className="w-full">
+          {geojson && (
+            <BufferImage
+              id={_id as string}
+              geojson={decodeGeo(geojson) as CustomFeatureCollection}
+              buffer={thumbnail}
+              alt="map image"
+              width={310}
+              height={220}
+              className="h-[220px] w-full rounded-t-lg"
+              style={{ objectFit: 'cover' }}
+            />
+          )}
+        </Link>
+
         <div className="align-center flex w-full flex-row items-center justify-between space-x-4 p-4">
-          <VoteBox
-            id={_id as string}
-            count={count}
-            upvoted={upvoted}
-            downvoted={downvoted}
-          />
-          <div className="flex w-full flex-col">
+          <div onClick={(e) => e.stopPropagation()}>
+            <VoteBox
+              id={_id as string}
+              count={count}
+              upvoted={upvoted}
+              downvoted={downvoted}
+            />
+          </div>
+
+          <Link href={`/map/${_id}`} className="flex w-full flex-col">
             <h3 className="truncate text-xl font-bold">{title}</h3>
             <p className="text-xs">By: {(owner as UserFields).username}</p>
-          </div>
-          <div className="flex space-x-3">
+          </Link>
+
+          <div onClick={(e) => e.stopPropagation()} className="flex space-x-3">
             <StarToggle mapId={_id as string} isStarred={isStar} />
           </div>
         </div>

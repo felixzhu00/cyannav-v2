@@ -1,6 +1,6 @@
 import { Types } from 'mongoose'
 import { getUsersByFields } from '@/core/data-access/user/get-user.persistence'
-import { IUserDocument } from '@/core/_entities/types/user.types'
+import { IUserDocument, UserFields } from '@/core/_entities/types/user.types'
 import { updateUserFieldsById } from '@/core/data-access/user/update-user.persistence'
 import { getMapById } from '@/core/data-access/map/get-map.persistence'
 import { IMapDocument } from '@/core/_entities/types/map.types'
@@ -38,9 +38,10 @@ export async function toggleUserFavoriteUseCase({
   const mapRes = mapDoc.payload as IMapDocument
 
   // if user is not in sharedUser and map is not public
-  const userInSharedUser = mapRes.sharedUsers?.some(
-    (id: any) => id.toString() === userId
-  )
+  const userInSharedUser =
+    mapRes.sharedUsers?.some((id: any) => id.toString() === userId) ||
+    (mapRes.owner as any)._id.toString() === userId
+
   if (!userInSharedUser && mapRes.isPublished !== 'public')
     return { status: 400, message: 'Can not star on restricted map' }
 

@@ -28,14 +28,14 @@ const FeatureCard: React.FC<FeatureProps> = ({
       <div className="z-50 mb-[-30px] flex h-[60px] w-[60px] items-center justify-center rounded-full bg-zinc-200 dark:bg-zinc-900">
         <Icon height={30} width={30} />
       </div>
-      <Card className="z-40 h-[340px] w-[350px] rounded-lg bg-zinc-100 px-[30px] py-[50px] shadow-lg">
+      <Card className="z-40 h-[440px] w-[350px] rounded-lg bg-zinc-100 px-8 py-12 shadow-lg">
         <CardHeader className="flex flex-col items-center">
           <CardTitle className="text-center text-2xl font-semibold">
             {title}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-base">{description}</p>
+          <p className="text-base p-4">{description}</p>
         </CardContent>
         <CardFooter>
           <p className="opacity-50">{comingSoon}</p>
@@ -48,8 +48,11 @@ const FeatureCard: React.FC<FeatureProps> = ({
 export default function Features() {
   return (
     <section id="features" className="flex flex-col space-y-10">
-      <HeadingRow heading='What is CyanNav?' subheading='Everything you need to create stunning maps.' />
-      <div className="flex flex-wrap justify-center gap-4">
+      <HeadingRow
+        heading="What is CyanNav?"
+        subheading="Everything you need to create stunning maps."
+      />
+      <div className="grid grid-cols-1 xl:grid-cols-3 justify-center gap-2">
         {features.map((feature, index) => (
           <FeatureCard
             key={index}

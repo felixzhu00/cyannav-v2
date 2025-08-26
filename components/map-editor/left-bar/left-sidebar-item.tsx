@@ -13,16 +13,21 @@ import {
 import {
   cn,
   // decodeGeo,
-  editFeatureSelf, encodeGeo
+  editFeatureSelf,
+  encodeGeo,
 } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
 import DeleteItemDialog from './delete-item-dialog'
 
 type LeftSidebarItemProps = {
   properties: { [key: string]: any }
+  isOwner?: Boolean
 }
 
-export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
+export default function LeftSidebarItem({
+  properties,
+  isOwner,
+}: LeftSidebarItemProps) {
   // React State
 
   // Jotai Global State
@@ -125,19 +130,24 @@ export default function LeftSidebarItem({ properties }: LeftSidebarItemProps) {
   }
 
   return (
-    <div className="flex flex-row items-center max-w-full">
-      <DeleteItemDialog featureName={name} featureId={id} hasTrash={hasTrash} />
+    <div className="flex max-w-full flex-row items-center">
+      <DeleteItemDialog
+        featureName={name}
+        featureId={id}
+        hasTrash={hasTrash}
+        isOwner={isOwner}
+      />
       <div
         className={cn(
-          'gap-1 flex flex-1 min-w-0 items-center justify-between rounded-md border border-transparent px-2 py-0.5 hover:border-sidebar-primary',
+          'flex min-w-0 flex-1 items-center justify-between gap-1 rounded-md border border-transparent px-2 py-0.5 hover:border-sidebar-primary',
           currLayer === id && 'border-white-500'
         )}
         onClick={handleLayerChange}
       >
-        <span className="flex-1 min-w-0 ml-2 overflow-hidden text-ellipsis whitespace-nowrap">
+        <span className="ml-2 min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
           {name}
         </span>
-        <div className="flex-shrink min-w-0 items-center ">
+        <div className="min-w-0 flex-shrink items-center">
           <Button
             variant="ghost"
             size="icon"

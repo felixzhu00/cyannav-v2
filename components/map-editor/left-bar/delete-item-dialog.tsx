@@ -27,16 +27,18 @@ export default function DeleteItemDialog({
   featureName,
   featureId,
   hasTrash,
+  isOwner,
 }: {
   featureId: string
   featureName: string
   hasTrash: boolean
+  isOwner?: boolean
 }) {
   const map = useAtomValue(mapAtom)
   const mapRef = useAtomValue(mapLibreAtom)
   const handlerRef = useAtomValue(attachedHandlersAtom)
   const setMapField = useSetAtom(setMapFieldAtom)
-
+  /// Hijack has trash
   const handleDeleteVariable = async () => {
     // init newGeo with a not null value
     const newGeo = map.geojson
@@ -95,13 +97,13 @@ export default function DeleteItemDialog({
       <DialogTrigger asChild disabled={!hasTrash}>
         <Button
           variant="ghost"
-          className={`flex-shrink aspect-square px-3 ${!hasTrash ? 'cursor-not-allowed' : ''}`} // Add a not-allowed cursor when disabled
+          className={`aspect-square flex-shrink px-3 ${!hasTrash ? 'cursor-not-allowed' : ''}`} // Add a not-allowed cursor when disabled
           onClick={(e) => {
             e.stopPropagation()
           }}
         >
           <Minus
-            className={`w-full h-full ${hasTrash ? 'text-red-500' : ''}`}
+            className={`h-full w-full ${hasTrash ? 'text-red-500' : ''}`}
           />
         </Button>
       </DialogTrigger>
@@ -116,8 +118,8 @@ export default function DeleteItemDialog({
             <DialogTitle>Delete Layer</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete{' '}
-              <span className="font-bold text-primary">{featureName}</span>{' '}
-              from <span className="font-bold text-primary">Map</span>
+              <span className="font-bold text-primary">{featureName}</span> from{' '}
+              <span className="font-bold text-primary">Map</span>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

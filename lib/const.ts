@@ -146,44 +146,44 @@ export const features = [
     icon: Map,
     featureTitle: 'Multiple Map Type Support',
     featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+      'Easily import and work with different map formats, including KML, GeoJSON, NavJSON, and ZIP files. This flexibility ensures you can bring in data from a wide range of sources without worrying about compatibility, making it simple to integrate your existing maps or collaborate with others.',
     comingSoon: '',
   },
   {
     icon: LayoutTemplate,
     featureTitle: 'Templates',
     featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+      'Start your projects faster with ready-to-use templates designed for different use cases. Whether you’re creating a simple map, planning routes, or organizing spatial data, templates give you a strong foundation so you can focus on customizing and refining your work.',
     comingSoon: '',
   },
-  {
-    icon: MessageCircle,
-    featureTitle: 'Dedicated Chat',
-    featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
-    comingSoon: '',
-  },
+  // {
+  //   icon: MessageCircle,
+  //   featureTitle: 'Dedicated Chat',
+  //   featureDescription:
+  //     'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+  //   comingSoon: '',
+  // },
   {
     icon: Download,
     featureTitle: 'Download Your Creations',
     featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+      'Export your finished maps in the format that works best for you. Save them as NavJSON files for future editing, or download them as JPG images for easy sharing and presentation. Your creations stay accessible, portable, and ready to use whenever you need them.',
     comingSoon: '',
   },
-  {
-    icon: BellRing,
-    featureTitle: 'Notifications',
-    featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
-    comingSoon: '',
-  },
-  {
-    icon: Users,
-    featureTitle: 'Multi-User Editing',
-    featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
-    comingSoon: 'Coming soon for Pro users!',
-  },
+  // {
+  //   icon: BellRing,
+  //   featureTitle: 'Notifications',
+  //   featureDescription:
+  //     'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+  //   comingSoon: '',
+  // },
+  // {
+  //   icon: Users,
+  //   featureTitle: 'Multi-User Editing',
+  //   featureDescription:
+  //     'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+  //   comingSoon: 'Coming soon for Pro users!',
+  // },
 ]
 
 export const pricingModels = [
@@ -396,7 +396,6 @@ export const userSettingsSteps: Step[] = [
     content: '🎉 That’s it! Your settings are just a few clicks away.',
   },
 ]
-
 
 export const yearlyPriceId = 'price_1RfTeYFJGOpcxqCyUirbAqcq'
 export const monthlyPriceId = 'price_1RfTh2FJGOpcxqCyrhLMLTAF'

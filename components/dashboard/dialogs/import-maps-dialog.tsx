@@ -100,7 +100,6 @@ export default function ImportMapDialog({
     // Generate a thumbnail for this new map
     const newThumbnail = await genImageBuffer(cutsomGeoJson)
 
-    console.log(newThumbnail)
     // convert geojson to buffer
     const encodedGeojson = encodeGeo(cutsomGeoJson)
 

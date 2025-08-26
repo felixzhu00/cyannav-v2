@@ -12,11 +12,16 @@ import Image from 'next/image'
 import { Star, ThumbsUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import HeadingRow from './heading-row'
-import { MapFields } from '@/core/_entities/types/map.types'
+import {
+  CustomFeatureCollection,
+  MapFields,
+} from '@/core/_entities/types/map.types'
 import Link from 'next/link'
 import { UserFields } from '@/core/_entities/types/user.types'
 import StarToggle from '../dashboard/card-grid/star-toggle'
 import VoteBox from '../dashboard/card-grid/vote-box'
+import BufferImage from '../dashboard/card-grid/buffer-image'
+import { decodeGeo } from '@/lib/utils'
 
 export default async function Community() {
   let mapList: MapFields[] = []
@@ -74,14 +79,21 @@ export default async function Community() {
               >
                 <CardContent className="flex flex-col items-center justify-center">
                   {/* thumbnail */}
-                  <Image
-                    src={mapPlaceholder}
-                    className="h-[220px] w-full rounded-t-lg"
-                    width={310}
-                    height={220}
-                    style={{ objectFit: 'cover' }}
-                    alt="map image"
-                  />
+                  <Link href={`/map/${map._id}`} className="w-full">
+                    <BufferImage
+                      id={map._id as string}
+                      geojson={
+                        decodeGeo(map.geojson) as CustomFeatureCollection
+                      }
+                      buffer={map.thumbnail}
+                      alt="map image"
+                      width={310}
+                      height={220}
+                      className="h-[220px] w-full rounded-t-lg"
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </Link>
+
                   <div className="align-center flex w-full flex-row items-center justify-between space-x-4 p-4">
                     <VoteBox
                       id={map._id as string}
@@ -91,14 +103,19 @@ export default async function Community() {
                       upvoted={false}
                       downvoted={false}
                     />
-                    <div className="flex w-full flex-col">
-                      <h3 className="truncate text-xl font-bold">
-                        {map.title}
-                      </h3>
-                      <p className="text-xs">
-                        By: {(map.owner as UserFields).username}
-                      </p>
-                    </div>
+                    <Link
+                      href={`/map/${map._id}`}
+                      className="flex w-full flex-col"
+                    >
+                      <div className="flex w-full flex-col">
+                        <h3 className="truncate text-xl font-bold">
+                          {map.title}
+                        </h3>
+                        <p className="text-xs">
+                          By: {(map.owner as UserFields).username}
+                        </p>
+                      </div>
+                    </Link>
                     <div className="flex space-x-3">
                       <StarToggle mapId={map._id as string} isStarred={false} />
                     </div>

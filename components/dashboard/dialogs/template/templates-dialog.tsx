@@ -41,8 +41,6 @@ export default function TemplateDialog({
       // Get the list of maps to display
       const maps = await response.json()
 
-      
-
       // set the maplist state
       setMapList(maps.payload)
     }
@@ -122,9 +120,11 @@ export default function TemplateDialog({
               mapList.map((mapElement, i) => (
                 <TemplateCard
                   key={i}
+                  id={mapElement._id as string}
                   creatorName={(mapElement.owner as UserFields).username || ''}
                   title={mapElement.title || ''}
                   geojson={mapElement.geojson}
+                  thumbnail={mapElement.thumbnail as Buffer}
                   onLearnMore={() => {
                     handleLearnMore(i)
                   }}

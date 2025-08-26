@@ -402,6 +402,7 @@ export function transformMap(map: IMapDocument) {
   return {
     ...map,
     owner: {
+      _id: (map.owner as IUserDocument)?._id?.toString() || '',
       username: (map.owner as IUserDocument)?.username?.toString() || '', // Safely access and convert username to string, fallback to an empty string if undefined
       email: (map.owner as IUserDocument)?.email?.toString() || '', // Safely access and convert email to string, fallback to an empty string if undefined
     },

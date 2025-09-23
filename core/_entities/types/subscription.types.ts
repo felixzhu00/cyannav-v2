@@ -1,11 +1,6 @@
-export interface ISubscription {
-  userId: string
-  stripeSubId: string
-  plan: 'free' | 'pro'
-  billingInterval: 'monthly' | 'yearly' | null
-  status: 'active' | 'canceling' | 'expired'
-  endDate: Date
-  updatedAt?: Date
-}
+import { subscriptionSchema } from '@/db/subscription.model'
+import { InferSchemaType } from 'mongoose'
+
+export type ISubscription = InferSchemaType<typeof subscriptionSchema>
 
 export interface ISubscriptionDocument extends ISubscription, Document {}

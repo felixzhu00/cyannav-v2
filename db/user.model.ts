@@ -1,9 +1,8 @@
-import { IUserDocument } from '@/core/_entities/types/user.types'
-import { InferSchemaType, Schema, model, models } from 'mongoose'
+import { Schema, model, models } from 'mongoose'
 
 // Next-Auth fields - username, email, image, emailVerified
 // createUser fields - profilePicture
-const userSchema = new Schema<IUserDocument>({
+export const userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String },
@@ -21,8 +20,5 @@ const userSchema = new Schema<IUserDocument>({
 })
 
 delete models.User
-//Export User Schema
-export default model<IUserDocument>('User', userSchema)
 
-// Export Type of User Schema
-export type IMessage = InferSchemaType<typeof userSchema>
+export default model('User', userSchema)

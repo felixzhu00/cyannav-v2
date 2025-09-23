@@ -1,7 +1,6 @@
-import { Schema, model, models, Types, InferSchemaType } from 'mongoose'
-import { IMessageDocument } from '@/core/_entities/types/messages.types'
+import { Schema, model, models, Types } from 'mongoose'
 
-const messageSchema = new Schema<IMessageDocument>({
+export const messageSchema = new Schema({
   author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   text: { type: String, required: true },
   replyTo: { type: Schema.Types.ObjectId, ref: 'Message' },
@@ -15,8 +14,4 @@ const messageSchema = new Schema<IMessageDocument>({
 })
 delete models.Message
 
-//Export Message Schema
-export default model<IMessageDocument>('Message', messageSchema)
-
-// Export Type of Message Schema
-export type IMessage = InferSchemaType<typeof messageSchema>
+export default model('Message', messageSchema)

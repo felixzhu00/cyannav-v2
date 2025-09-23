@@ -1,26 +1,10 @@
-import { Document, Types } from 'mongoose'
+import { Document, InferSchemaType, Types } from 'mongoose'
 import { FeatureCollection, Feature } from 'geojson'
-import { IUserDocument } from './user.types'
-import { IMessageDocument, MessageFields } from './messages.types'
+import { MessageFields } from './messages.types'
+import { mapSchema } from '@/db/map.model'
 
-// DB MAP Structure
-export interface IMap {
-  title: string
-  owner: IUserDocument | IUserDocument['_id'] | Types.ObjectId
-  mapType: string
-  isPublished: 'public' | 'private' | 'invited'
-  isTemplate?: boolean
-  thumbnail?: Buffer
-  geojson?: Buffer
-  likes?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
-  dislikes?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
-  messages?: IMessageDocument[] | IMessageDocument['_id'][] | Types.ObjectId[]
-  sharedUsers?: IUserDocument[] | IUserDocument['_id'][] | Types.ObjectId[]
-  forkedFrom?: IMapDocument | IMapDocument['_id'] | Types.ObjectId
-  dateCreated?: Date
-  dateUpdated?: Date
-  dateThumbnailUpdated?: Date
-}
+export type IMap = InferSchemaType<typeof mapSchema>
+
 export interface IMapDocument extends IMap, Document {}
 
 // Custom Feature Collection

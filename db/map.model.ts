@@ -1,7 +1,6 @@
-import { InferSchemaType, Schema, model, models } from 'mongoose'
-import { IMapDocument } from '@/core/_entities/types/map.types'
+import { Schema, model, models } from 'mongoose'
 
-const mapSchema = new Schema<IMapDocument>({
+export const mapSchema = new Schema({
   title: { type: String, required: true },
   owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   mapType: { type: String, required: true },
@@ -20,8 +19,5 @@ const mapSchema = new Schema<IMapDocument>({
 })
 
 delete models.Map
-//Export Map Schema
-export default model<IMapDocument>('Map', mapSchema)
 
-// Export Type of Map Schema
-export type IMap = InferSchemaType<typeof mapSchema>
+export default model('Map', mapSchema)

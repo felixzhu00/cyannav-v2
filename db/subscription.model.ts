@@ -1,7 +1,7 @@
 import { ISubscriptionDocument } from '@/core/_entities/types/subscription.types'
-import { Schema, model, models } from 'mongoose'
+import { InferSchemaType, Schema, model, models } from 'mongoose'
 
-const SubscriptionSchema = new Schema<ISubscriptionDocument>({
+const subscriptionSchema = new Schema<ISubscriptionDocument>({
   userId: { type: String, required: true, unique: true },
   stripeSubId: { type: String, required: true },
   plan: { type: String, enum: ['free', 'pro'], default: 'free' },
@@ -20,4 +20,8 @@ const SubscriptionSchema = new Schema<ISubscriptionDocument>({
 })
 
 delete models.Subscription
-export default model<ISubscriptionDocument>('Subscription', SubscriptionSchema)
+//Export Subscription Schema
+export default model<ISubscriptionDocument>('Subscription', subscriptionSchema)
+
+// Export Type of Subscription Schema
+export type IMap = InferSchemaType<typeof subscriptionSchema>

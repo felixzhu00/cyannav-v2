@@ -41,7 +41,7 @@ export function encodeGeo(geojsonData: CustomFeatureCollection) {
   return finalBuffer
 }
 
-export function decodeGeo(geojsonBuffer: { type: string; data: number[] }) {
+export function decodeGeo(geojsonBuffer: Buffer) {
   // Convert JSON representation to Buffer
   const buffer = Buffer.from(new Uint8Array(geojsonBuffer.data))
 
@@ -631,7 +631,9 @@ export const handleUseTemplate = async (
     const formData = new FormData()
 
     // Convert Buffers to Blob
-    const thumbnailBlob = new Blob([thumbnail], { type: 'image/png' }) // adjust MIME type as needed
+    const thumbnailBlob = new Blob([new Uint8Array(thumbnail)], {
+      type: 'image/png',
+    })
 
     formData.append('geojson', JSON.stringify(geojson))
     formData.append('title', title)

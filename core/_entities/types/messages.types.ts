@@ -1,5 +1,5 @@
-import { Document, Types } from 'mongoose'
-import { IUserDocument } from './user.types'
+import { Document, InferSchemaType, Types } from 'mongoose'
+import { messageSchema } from '@/db/message.model'
 
 // DB Emoji Structure
 export interface IEmoji {
@@ -7,17 +7,11 @@ export interface IEmoji {
   owner: Types.ObjectId
 }
 
-// DB Message Structure
-export interface IMessage {
-  author: IUserDocument | IUserDocument['_id'] | Types.ObjectId
-  text: string
-  emojis?: IEmoji[]
-  replyTo?: Types.ObjectId // Array of Message references
-  dateCreated?: Date
-}
+export type IMessage = InferSchemaType<typeof messageSchema>
+
 export interface IMessageDocument extends IMessage, Document {}
 
-export interface MessageFields{
+export interface MessageFields {
   _id: string
   author: string
   text: string

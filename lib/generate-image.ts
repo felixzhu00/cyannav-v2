@@ -12,7 +12,7 @@ export const initializeOffScreenMapDiv = async (
     fitBound?: boolean
   } = {}
 ): Promise<Blob> => {
-  //Default option settings
+  // Default option settings
   const {
     width = '1920px',
     height = '1080px',
@@ -47,7 +47,7 @@ export const initializeOffScreenMapDiv = async (
       if (fitBound) {
         const bbox = turf.bbox(geojson) // Use @turf/bbox
         map.fitBounds(bbox as [number, number, number, number], {
-          padding: padding,
+          padding,
           duration: 0,
         })
       }
@@ -72,7 +72,7 @@ export const initializeOffScreenMapDiv = async (
   })
 }
 
-export const handleThumbnailDownload = async (
+export const handleThumbnail = async (
   name: string,
   myGeoJson: GeoJSON.FeatureCollection,
   options: {
@@ -80,9 +80,10 @@ export const handleThumbnailDownload = async (
     height?: string
     padding?: number
     fitBound?: boolean
-  } = {}
+  } = {},
+  download: boolean = true
 ) => {
-  //Default option settings
+  //Default option settingss
   const mergedOptions = {
     width: '1920px',
     height: '1080px',
@@ -93,10 +94,47 @@ export const handleThumbnailDownload = async (
 
   // Make the map
   const blob = await initializeOffScreenMapDiv(myGeoJson, mergedOptions)
+  if (!download) {
+    const arrayBuffer = await blob.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    return buffer
+  }
+
   const url = URL.createObjectURL(blob)
+
   const a = document.createElement('a')
   a.href = url
   a.download = `${name}.png`
   a.click()
   URL.revokeObjectURL(url)
+}
+
+export const genImageBuffer = async (geojson: GeoJSON.FeatureCollection) => {
+  return (await handleThumbnail(
+    '',
+    geojson,
+    { fitBound: true },
+    false
+  )) as Buffer
+}
+
+export const updateThumbnail = async (mapId: string, thumbnail: Buffer) => {
+  const response = await fetch(`/api/map/${mapId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ thumbnail }),
+  })
+
+  // Check if response errors
+  if (!response.ok) {
+    const errorData = await response.json()
+    return errorData
+  }
+
+  // Get the list of maps to display
+  const map = await response.json()
+
+  return map
 }

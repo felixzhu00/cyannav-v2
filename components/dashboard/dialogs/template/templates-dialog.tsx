@@ -11,8 +11,12 @@ import { ChevronLeft } from 'lucide-react'
 import { MapFields } from '@/core/_entities/types/map.types'
 import { UserFields } from '@/core/_entities/types/user.types'
 import MapPreviewPage from './map-preview'
-import { toast } from '@/components/ui/use-toast'
 import { useRouter } from 'next/navigation'
+import { handleUseTemplate } from '@/lib/utils'
+
+function isUser(owner: any): owner is UserFields {
+  return owner && typeof owner === 'object' && 'username' in owner
+}
 
 export default function TemplateDialog({
   isOpen,
@@ -25,8 +29,8 @@ export default function TemplateDialog({
   const [mapList, setMapList] = useState<MapFields[]>()
   // either index in mapList or null
   const [selectedTemplateIndex, setSelectedTemplateIndex] = useState<
-    number | null
-  >(null)
+    number
+  >(-1)
 
   const router = useRouter()
 
@@ -53,32 +57,7 @@ export default function TemplateDialog({
   }
 
   const handleBackToGrid = () => {
-    setSelectedTemplateIndex(null)
-  }
-
-  const handleUseTemplate = async (geojson: Buffer, title: string) => {
-    try {
-      // API call to create a new map for user under my maps
-      const res = await fetch(`/api/map`, {
-        method: 'POST',
-        body: JSON.stringify({ geojson, title }),
-        cache: 'no-store',
-      })
-
-      console.log(res)
-
-      // if fail toast and go back to templates
-      if (!res.ok) {
-        toast({
-          description: 'Fail to create Map from template',
-        })
-      }
-
-      const data = await res.json()
-
-      // If sucsess direct user to new map/[id]
-      router.push(`/map/${data.payload}`)
-    } catch (error) {}
+    setSelectedTemplateIndex(-1)
   }
 
   if (!isOpen) return null
@@ -114,12 +93,14 @@ export default function TemplateDialog({
                   {mapList[selectedTemplateIndex || 0].title}
                 </h1>
                 <Button
-                  onClick={() =>
-                    handleUseTemplate(
-                      mapList[selectedTemplateIndex].geojson,
-                      mapList[selectedTemplateIndex || 0].title
+                  onClick={async () => {
+                    const res = await handleUseTemplate(
+                      mapList[selectedTemplateIndex].geojson as any,
+                      mapList[selectedTemplateIndex || 0].title as any,
+                      mapList[selectedTemplateIndex].thumbnail as any,
                     )
-                  }
+                    if (res) router.push(res)
+                  }}
                   className="w-full bg-cyan-200 text-black sm:w-auto lg:w-40"
                 >
                   Use template
@@ -127,7 +108,7 @@ export default function TemplateDialog({
               </div>
               <div className="aspect-[4/3] w-full rounded-lg bg-pf sm:aspect-video">
                 <MapPreviewPage
-                  geojson={mapList[selectedTemplateIndex].geojson}
+                  geojson={mapList[selectedTemplateIndex].geojson as any}
                 />
               </div>
             </div>
@@ -144,9 +125,11 @@ export default function TemplateDialog({
               mapList.map((mapElement, i) => (
                 <TemplateCard
                   key={i}
-                  creatorName={(mapElement.owner as UserFields).username || ''}
+                  id={mapElement._id as string}
+                  creatorName={(mapElement.owner as any).username || ''}
                   title={mapElement.title || ''}
-                  geojson={mapElement.geojson}
+                  geojson={mapElement.geojson as any}
+                  thumbnail={mapElement.thumbnail as Buffer}
                   onLearnMore={() => {
                     handleLearnMore(i)
                   }}

@@ -127,11 +127,32 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  subscriptions: [{ type: Schema.Types.ObjectId, ref: 'Subscription' }],
+})
+const User = mongoose.models.User || mongoose.model('User', UserSchema)
+
+const SubscriptionSchema = new Schema({
+  userId: { type: String, required: true, unique: true },
+  stripeSubId: { type: String, required: true },
   plan: { type: String, enum: ['free', 'pro'], default: 'free' },
+  billingInterval: {
+    type: String,
+    enum: ['monthly', 'yearly'],
+    default: 'monthly',
+  },
+  status: {
+    type: String,
+    enum: ['active', 'canceling', 'expired'],
+    default: 'active',
+  },
+  endDate: { type: Date, required: true },
+  updatedAt: { type: Date, default: Date.now },
 })
 
 // Check if the model already exists (to prevent recompilation during hot reloads)
-const User = mongoose.models.User || mongoose.model('User', UserSchema)
+const Subscription =
+  mongoose.models.Subscription ||
+  mongoose.model('Subscription', SubscriptionSchema)
 
 const mongoDB = 'mongodb://localhost:27017/cyan' // replace with db of your choice
 
@@ -602,7 +623,7 @@ async function main() {
   const users = await createBotUsers(10)
   const Messages = await createBotMessages(users, 20)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const maps = await createBotMap(20, users, Messages)
+  const maps = await createBotMap(1, users, Messages)
 
   // create Admin
   const admin = await createUser(

@@ -4,6 +4,7 @@ import {
   IMap,
   MapAtom,
 } from '@/core/_entities/types/map.types'
+
 import { atom } from 'jotai'
 import maplibregl from 'maplibre-gl'
 import { updateFeature, updateGeoJSONAPI } from './utils'

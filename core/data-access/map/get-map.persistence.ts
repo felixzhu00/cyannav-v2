@@ -29,7 +29,6 @@ export async function getMapById(id: string): Promise<APIResponse> {
         },
       })
       .populate('sharedUsers', 'username email')
-      .lean()
 
     // Check if a Map is found in DB
     if (!map) {

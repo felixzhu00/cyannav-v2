@@ -23,6 +23,9 @@ import { Types } from 'mongoose'
 import { toast } from '@/components/ui/use-toast'
 import { populateDefault } from './maplibre-actions/map-utils'
 import { initializeOffScreenMapDiv } from './generate-image'
+import shp from 'shpjs'
+import { kml as kmlToGeoJSON } from '@tmcw/togeojson'
+
 // eslint-disable-next-line import/prefer-default-export
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -38,50 +41,70 @@ export function encodeGeo(geojsonData: CustomFeatureCollection) {
   return finalBuffer
 }
 
-export function decodeGeo(geojsonBuffer: { type: string; data: number[] }) {
-  // Convert JSON representation to Buffer
-  const buffer = Buffer.from(new Uint8Array(geojsonBuffer.data))
+export function decodeGeo(geojsonBuffer: Buffer) {
+  // Convert the buffer into a Uint8Array directly
+  const uint8Array = new Uint8Array(geojsonBuffer);
 
-  // Decode the Buffer using geobuf
-  const uint8Array = new Uint8Array(geojsonBuffer.data)
-  const geo = geobuf.decode(new Pbf(uint8Array)) as CustomFeatureCollection
+  // Decode geobuf
+  const geo = geobuf.decode(new Pbf(uint8Array)) as CustomFeatureCollection;
 
-  // Populate default in case the geojson from db does not have render properties
+  // Populate defaults
   const defaultFeatureList = geo.features.map((feature) =>
     populateDefault(feature)
-  )
+  );
 
-  // Replace features
-  const defaultGeoCollection = {
+  return {
     ...geo,
     features: defaultFeatureList,
-  }
-
-  return defaultGeoCollection
+  };
 }
+
 
 // Use during import new map
 export function convertToCustomFeatureCollection(
   geojson: GeoJSON
 ): CustomFeatureCollection {
   if (geojson.type === 'FeatureCollection') {
-    const postGeo = geojson.features.map((feature, index) => ({
-      ...feature,
-      properties: {
-        name: feature.properties?.name || `Feature${index}`,
-        ...feature.properties,
-        _self: {
-          _id: nanoid(),
-          _visible: true,
-          _lock: false,
+    const postGeo = geojson.features.map((feature, index) => {
+      const tempId = nanoid(32) // Declare tempId inside the map function
+      return {
+        ...feature,
+        id: tempId, // Set the feature's id to the generated tempId
+        properties: {
+          id: tempId, // Also include the tempId in the properties
+          render: {
+            name: {
+              payload: feature.properties?.name || `Feature${index}`,
+              variableType: 'string',
+            },
+            visible: {
+              payload: true,
+              variableType: 'boolean',
+            },
+            lock: {
+              payload: false,
+              variableType: 'boolean',
+            },
+            draw: {
+              payload: 'feature',
+              variableType: 'string',
+            },
+            trash: {
+              payload: false,
+              variableType: 'boolean',
+            },
+          },
+          old: {
+            ...feature.properties,
+          },
         },
-      },
-    }))
+      }
+    })
 
     const finalGeo = {
       type: 'FeatureCollection',
       features: postGeo,
-      _shared: new Map<string, string | number>(),
+      _shared: { mode: 'none' },
     }
 
     return finalGeo as CustomFeatureCollection
@@ -372,32 +395,66 @@ export function handleDBError(error: any): APIResponse {
   }
 }
 
+function isUserDocument(user: any): user is IUserDocument {
+  return user && typeof user === "object" && "username" in user;
+}
+
 export function transformMap(map: IMapDocument) {
   return {
     ...map,
-    owner: {
-      username: (map.owner as IUserDocument)?.username?.toString() || '', // Safely access and convert username to string, fallback to an empty string if undefined
-      email: (map.owner as IUserDocument)?.email?.toString() || '', // Safely access and convert email to string, fallback to an empty string if undefined
-    },
+    owner: (() => {
+      const owner = map.owner as unknown as IUserDocument | Types.ObjectId;
+
+      if (isUserDocument(owner)) {
+        return {
+          _id: owner._id?.toString() || '',
+          username: owner.username || '',
+          email: owner.email || '',
+        };
+      }
+
+      // Unpopulated fallback
+      return {
+        _id: owner.toString(),
+        username: '',
+        email: '',
+      };
+    })(),
+
     geojson: map.geojson ? Buffer.from(map.geojson.buffer) : undefined,
     thumbnail: map.thumbnail ? Buffer.from(map.thumbnail.buffer) : undefined,
-    messages: map.messages?.map((m) => {
-      // Explicitly assert the type of m.author
-      const author = (m as IMessageDocument).author as IUserDocument
+
+    messages: map.messages?.map((msg) => {
+      const m = msg as unknown as IMessageDocument; // safe cast after `unknown`
+
+      const author = m.author as unknown as IUserDocument | Types.ObjectId;
+
       return {
-        ...(m as IMessageDocument),
-        author: author.username,
-      }
+        ...m,
+        author: isUserDocument(author) ? author.username : author.toString(),
+      };
     }),
-    sharedUsers:
-      map.sharedUsers?.map((sharedUser) => ({
-        username: (sharedUser as IUserDocument)?.username?.toString() || '',
-        email: (sharedUser as IUserDocument)?.email?.toString() || '',
-      })) || [],
+
+    sharedUsers: map.sharedUsers?.map((u) => {
+      const user = u as unknown as IUserDocument | Types.ObjectId;
+
+      if (isUserDocument(user)) {
+        return {
+          username: user.username || '',
+          email: user.email || '',
+        };
+      }
+      return {
+        username: '',
+        email: '',
+      };
+    }) || [],
+
     forkedFrom: map.forkedFrom?.toString(),
-    likes: map.likes?.map((likeId) => (likeId as Types.ObjectId).toString()),
-  }
+    likes: map.likes?.map((id) => id.toString()),
+  };
 }
+
 export function createErrorResponse(
   status: number,
   message: string,
@@ -545,3 +602,91 @@ export const propNameToString = (str: string) =>
     .join(' ') // Join them back with spaces}
 
 //create a instace
+
+export const parseKML = (fileData: string) => {
+  const kmlDom = new DOMParser().parseFromString(fileData, 'text/xml')
+  const geojson = kmlToGeoJSON(kmlDom)
+  return geojson
+}
+
+export const parseShapefile = async (file: string | File | ArrayBuffer) => {
+  let arrayBuffer: ArrayBuffer
+
+  if (typeof file === 'string') {
+    // Convert string to ArrayBuffer using TextEncoder
+    const uint8array = new TextEncoder().encode(file)
+    arrayBuffer = uint8array.slice().buffer
+  } else if (file instanceof File) {
+    arrayBuffer = await file.arrayBuffer()
+  } else {
+    arrayBuffer = file
+  }
+
+  const geojson = await shp(arrayBuffer)
+  return geojson
+}
+
+// export const handleUseTemplate = async (geojson: Buffer, title: string) => {
+//   try {
+//     // API call to create a new map for user under my maps
+//     const res = await fetch(`/api/map`, {
+//       method: 'POST',
+//       body: JSON.stringify({ geojson, title }),
+//       cache: 'no-store',
+//     })
+
+//     console.log(res)
+
+//     // if fail toast and go back to templates
+//     if (!res.ok) {
+//       toast({
+//         description: 'Fail to create Map',
+//       })
+//     }
+
+//     const data = await res.json()
+
+//     // If sucsess direct user to new map/[id]
+//     router.push(`/map/${data.payload}`)
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
+export const handleUseTemplate = async (
+  geojson: Buffer,
+  title: string,
+  thumbnail: Buffer
+) => {
+  try {
+    const formData = new FormData()
+
+    // Convert Buffers to Blob
+    const thumbnailBlob = new Blob([new Uint8Array(thumbnail)], {
+      type: 'image/png',
+    })
+
+    formData.append('geojson', JSON.stringify(geojson))
+    formData.append('title', title)
+    formData.append('thumbnail', thumbnailBlob)
+
+    const res = await fetch('/api/map', {
+      method: 'POST',
+      body: formData,
+      cache: 'no-store',
+    })
+
+    // if fail toast and go back to templates
+    if (!res.ok) {
+      toast({
+        description: 'Fail to create Map',
+      })
+    }
+
+    const data = await res.json()
+
+    // If sucsess direct user to new map/[id]
+    return `/map/${data.payload}`
+  } catch (error) {
+    console.error(error)
+  }
+}

@@ -8,6 +8,7 @@ import {
   BellRing,
   Users,
 } from 'lucide-react'
+import { Step } from 'react-joyride'
 
 // eslint-disable-next-line import/prefer-default-export
 export const items = [
@@ -145,44 +146,44 @@ export const features = [
     icon: Map,
     featureTitle: 'Multiple Map Type Support',
     featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+      'Easily import and work with different map formats, including KML, GeoJSON, NavJSON, and ZIP files. This flexibility ensures you can bring in data from a wide range of sources without worrying about compatibility, making it simple to integrate your existing maps or collaborate with others.',
     comingSoon: '',
   },
   {
     icon: LayoutTemplate,
     featureTitle: 'Templates',
     featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+      'Start your projects faster with ready-to-use templates designed for different use cases. Whether you’re creating a simple map, planning routes, or organizing spatial data, templates give you a strong foundation so you can focus on customizing and refining your work.',
     comingSoon: '',
   },
-  {
-    icon: MessageCircle,
-    featureTitle: 'Dedicated Chat',
-    featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
-    comingSoon: '',
-  },
+  // {
+  //   icon: MessageCircle,
+  //   featureTitle: 'Dedicated Chat',
+  //   featureDescription:
+  //     'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+  //   comingSoon: '',
+  // },
   {
     icon: Download,
     featureTitle: 'Download Your Creations',
     featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+      'Export your finished maps in the format that works best for you. Save them as NavJSON files for future editing, or download them as JPG images for easy sharing and presentation. Your creations stay accessible, portable, and ready to use whenever you need them.',
     comingSoon: '',
   },
-  {
-    icon: BellRing,
-    featureTitle: 'Notifications',
-    featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
-    comingSoon: '',
-  },
-  {
-    icon: Users,
-    featureTitle: 'Multi-User Editing',
-    featureDescription:
-      'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
-    comingSoon: 'Coming soon for Pro users!',
-  },
+  // {
+  //   icon: BellRing,
+  //   featureTitle: 'Notifications',
+  //   featureDescription:
+  //     'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+  //   comingSoon: '',
+  // },
+  // {
+  //   icon: Users,
+  //   featureTitle: 'Multi-User Editing',
+  //   featureDescription:
+  //     'Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl. Lorem ipsum dolor sit amet consectetur. Sit venenatis posuere sapien pretium adipiscing dictum ut sagittis nisl.',
+  //   comingSoon: 'Coming soon for Pro users!',
+  // },
 ]
 
 export const pricingModels = [
@@ -297,3 +298,104 @@ export const dashboardViews: { [key: string]: DashboardView } = {
     selectOptions: [], // no sort options
   },
 }
+
+export const sharedNavbarSteps: Step[] = [
+  // Navbar
+  {
+    target: '#navbar-notification-icon',
+    content: '🔔 This icon shows all the messages you’ve received.',
+  },
+  {
+    target: '#navbar-help-icon',
+    content: '❓ Click here for help and guides when you’re lost.',
+  },
+  {
+    target: '#navbar-profile-icon',
+    content:
+      '👤 View your profile, manage settings, and even delete your account here.',
+  },
+]
+export const dashboardSteps: Step[] = [
+  {
+    target: 'body',
+    placement: 'center',
+    content:
+      '👋 Welcome to CyanNav Dashboard! Here you can manage your maps and discover others.',
+    disableBeacon: true,
+  },
+  ...sharedNavbarSteps,
+  // Sidebar
+  {
+    target: '#sidebar-mymaps',
+    content: '🗺️ “My Maps” shows all the maps you own.',
+  },
+  {
+    target: '#sidebar-community',
+    content: '🌍 “Community” displays public maps from other users.',
+  },
+  {
+    target: '#sidebar-shared',
+    content: '🤝 “Shared with Me” shows maps others have shared with you.',
+  },
+  {
+    target: '#sidebar-starred',
+    content: '⭐ “Starred Maps” are your favorited maps for quick access.',
+  },
+  {
+    target: '#sidebar-import-button',
+    content:
+      '➕ Use this button to import your own map files like NavJSON, GeoJSON, KML, or Shapefile.',
+  },
+  {
+    target: '#sidebar-template-button',
+    content:
+      ' 🗺️ Click here to choose a ready-made template and start quickly.',
+  },
+
+  // General Area
+  {
+    target: '#map-grid',
+    content:
+      '📁 This is where your maps are displayed in a grid. You can search and sort them here.',
+  },
+  {
+    target: 'body',
+    placement: 'center',
+    content: '🎉 That’s the tour! Now go explore CyanNav.',
+  },
+]
+
+export const userSettingsSteps: Step[] = [
+  {
+    target: 'body',
+    placement: 'center',
+    content:
+      '👋 Welcome to your User Settings page! Here you can manage your personal information and view your activity.',
+    disableBeacon: true,
+  },
+  ...sharedNavbarSteps,
+
+  // Tabs
+  {
+    target: '#user-settings-back-tab',
+    content: '⬅️ Click here to go back to the previous page or dashboard.',
+  },
+  {
+    target: '#user-settings-profile-tab',
+    content:
+      '🧑 This tab lets you update your profile picture, change your username, or delete your account.',
+  },
+  {
+    target: '#user-settings-transactions-tab',
+    content: '📜 View a full history of your past transactions here.',
+  },
+
+  {
+    target: 'body',
+    placement: 'center',
+    content: '🎉 That’s it! Your settings are just a few clicks away.',
+  },
+]
+
+export const yearlyPriceId = 'price_1RfTeYFJGOpcxqCyUirbAqcq'
+export const monthlyPriceId = 'price_1RfTh2FJGOpcxqCyrhLMLTAF'

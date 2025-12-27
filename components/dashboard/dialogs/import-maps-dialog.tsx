@@ -4,27 +4,111 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/components/ui/form'
+import { useForm } from 'react-hook-form'
+import {
+  convertToCustomFeatureCollection,
+  encodeGeo,
+  handleUseTemplate,
+  parseKML,
+  parseShapefile,
+} from '@/lib/utils'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { importMapSchema } from '@/core/_entities/z-schemas/form.schema'
+import { toast } from '@/components/ui/use-toast'
+import { useRouter } from 'next/navigation'
+import { genImageBuffer } from '@/lib/generate-image'
 
 interface ImportMapDialogProps {
   isOpen: boolean
   onClose: () => void
 }
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  // Handle form submission
+interface ImportMapFormValues {
+  title: string
+  file: FileList
 }
 
 export default function ImportMapDialog({
   isOpen,
   onClose,
 }: ImportMapDialogProps) {
+  const form = useForm<ImportMapFormValues>({
+    resolver: zodResolver(importMapSchema),
+    defaultValues: {
+      title: '',
+      file: undefined as unknown as FileList,
+    },
+  })
+
+  const router = useRouter()
+  const onSubmit = async (data: ImportMapFormValues) => {
+    // TODO zod validation
+    // const file = data.file
+    // if (!file) {
+    //   console.error('No file uploaded')
+    //   return
+    // }
+
+    const file = data.file[0]
+    const title = data.title
+    const fileData = await file.text()
+
+    // Set geosjon base on import type
+    let geojson
+
+    const ext = file.name.split('.').pop()?.toLowerCase()
+
+    switch (ext) {
+      case 'geojson':
+      case 'json':
+        geojson = JSON.parse(fileData)
+        break
+      case 'kml':
+        geojson = parseKML(fileData)
+        break
+      case 'zip':
+        geojson = await parseShapefile(file)
+        break
+      case 'navjson':
+        geojson = JSON.parse(fileData)
+        break
+      default:
+        console.error('Unsupported file type')
+    }
+
+    if (!geojson) {
+      toast({
+        description: 'Imported not supported',
+      })
+      return
+    }
+
+    // covert to custom format before storing
+    const cutsomGeoJson = convertToCustomFeatureCollection(geojson)
+
+    // Generate a thumbnail for this new map
+    const newThumbnail = await genImageBuffer(cutsomGeoJson)
+
+    // convert geojson to buffer
+    const encodedGeojson = encodeGeo(cutsomGeoJson)
+
+    // do api call
+    const res = await handleUseTemplate(encodedGeojson, title, newThumbnail)
+    // Success or fails
+    if (res) router.push(res)
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -34,35 +118,44 @@ export default function ImportMapDialog({
             Enter and select information to import your .navjson map.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="max-w-sm items-center">
-            <Label htmlFor="map_title">Map Name</Label>
-            <Input
-              id="map_title"
-              type="input"
-              placeholder="America Choropleth v2"
-              // onChange={handleFileChange}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input {...field} type="text" placeholder="Map Title" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="max-w-sm items-center">
-            <Label htmlFor="map_navjson">Map File (.navjson)</Label>
-            <Input
-              id="map_navjson"
-              type="file"
-              accept=".navjson"
-              // onChange={handleFileChange}
+            <FormField
+              control={form.control}
+              name="file"
+              render={({ field: { onChange, ref, value, ...fieldProps } }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      type="file"
+                      accept=".zip,.json,.kml,.navjson"
+                      ref={ref}
+                      onChange={(e) => onChange(e.target.files)}
+                      {...fieldProps}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {/* {errorMessage && (
-              <p className="text-sm text-red-600">{errorMessage}</p>
-            )} */}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={onClose}>
-              Cancel
+
+            <Button type="submit" className="w-full">
+              Import
             </Button>
-            <Button type="submit">Import</Button>
-          </DialogFooter>{' '}
-        </form>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )

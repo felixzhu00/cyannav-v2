@@ -38,9 +38,10 @@ export async function toggleUserFavoriteUseCase({
   const mapRes = mapDoc.payload as IMapDocument
 
   // if user is not in sharedUser and map is not public
-  const userInSharedUser = mapRes.sharedUsers?.some(
-    (id: any) => id.toString() === userId
-  )
+  const userInSharedUser =
+    mapRes.sharedUsers?.some((id: any) => id.toString() === userId) ||
+    (mapRes.owner as any)._id.toString() === userId
+
   if (!userInSharedUser && mapRes.isPublished !== 'public')
     return { status: 400, message: 'Can not star on restricted map' }
 

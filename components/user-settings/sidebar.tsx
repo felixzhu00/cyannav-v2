@@ -11,6 +11,7 @@ export default function Sidebar({ view }: { view: string | string[] }) {
           <Link
             href="/"
             className="flex flex-row items-center space-x-3.5 text-sm font-medium"
+            id="user-settings-back-tab"
           >
             <ChevronLeft className="h-4 w-4" />
             <p>Go Back</p>
@@ -22,20 +23,22 @@ export default function Sidebar({ view }: { view: string | string[] }) {
                 'flex flex-row items-center space-x-2.5',
                 view === 'settings' ? 'font-bold' : ''
               )}
+              id='user-settings-profile-tab'
             >
               <Settings2 className="h-6 w-6" />
               <p>Profile Settings</p>
             </Link>
-            <Link
+            {/* <Link
               href="/user?view=transactions"
               className={cn(
                 'flex flex-row items-center space-x-2.5',
                 view === 'transactions' ? 'font-bold' : ''
               )}
+              id='user-settings-transactions-tab'
             >
               <File className="h-6 w-6" />
               <p>Transaction History</p>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

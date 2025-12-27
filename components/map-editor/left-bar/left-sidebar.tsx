@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai'
 import { mapAtom } from '@/lib/jotai'
 // Temp const var to populate
 
-export default function LeftSidebar() {
+export default function LeftSidebar({ isOwner }: { isOwner?: boolean }) {
   const map = useAtomValue(mapAtom)
 
   if (!map.geojson) return <div>GeoJSON not found</div>
@@ -12,10 +12,11 @@ export default function LeftSidebar() {
   return (
     <div className="h-full max-h-[calc(100vh-74px)] w-full overflow-y-auto pt-8">
       {/* Feature List */}
-      <div className="w-full h-full">
-        <ul className="flex flex-col h-full w-full">
+      <div className="h-full w-full">
+        <ul className="flex h-full w-full flex-col">
           {map.geojson?.features?.map((feature) => (
             <LeftSidebarItem
+              isOwner={isOwner}
               key={feature?.id.toString()}
               properties={feature?.properties || {}}
             />

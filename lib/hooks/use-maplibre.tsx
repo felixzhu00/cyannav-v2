@@ -5,7 +5,6 @@ import {
   attachedHandlersAtom,
   mapDrawAtom,
   mapLibreAtom,
-  mapSourceAtom,
 } from '../jotai'
 // @ts-ignore
 import MapboxDraw from '@mapbox/mapbox-gl-draw'

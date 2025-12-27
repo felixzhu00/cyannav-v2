@@ -22,9 +22,9 @@ export default function DashboardSidebar({
 }) {
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
   const handleTemplateClick = () => {
-    console.log('open')
     setIsTemplateDialogOpen(true) // Open the template dialog
   }
 
@@ -37,6 +37,14 @@ export default function DashboardSidebar({
   }
 
   const handleImportDialogClose = () => {
+    setIsImportDialogOpen(false)
+  }
+
+  const handleAddClick = () => {
+    setIsImportDialogOpen(true)
+  }
+
+  const handleAddDialogClose = () => {
     setIsImportDialogOpen(false)
   }
 
@@ -56,24 +64,28 @@ export default function DashboardSidebar({
       href: '/dashboard?view=my-maps',
       icon: File,
       viewKey: 'my-maps',
+      id: 'sidebar-mymaps',
     },
     {
       label: 'Community',
       href: '/dashboard?view=community',
       icon: Users,
       viewKey: 'community',
+      id: 'sidebar-community',
     },
     {
       label: 'Shared with me',
       href: '/dashboard?view=shared-with-me',
       icon: Share2,
       viewKey: 'shared-with-me',
+      id: 'sidebar-shared',
     },
     {
       label: 'Starred Maps',
       href: '/dashboard?view=starred-maps',
       icon: Star,
       viewKey: 'starred-maps',
+      id: 'sidebar-starred',
     },
   ]
 
@@ -82,7 +94,7 @@ export default function DashboardSidebar({
       <div className="z-40 mb-20 inline-block h-full max-w-lg bg-sidebar-accent">
         <div className="h-full space-y-4 px-12 pt-12">
           <div className="flex flex-col justify-center">
-            {sidebarLinks.map(({ label, href, icon: Icon, viewKey }) => (
+            {sidebarLinks.map(({ label, href, icon: Icon, viewKey, id }) => (
               <Link
                 key={label}
                 href={href}
@@ -90,6 +102,7 @@ export default function DashboardSidebar({
                   baseLinkClass,
                   view === viewKey && 'border-l-primary font-extrabold'
                 )}
+                id={id}
               >
                 <Icon className={iconClass} />
                 <p>{label}</p>
@@ -99,6 +112,7 @@ export default function DashboardSidebar({
           <Button
             onClick={handleTemplateClick}
             className={cn(baseLinkClass, 'w-full justify-start')}
+            id="sidebar-import-button"
           >
             <LayoutTemplate />
             <p>Template</p>
@@ -106,6 +120,7 @@ export default function DashboardSidebar({
           <Button
             onClick={handleImportClick}
             className={cn(baseLinkClass, 'w-full justify-start')}
+            id="sidebar-template-button"
           >
             <Import />
             <p>Import Map</p>
@@ -128,6 +143,10 @@ export default function DashboardSidebar({
           onClose={handleImportDialogClose}
         />
       )}
+
+      {/* {isAddDialogOpen && (
+        <AddMapDialog isOpen={isAddDialogOpen} onClose={handleAddDialogClose} />
+      )} */}
     </div>
   )
 }

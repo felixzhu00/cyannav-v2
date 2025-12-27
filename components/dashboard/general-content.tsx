@@ -37,7 +37,7 @@ export default function GeneralContent({ view, mapList }: GeneralContentProps) {
   const filteredMapList = useFilteredMaps(mapList, sortKey, searchTerm)
 
   return (
-    <div className="w-full space-y-7 px-4 py-8 md:px-6 lg:px-24 lg:py-16">
+    <div className="w-full space-y-7 px-4 py-8 md:px-6 lg:px-24 lg:py-16" id='map-grid'>
       <div className="flex flex-col justify-between space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
         <h1 className="text-xl font-bold md:text-2xl lg:text-3xl">{title}</h1>
         <div className="flex flex-col space-y-4 md:flex-row md:items-center md:space-x-4 md:space-y-0 lg:items-center lg:space-x-4 lg:space-y-0">
@@ -73,7 +73,8 @@ export default function GeneralContent({ view, mapList }: GeneralContentProps) {
 
       {filteredMapList.length ? (
         <CardGrid
-          showAddNewMap={view === 'my-maps'}
+          // showAddNewMap={view === 'my-maps'}
+          showAddNewMap={false}
           mapList={filteredMapList}
         />
       ) : (

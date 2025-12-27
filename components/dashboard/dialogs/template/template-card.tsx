@@ -2,16 +2,23 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import logo from '@/public/logo.svg'
+import BufferImage from '../../card-grid/buffer-image'
+import { decodeGeo } from '@/lib/utils'
+import { CustomFeatureCollection } from '@/core/_entities/types/map.types'
 
 export default function TemplateCard({
+  id,
   creatorName,
   title,
   geojson,
+  thumbnail,
   onLearnMore, // Pass down this function from TemplateDialog
 }: {
+  id: string
   creatorName: string
   title: string
   geojson: Buffer | undefined
+  thumbnail: Buffer | undefined
   onLearnMore: () => void
 }) {
   const [isHovered, setIsHovered] = useState(false)
@@ -23,8 +30,18 @@ export default function TemplateCard({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
+        <BufferImage
+          id={id}
+          geojson={decodeGeo(geojson as any) as CustomFeatureCollection}
+          buffer={thumbnail}
+          alt="map image"
+          width={310}
+          height={220}
+          className="absolute h-full w-full"
+          style={{ objectFit: 'cover' }}
+        />
         {isHovered && (
-          <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white/90 p-6 opacity-100 transition-opacity duration-300">
+          <div className="absolute inset-0 flex items-center justify-center rounded-lg p-6 opacity-100 transition-opacity duration-300">
             <div>
               <div className="flex w-full justify-start space-x-2">
                 <Button className="transform bg-cyan-300 text-sm text-black transition-transform duration-200 hover:scale-105 hover:bg-cyan-400 md:text-sm lg:text-xs">

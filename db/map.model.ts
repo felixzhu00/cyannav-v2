@@ -1,7 +1,6 @@
 import { Schema, model, models } from 'mongoose'
-import { IMapDocument } from '@/core/_entities/types/map.types'
 
-const MapSchema = new Schema<IMapDocument>({
+export const mapSchema = new Schema({
   title: { type: String, required: true },
   owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   mapType: { type: String, required: true },
@@ -20,8 +19,5 @@ const MapSchema = new Schema<IMapDocument>({
 })
 
 delete models.Map
-export default model<IMapDocument>('Map', MapSchema)
 
-// const Map: Model<IMapDocument> =
-//   .models.Map || model<IMapDocument>('Map', MapSchema)
-// export default Map
+export default model('Map', mapSchema)

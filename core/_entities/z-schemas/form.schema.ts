@@ -34,3 +34,25 @@ export const FooterEmailFormSchema = z.object({
 })
 
 export type FooterEmailFormData = z.infer<typeof FooterEmailFormSchema>
+
+const acceptedExtensions = ['zip', 'json', 'kml', 'navjson']
+
+export const importMapSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  file: z
+    .custom<FileList>((files) => files && files.length > 0, {
+      message: 'A file is required',
+    })
+    .refine(
+      (files) => {
+        if (!files || files.length === 0) return false
+        const ext = files[0].name.split('.').pop()?.toLowerCase()
+        return acceptedExtensions.includes(ext || '')
+      },
+      {
+        message: 'File must be .zip, .json, .kml, or .navjson',
+      }
+    ),
+})
+
+export type ImportMapFormValues = z.infer<typeof importMapSchema>

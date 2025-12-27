@@ -23,7 +23,13 @@ import {
 } from '@/lib/maplibre-actions/map-apply-handler'
 import DescriptionBox from './description-box'
 
-export default function MapEditPage({ initialMap }: { initialMap: any }) {
+export default function MapEditPage({
+  initialMap,
+  isOwner,
+}: {
+  initialMap: any
+  isOwner?: boolean
+}) {
   // Decode the GeoJson from REST API
   const decodedGeoJSON = decodeGeo(
     initialMap.geojson
@@ -84,11 +90,11 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
 
   return (
     <div className="flex h-screen w-full flex-col bg-pf">
-      <MenuBar />
+      <MenuBar isOwner={isOwner} />
       <div className="flex h-screen justify-between">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel className="min-w-[160px]" defaultSize={20}>
-            <LeftSidebar />
+            <LeftSidebar isOwner={isOwner} />
           </ResizablePanel>
           <ResizableHandle withHandle />
 
@@ -104,7 +110,7 @@ export default function MapEditPage({ initialMap }: { initialMap: any }) {
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={20}>
-            <RightBar />
+            {isOwner && <RightBar />}
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

@@ -14,6 +14,10 @@ import MapPreviewPage from './map-preview'
 import { useRouter } from 'next/navigation'
 import { handleUseTemplate } from '@/lib/utils'
 
+function isUser(owner: any): owner is UserFields {
+  return owner && typeof owner === 'object' && 'username' in owner
+}
+
 export default function TemplateDialog({
   isOpen,
   onClose,
@@ -25,8 +29,8 @@ export default function TemplateDialog({
   const [mapList, setMapList] = useState<MapFields[]>()
   // either index in mapList or null
   const [selectedTemplateIndex, setSelectedTemplateIndex] = useState<
-    number | null
-  >(null)
+    number
+  >(-1)
 
   const router = useRouter()
 
@@ -53,7 +57,7 @@ export default function TemplateDialog({
   }
 
   const handleBackToGrid = () => {
-    setSelectedTemplateIndex(null)
+    setSelectedTemplateIndex(-1)
   }
 
   if (!isOpen) return null
@@ -91,8 +95,9 @@ export default function TemplateDialog({
                 <Button
                   onClick={async () => {
                     const res = await handleUseTemplate(
-                      mapList[selectedTemplateIndex].geojson,
-                      mapList[selectedTemplateIndex || 0].title
+                      mapList[selectedTemplateIndex].geojson as any,
+                      mapList[selectedTemplateIndex || 0].title as any,
+                      mapList[selectedTemplateIndex].thumbnail as any,
                     )
                     if (res) router.push(res)
                   }}
@@ -103,7 +108,7 @@ export default function TemplateDialog({
               </div>
               <div className="aspect-[4/3] w-full rounded-lg bg-pf sm:aspect-video">
                 <MapPreviewPage
-                  geojson={mapList[selectedTemplateIndex].geojson}
+                  geojson={mapList[selectedTemplateIndex].geojson as any}
                 />
               </div>
             </div>
@@ -121,9 +126,9 @@ export default function TemplateDialog({
                 <TemplateCard
                   key={i}
                   id={mapElement._id as string}
-                  creatorName={(mapElement.owner as UserFields).username || ''}
+                  creatorName={(mapElement.owner as any).username || ''}
                   title={mapElement.title || ''}
-                  geojson={mapElement.geojson}
+                  geojson={mapElement.geojson as any}
                   thumbnail={mapElement.thumbnail as Buffer}
                   onLearnMore={() => {
                     handleLearnMore(i)

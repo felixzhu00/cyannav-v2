@@ -40,7 +40,7 @@ export async function toggleMapVoteUseCase({
 
   // Check if user can vote
   // case 1: if user is owner
-  const notOwner = (mapRes.owner as UserFields)._id == userObjectId
+  const notOwner = mapRes.owner?._id?.toString() !== userObjectId.toString();
   if (notOwner) return { status: 400, message: 'Can not vote as owner' }
   // case 2: if user is not sharedUser and map is not public
   const userInSharedUser = mapRes.sharedUsers?.some(

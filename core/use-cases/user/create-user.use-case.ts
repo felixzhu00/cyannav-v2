@@ -12,8 +12,7 @@ export default async function createUserUseCase(
     username,
     email,
     password,
-    plan = 'free',
-    profilePicture = '',
+    profilePicture = null,
     favorite = [],
     dateCreated = new Date(),
     emailVerified = new Date(),
@@ -75,12 +74,12 @@ export default async function createUserUseCase(
     email: email as string,
     password: hashedPassword,
     salt,
-    plan,
     profilePicture,
     favorite,
     dateCreated,
     emailVerified,
     providers,
+    subscriptions: [],
   })
 
   // Check DB request errored

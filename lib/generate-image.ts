@@ -12,7 +12,7 @@ export const initializeOffScreenMapDiv = async (
     fitBound?: boolean
   } = {}
 ): Promise<Blob> => {
-  //Default option settings
+  // Default option settings
   const {
     width = '1920px',
     height = '1080px',
@@ -47,7 +47,7 @@ export const initializeOffScreenMapDiv = async (
       if (fitBound) {
         const bbox = turf.bbox(geojson) // Use @turf/bbox
         map.fitBounds(bbox as [number, number, number, number], {
-          padding: padding,
+          padding,
           duration: 0,
         })
       }

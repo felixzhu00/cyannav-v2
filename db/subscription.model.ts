@@ -1,6 +1,6 @@
 import { Schema, model, models } from 'mongoose'
 
-const subscriptionSchema = new Schema({
+export const subscriptionSchema = new Schema({
   userId: { type: String, required: true, unique: true },
   stripeSubId: { type: String, required: true },
   plan: { type: String, enum: ['free', 'pro'], default: 'free' },

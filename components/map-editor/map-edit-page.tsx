@@ -28,7 +28,7 @@ export default function MapEditPage({
   isOwner,
 }: {
   initialMap: any
-  isOwner?: Boolean
+  isOwner?: boolean
 }) {
   // Decode the GeoJson from REST API
   const decodedGeoJSON = decodeGeo(

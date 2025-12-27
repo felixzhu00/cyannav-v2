@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai'
 import { mapAtom } from '@/lib/jotai'
 // Temp const var to populate
 
-export default function LeftSidebar({ isOwner }: { isOwner?: Boolean }) {
+export default function LeftSidebar({ isOwner }: { isOwner?: boolean }) {
   const map = useAtomValue(mapAtom)
 
   if (!map.geojson) return <div>GeoJSON not found</div>

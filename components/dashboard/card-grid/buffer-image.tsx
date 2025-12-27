@@ -7,7 +7,7 @@ import { genImageBuffer, handleThumbnail } from '@/lib/generate-image'
 interface BufferImageProps {
   id: string
   geojson: CustomFeatureCollection
-  buffer: Buffer | undefined
+  buffer: Buffer | null |undefined
   alt?: string
   width?: number
   height?: number

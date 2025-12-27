@@ -42,26 +42,23 @@ export function encodeGeo(geojsonData: CustomFeatureCollection) {
 }
 
 export function decodeGeo(geojsonBuffer: Buffer) {
-  // Convert JSON representation to Buffer
-  const buffer = Buffer.from(new Uint8Array(geojsonBuffer.data))
+  // Convert the buffer into a Uint8Array directly
+  const uint8Array = new Uint8Array(geojsonBuffer);
 
-  // Decode the Buffer using geobuf
-  const uint8Array = new Uint8Array(geojsonBuffer.data)
-  const geo = geobuf.decode(new Pbf(uint8Array)) as CustomFeatureCollection
+  // Decode geobuf
+  const geo = geobuf.decode(new Pbf(uint8Array)) as CustomFeatureCollection;
 
-  // Populate default in case the geojson from db does not have render properties
+  // Populate defaults
   const defaultFeatureList = geo.features.map((feature) =>
     populateDefault(feature)
-  )
+  );
 
-  // Replace features
-  const defaultGeoCollection = {
+  return {
     ...geo,
     features: defaultFeatureList,
-  }
-
-  return defaultGeoCollection
+  };
 }
+
 
 // Use during import new map
 export function convertToCustomFeatureCollection(
@@ -398,33 +395,66 @@ export function handleDBError(error: any): APIResponse {
   }
 }
 
+function isUserDocument(user: any): user is IUserDocument {
+  return user && typeof user === "object" && "username" in user;
+}
+
 export function transformMap(map: IMapDocument) {
   return {
     ...map,
-    owner: {
-      _id: (map.owner as IUserDocument)?._id?.toString() || '',
-      username: (map.owner as IUserDocument)?.username?.toString() || '', // Safely access and convert username to string, fallback to an empty string if undefined
-      email: (map.owner as IUserDocument)?.email?.toString() || '', // Safely access and convert email to string, fallback to an empty string if undefined
-    },
+    owner: (() => {
+      const owner = map.owner as unknown as IUserDocument | Types.ObjectId;
+
+      if (isUserDocument(owner)) {
+        return {
+          _id: owner._id?.toString() || '',
+          username: owner.username || '',
+          email: owner.email || '',
+        };
+      }
+
+      // Unpopulated fallback
+      return {
+        _id: owner.toString(),
+        username: '',
+        email: '',
+      };
+    })(),
+
     geojson: map.geojson ? Buffer.from(map.geojson.buffer) : undefined,
     thumbnail: map.thumbnail ? Buffer.from(map.thumbnail.buffer) : undefined,
-    messages: map.messages?.map((m) => {
-      // Explicitly assert the type of m.author
-      const author = (m as IMessageDocument).author as IUserDocument
+
+    messages: map.messages?.map((msg) => {
+      const m = msg as unknown as IMessageDocument; // safe cast after `unknown`
+
+      const author = m.author as unknown as IUserDocument | Types.ObjectId;
+
       return {
-        ...(m as IMessageDocument),
-        author: author.username,
-      }
+        ...m,
+        author: isUserDocument(author) ? author.username : author.toString(),
+      };
     }),
-    sharedUsers:
-      map.sharedUsers?.map((sharedUser) => ({
-        username: (sharedUser as IUserDocument)?.username?.toString() || '',
-        email: (sharedUser as IUserDocument)?.email?.toString() || '',
-      })) || [],
+
+    sharedUsers: map.sharedUsers?.map((u) => {
+      const user = u as unknown as IUserDocument | Types.ObjectId;
+
+      if (isUserDocument(user)) {
+        return {
+          username: user.username || '',
+          email: user.email || '',
+        };
+      }
+      return {
+        username: '',
+        email: '',
+      };
+    }) || [],
+
     forkedFrom: map.forkedFrom?.toString(),
-    likes: map.likes?.map((likeId) => (likeId as Types.ObjectId).toString()),
-  }
+    likes: map.likes?.map((id) => id.toString()),
+  };
 }
+
 export function createErrorResponse(
   status: number,
   message: string,

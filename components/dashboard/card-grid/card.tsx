@@ -47,12 +47,12 @@ export default function CardComponent({
 
   // Param to pass to Vote Box
   const count = (likes?.length ?? 0) - (dislikes?.length ?? 0)
-  const upvoted = (likes as string[])?.includes(userId.toString())
-  const downvoted = (dislikes as string[])?.includes(userId.toString())
+  const upvoted = likes?.includes(userId)
+  const downvoted = dislikes?.includes(userId)
 
   // Param to pass to Star
-  const idStr = (_id as Types.ObjectId).toString() // cast id to string form
-  const isStar = (session?.user?.favorite ?? []).includes(idStr.toString())
+  const idStr = _id as Types.ObjectId // cast id to string form
+  const isStar = (session?.user?.favorite ?? []).includes(idStr)
 
   return (
     <Card
@@ -87,7 +87,7 @@ export default function CardComponent({
 
           <Link href={`/map/${_id}`} className="flex w-full flex-col">
             <h3 className="truncate text-xl font-bold">{title}</h3>
-            <p className="text-xs">By: {(owner as UserFields).username}</p>
+            <p className="text-xs">By: {(owner as any).username}</p>
           </Link>
 
           <div onClick={(e) => e.stopPropagation()} className="flex space-x-3">

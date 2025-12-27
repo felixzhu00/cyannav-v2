@@ -23,6 +23,9 @@ import VoteBox from '../dashboard/card-grid/vote-box'
 import BufferImage from '../dashboard/card-grid/buffer-image'
 import { decodeGeo } from '@/lib/utils'
 
+function isUser(obj: any): obj is UserFields {
+  return obj && typeof obj === 'object' && 'username' in obj;
+}
 export default async function Community() {
   let mapList: MapFields[] = []
 
@@ -83,7 +86,7 @@ export default async function Community() {
                     <BufferImage
                       id={map._id as string}
                       geojson={
-                        decodeGeo(map.geojson) as CustomFeatureCollection
+                        decodeGeo(map.geojson as any) as CustomFeatureCollection
                       }
                       buffer={map.thumbnail}
                       alt="map image"
@@ -112,7 +115,7 @@ export default async function Community() {
                           {map.title}
                         </h3>
                         <p className="text-xs">
-                          By: {(map.owner as UserFields).username}
+                           By: {isUser(map.owner) ? map.owner.username : 'Unknown'}
                         </p>
                       </div>
                     </Link>

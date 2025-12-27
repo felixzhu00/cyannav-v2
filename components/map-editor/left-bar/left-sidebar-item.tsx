@@ -21,7 +21,7 @@ import DeleteItemDialog from './delete-item-dialog'
 
 type LeftSidebarItemProps = {
   properties: { [key: string]: any }
-  isOwner?: Boolean
+  isOwner?: boolean
 }
 
 export default function LeftSidebarItem({

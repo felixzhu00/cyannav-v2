@@ -1,6 +1,6 @@
 import { Types } from 'mongoose'
 import { getUsersByFields } from '@/core/data-access/user/get-user.persistence'
-import { IUserDocument, UserFields } from '@/core/_entities/types/user.types'
+import { IUserDocument } from '@/core/_entities/types/user.types'
 import { updateUserFieldsById } from '@/core/data-access/user/update-user.persistence'
 import { getMapById } from '@/core/data-access/map/get-map.persistence'
 import { IMapDocument } from '@/core/_entities/types/map.types'

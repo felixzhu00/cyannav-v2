@@ -16,7 +16,7 @@ export default function MapPreviewPage({ geojson }: MapPreviewPageProps) {
   const mapRef = useRef<maplibregl.Map | null>(null)
 
   useEffect(() => {
-    const decodedGeoJSON = decodeGeo(geojson) as CustomFeatureCollection
+    const decodedGeoJSON = decodeGeo(geojson as any) as CustomFeatureCollection
 
     const map = new maplibregl.Map({
       container: 'map-container',

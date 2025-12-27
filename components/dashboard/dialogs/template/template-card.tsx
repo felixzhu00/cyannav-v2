@@ -32,7 +32,7 @@ export default function TemplateCard({
       >
         <BufferImage
           id={id}
-          geojson={decodeGeo(geojson) as CustomFeatureCollection}
+          geojson={decodeGeo(geojson as any) as CustomFeatureCollection}
           buffer={thumbnail}
           alt="map image"
           width={310}
